@@ -1,10 +1,11 @@
 package com.example.apartmentmanagement.entities;
 
-import com.example.apartmentmanagement.validate.ValidPositiveNumber;
+/***
+ * Entity apartment: info co ban cua can ho
+ */
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,7 +22,7 @@ import java.util.List;
 public class Apartment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long apartmentId;
 
     @NotBlank(message = "Apartment name must not be null")
     @Column(name = "apartment_name", nullable = false)
@@ -33,10 +34,20 @@ public class Apartment {
     @Column(name = "total_member")
     private int totalNumber;
 
+    /**
+     * @param status: trang thai cua can ho: rented (duoc thue, mua), unrented (chua duoc thue, mua)
+     */
     @Column(name = "status")
     private String status;
 
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "userId", nullable = false)
+    private User user;
+
     @OneToMany(mappedBy = "apartment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Resident> residents;
+
+    @OneToMany(mappedBy = "apartment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Bill> bills;
 
 }

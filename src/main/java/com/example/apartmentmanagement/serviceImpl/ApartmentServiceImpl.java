@@ -1,4 +1,4 @@
-package com.example.apartmentmanagement.service.serviceImpl;
+package com.example.apartmentmanagement.serviceImpl;
 
 import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.repository.ApartmentRepository;

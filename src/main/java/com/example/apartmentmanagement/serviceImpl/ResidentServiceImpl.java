@@ -1,4 +1,4 @@
-package com.example.apartmentmanagement.service.serviceImpl;
+package com.example.apartmentmanagement.serviceImpl;
 
 import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.Resident;
@@ -6,8 +6,6 @@ import com.example.apartmentmanagement.repository.ApartmentRepository;
 import com.example.apartmentmanagement.repository.ResidentRepository;
 import com.example.apartmentmanagement.service.ResidentService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -27,7 +25,7 @@ public class ResidentServiceImpl implements ResidentService {
         if (apartment == null) {
             return "Cannot found apartment";
         }
-        int total = residentRepository.countResidentsByApartmentId(apartment.getId());
+        int total = residentRepository.countResidentsByApartmentId(apartment.getApartmentId());
         int allowedMember = apartment.getTotalNumber();
         if (total<=allowedMember) {
             resident.setApartment(apartment);
@@ -37,4 +35,11 @@ public class ResidentServiceImpl implements ResidentService {
             return "Cannot add more people";
         }
     }
+
+    @Override
+    public Resident getResidentById(Long id) {
+        return null;
+    }
+
+
 }

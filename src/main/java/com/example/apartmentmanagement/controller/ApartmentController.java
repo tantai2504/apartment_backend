@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -30,26 +31,28 @@ public class ApartmentController {
     }
 
     @PostMapping("/add")
-    public ResponseEntity<Object> add(@Valid @RequestBody Apartment apartment, BindingResult bindingResult) {
+    public ResponseEntity<Object> addApartment(
+            @Valid @ModelAttribute Apartment apartment,
+            @RequestParam(value = "user_id", required = false) Long userId,
+            @RequestParam(value = "file", required = false) MultipartFile imageFile,
+            BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
         }
+
         String checkResult = apartmentService.checkApartmentExisted(apartment);
         if (checkResult.equals("Existed apartment")) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Existed apartment");
+        }
+        String result = apartmentService.addApartment(apartment, userId, imageFile);
+        if (result.equals("Add successfully")) {
+            return ResponseEntity.status(HttpStatus.CREATED).body("Add successfully");
         } else {
-            String result = apartmentService.addApartment(apartment);
-            if (result.equals("Add successfully")) {
-                return ResponseEntity.status(HttpStatus.CREATED).body(result);
-            } else {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
-            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
         }
     }
-
-
 
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> findApartmentById(@PathVariable("id") Long id) {
@@ -62,7 +65,11 @@ public class ApartmentController {
     }
 
     @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateApartment(@PathVariable("id") Long id, @Valid @RequestBody Apartment apartment, BindingResult bindingResult){
+    public ResponseEntity<Object> updateApartment(
+            @PathVariable("id") Long id,
+            @Valid @ModelAttribute Apartment apartment,
+            @RequestParam(value = "file", required = false) MultipartFile imageFile,
+            BindingResult bindingResult){
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
@@ -70,7 +77,7 @@ public class ApartmentController {
         }
         Apartment existed = apartmentService.getApartmentById(id);
         if (existed != null) {
-            apartmentService.updateApartment(existed, apartment);
+            apartmentService.updateApartment(existed, apartment, imageFile);
             return ResponseEntity.status(HttpStatus.CREATED).body("Update successfully!");
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cannot found apartment");

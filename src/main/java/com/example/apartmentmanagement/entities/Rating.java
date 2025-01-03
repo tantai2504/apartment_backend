@@ -28,10 +28,10 @@ public class Rating {
     private Date rateDate;
 
     @ManyToOne
-    @JoinColumn(name = "post_Id", nullable = false)
+    @JoinColumn(name = "post_Id", nullable = true)
     private Post post;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = true)
     private User user;
 }

@@ -24,24 +24,21 @@ public class Apartment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long apartmentId;
 
-    @NotBlank(message = "Apartment name must not be null")
-    @Column(name = "apartment_name", nullable = false)
     private String apartmentName;
 
-    @Column(name = "householder")
     private String householder;
 
-    @Column(name = "total_member")
     private int totalNumber;
 
     /**
      * @param status: trang thai cua can ho: rented (duoc thue, mua), unrented (chua duoc thue, mua)
      */
-    @Column(name = "status")
     private String status;
 
+    private String aptImgUrl;
+
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "userId", nullable = false)
+    @JoinColumn(name = "user_id", referencedColumnName = "userId", nullable = true)
     private User user;
 
     @OneToMany(mappedBy = "apartment", cascade = CascadeType.ALL, orphanRemoval = true)

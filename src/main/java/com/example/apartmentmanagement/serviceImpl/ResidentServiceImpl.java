@@ -8,8 +8,6 @@ import com.example.apartmentmanagement.service.ResidentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class ResidentServiceImpl implements ResidentService {
 
@@ -19,6 +17,12 @@ public class ResidentServiceImpl implements ResidentService {
     @Autowired
     private ApartmentRepository apartmentRepository;
 
+    /**
+     *
+     * @param resident
+     * @param id
+     * @return String thong bao add thanh cong hoac that bai
+     */
     @Override
     public String addResident(Resident resident, Long id) {
         Apartment apartment = apartmentRepository.findById(id).orElse(null);
@@ -40,6 +44,5 @@ public class ResidentServiceImpl implements ResidentService {
     public Resident getResidentById(Long id) {
         return null;
     }
-
 
 }

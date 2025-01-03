@@ -20,7 +20,7 @@ public class ResidentController {
     private ResidentService residentService;
 
     @PostMapping("/add/{apartmentId}")
-    public ResponseEntity<Object> add(@Valid @RequestBody Resident resident, BindingResult bindingResult,
+    public ResponseEntity<Object> add(@Valid @ModelAttribute Resident resident, BindingResult bindingResult,
                                       @PathVariable Long apartmentId) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();

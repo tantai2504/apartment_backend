@@ -1,10 +1,13 @@
 package com.example.apartmentmanagement.serviceImpl;
 
 import com.example.apartmentmanagement.entities.Apartment;
+import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.repository.ApartmentRepository;
+import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.service.ApartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,22 +17,42 @@ public class ApartmentServiceImpl implements ApartmentService{
     @Autowired
     private ApartmentRepository apartmentRepository;
 
-    @Override
-    public String addApartment(Apartment apartment) {
+    @Autowired
+    private ImageUploadService imageUploadService;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Override
+    public String addApartment(Apartment apartment, Long userId, MultipartFile imageFile) {
         List<Apartment> apartmentList = apartmentRepository.findAll();
 
-        for (Apartment a: apartmentList) {
-            if (apartment.getApartmentName() == a.getApartmentName()) {
+        for (Apartment a : apartmentList) {
+            if (apartment.getApartmentName().equals(a.getApartmentName())) {
                 return "Existed apartment";
             }
         }
-        if(apartment.getTotalNumber() == 0 && (apartment.getHouseholder() == null || apartment.getHouseholder() == "")){
+
+        if (apartment.getTotalNumber() == 0 &&
+                (apartment.getHouseholder() == null || apartment.getHouseholder().isEmpty())) {
             apartment.setHouseholder("");
             apartment.setStatus("unrented");
         } else {
             apartment.setStatus("rented");
         }
+
+        String imgUrl = imageUploadService.uploadImage(imageFile);
+        if (imgUrl.equals("image-url")) {
+            apartment.setAptImgUrl("");
+        } else {
+            apartment.setAptImgUrl(imgUrl);
+        }
+
+        User user = null;
+        if (userId != null) {
+            user = userRepository.findById(userId).orElse(null);
+        }
+        apartment.setUser(user);
         apartmentRepository.save(apartment);
         return "Add successfully";
     }
@@ -57,10 +80,17 @@ public class ApartmentServiceImpl implements ApartmentService{
     }
 
     @Override
-    public void updateApartment(Apartment existedApartment, Apartment apartment) {
+    public void updateApartment(Apartment existedApartment, Apartment apartment, MultipartFile imageFile) {
         existedApartment.setApartmentName(apartment.getApartmentName());
         existedApartment.setHouseholder(apartment.getHouseholder());
         existedApartment.setTotalNumber(apartment.getTotalNumber());
+
+        if (imageFile != null) {
+            String imgUrl = imageUploadService.uploadImage(imageFile);
+            apartment.setAptImgUrl(imgUrl);
+        } else {
+            apartment.setAptImgUrl(" ");
+        }
         apartmentRepository.save(existedApartment);
     }
 

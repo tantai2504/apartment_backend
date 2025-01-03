@@ -27,6 +27,14 @@ public class User {
 
     private String password;
 
+    private String email;
+
+    private String description;
+
+    private String phone;
+
+    private String userImgUrl;
+
     /**
      * @param role: phan quyen dua tren param nay (visitor, resident, admin, facilityOwner)
      */

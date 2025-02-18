@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -25,11 +27,7 @@ public class Rating {
 
     private String rate;
 
-    private Date rateDate;
-
-    @ManyToOne
-    @JoinColumn(name = "post_Id", nullable = true)
-    private Post post;
+    private LocalDateTime rateDate;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = true)

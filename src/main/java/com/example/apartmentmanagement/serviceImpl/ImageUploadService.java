@@ -7,7 +7,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class ImageUploadService {
@@ -27,4 +27,24 @@ public class ImageUploadService {
             throw new RuntimeException("Upload ảnh thất bại: " + e.getMessage(), e);
         }
     }
+
+    public List<String> uploadMultipleImages(List<MultipartFile> imageFileList) {
+        List<String> imageUrls = new ArrayList<>();
+        if (imageFileList == null || imageFileList.isEmpty()) {
+            return Collections.emptyList(); // Trả về danh sách rỗng nếu không có ảnh
+        }
+        for (MultipartFile imageFile : imageFileList) {
+            if (imageFile != null && !imageFile.isEmpty()) {
+                try {
+                    Map<String, Object> uploadResult = cloudinary.uploader()
+                            .upload(imageFile.getBytes(), ObjectUtils.emptyMap());
+                    imageUrls.add((String) uploadResult.get("url"));
+                } catch (IOException e) {
+                    throw new RuntimeException("Upload ảnh thất bại: " + e.getMessage(), e);
+                }
+            }
+        }
+        return imageUrls;
+    }
 }
+

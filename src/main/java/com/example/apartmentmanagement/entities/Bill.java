@@ -10,7 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "bill")
@@ -33,7 +34,7 @@ public class Bill {
 
     private float total;
 
-    private Date billDate;
+    private LocalDateTime billDate;
 
     @OneToOne
     @JoinColumn(name = "payment_id", referencedColumnName = "paymentId", nullable = false)

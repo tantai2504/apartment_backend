@@ -22,27 +22,27 @@ import java.util.List;
 public class Apartment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "apartment_id")
     private Long apartmentId;
 
     private String apartmentName;
 
     private String householder;
 
+    /**
+     * @param totalNumber: Tong so thanh vien trong can ho
+     */
     private int totalNumber;
 
     /**
-     * @param status: trang thai cua can ho: rented (duoc thue, mua), unrented (chua duoc thue, mua)
+     * @param status: trang thai cua can ho: rented (duoc thue), unrented (chua duoc thue)
      */
     private String status;
 
     private String aptImgUrl;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "userId", nullable = true)
-    private User user;
-
-    @OneToMany(mappedBy = "apartment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Resident> residents;
+    @OneToMany(mappedBy = "apartment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<User> users;
 
     @OneToMany(mappedBy = "apartment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bill> bills;

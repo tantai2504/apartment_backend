@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "card")
@@ -28,12 +28,12 @@ public class Card {
     /**
      * @param issuanceDate: ngay mo the
      */
-    private Date issuanceDate;
+    private LocalDate issuanceDate;
 
     /**
      * @param expirationDate: ngay het han
      */
-    private Date expirationDate;
+    private LocalDate expirationDate;
 
     private String cardStatus;
 

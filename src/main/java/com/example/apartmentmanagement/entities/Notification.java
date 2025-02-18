@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -27,7 +29,7 @@ public class Notification {
 
     private String notificationContent;
 
-    private Date notificationDate;
+    private LocalDateTime notificationDate;
 
     /**
      * @param notificationCheck: flag kiem tra notification da duoc ben phia user nhan hay chua

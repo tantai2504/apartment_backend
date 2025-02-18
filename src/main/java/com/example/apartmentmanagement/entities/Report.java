@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -25,7 +27,7 @@ public class Report {
 
     private String reportContent;
 
-    private Date reportDate;
+    private LocalDateTime reportDate;
 
     /**
      * @param reportCheck: kiem tra report da duoc phan hoi hay chua

@@ -56,7 +56,7 @@ public class User {
     private String role;
 
     @ManyToOne
-    @JoinColumn(name = "apartment_id", referencedColumnName = "apartment_id", nullable = false)
+    @JoinColumn(name = "apartment_id", referencedColumnName = "apartment_id")
     private Apartment apartment;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
@@ -71,8 +71,6 @@ public class User {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Payment> payments;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Rating> ratings;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Report> reports;

@@ -11,7 +11,7 @@ public interface UserService {
 
     List<User> showAllUser();
 
-    String addUser(User user, MultipartFile imageFile);
+    String addUser(User user, MultipartFile imageFile, Long apartmentId);
 
     boolean checkUserExisted(User user);
 

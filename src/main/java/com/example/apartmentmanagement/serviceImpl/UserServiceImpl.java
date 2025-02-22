@@ -37,15 +37,13 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String addUser(User user, MultipartFile imageFile) {
+    public String addUser(User user, MultipartFile imageFile, Long apartmentId) {
         if (user.getUserName() == null || user.getPassword() == null) {
             throw new IllegalArgumentException("User name and password must not be null");
         }
         if (!checkUserExisted(user)) {
             return "Da co user nay";
         } else {
-            user.setRole("visitor");
-
             String imgUrl = imageUploadService.uploadImage(imageFile);
 
             if (imgUrl.equals("image-url")) {
@@ -56,8 +54,27 @@ public class UserServiceImpl implements UserService {
             String encryptPass = AESUtil.encrypt(user.getPassword());
             user.setPassword(encryptPass);
 
+            Apartment apartment = apartmentRepository.findById(apartmentId).get();
+
+            apartment.setTotalNumber(apartment.getTotalNumber() + 1);
+            if (apartment.getTotalNumber()>0) {
+                apartment.setStatus("rented");
+            }
+            if (apartment.getHouseholder() == null) {
+                if (user.getRole().equals("Chủ sở hữu")){
+                    apartment.setHouseholder(user.getFullName());
+                }
+            } else {
+                if (user.getRole().equals("Chủ sở hữu")){
+                    return "Da co nguoi dung ten chu can ho";
+                }
+            }
+
+            user.setApartment(apartment);
+
             userRepository.save(user);
-            return "Dang ky thanh cong";
+
+            return "Add Successfully";
         }
     }
 

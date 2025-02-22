@@ -30,15 +30,16 @@ public class UserController {
     public ResponseEntity<Object> addUser(
             @Valid @ModelAttribute User user,
             @RequestPart(value = "file", required = false) MultipartFile imageFile,
+            @RequestParam(value = "apartment_id", required = false) Long apartmentId,
             BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             Map<String, String> errors = new HashMap<>();
             bindingResult.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
         }
-        String result = userService.addUser(user, imageFile);
+        String result = userService.addUser(user, imageFile, apartmentId);
         if (result.equals("Add Successfully")) {
-            return ResponseEntity.status(HttpStatus.CREATED).body("Add successfully");
+            return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
         }

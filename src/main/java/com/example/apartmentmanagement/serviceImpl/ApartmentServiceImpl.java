@@ -54,7 +54,6 @@ public class ApartmentServiceImpl implements ApartmentService{
         } else {
             apartment.setAptImgUrl(imgUrl);
         }
-
         User user = null;
         if (userId != null) {
             user = userRepository.findById(userId).orElse(null);

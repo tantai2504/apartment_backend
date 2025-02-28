@@ -9,10 +9,12 @@ import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.service.ApartmentService;
 import com.example.apartmentmanagement.service.UserService;
 import com.example.apartmentmanagement.util.AESUtil;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,9 +23,6 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private ApartmentService apartmentService;
 
     @Autowired
     private ApartmentRepository apartmentRepository;
@@ -96,53 +95,73 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDTO getUserDTOById(Long id) {
-        UserDTO userDTO = new UserDTO();
+        UserDTO userDTO;
         User user = userRepository.findById(id).orElse(null);
-
-        String userName = user.getUserName();
-        String email = user.getEmail();
-        String phone = user.getPhone();
-        String userImgUrl = user.getUserImgUrl();
-        String description = user.getDescription();
-        String role = user.getRole();
-
-        userDTO = new UserDTO(userName, email, description, phone, userImgUrl, role);
-
+        userDTO = new UserDTO(
+                user.getUserName(),
+                user.getFullName(),
+                user.getPassword(),
+                user.getEmail(),
+                user.getDescription(),
+                user.getPhone(),
+                user.getUserImgUrl(),
+                user.getAge(),
+                user.getBirthday(),
+                user.getIdNumber(),
+                user.getJob(),
+                user.getApartment().getApartmentName(),
+                user.getRole()
+        );
         return userDTO;
     }
 
+    @Override
+    public boolean updateImage(User user, MultipartFile imageFile) {
+        String imgUrl = imageUploadService.uploadImage(imageFile);
+        if (imgUrl.equals("image-url")) {
+            user.setUserImgUrl("");
+        } else {
+            user.setUserImgUrl(imgUrl);
+        }
+        userRepository.save(user);
+        return true;
+    }
+
     /**
-     *
      * ServiceImpl: Cap nhat thong tin nguoi dung
      *
-     * @param userId
-     * @param user
-     * @param file
+     * @param updateUserDTO
+     * @param checkUser
      * @return
      */
     @Override
-    public String updateUser(Long userId, User user, MultipartFile file) {
-        User checkUser = getUserById(userId);
-        if (checkUser != null) {
-            checkUser.setUserName(user.getUserName());
-            checkUser.setFullName(user.getFullName());
-            checkUser.setEmail(user.getEmail());
-            checkUser.setPhone(user.getPhone());
-            checkUser.setDescription(user.getDescription());
-            checkUser.setAge(user.getAge());
-            checkUser.setBirthday(user.getBirthday());
-            checkUser.setIdNumber(user.getIdNumber());
-            checkUser.setDescription(user.getDescription());
-            checkUser.setJob(user.getJob());
-            checkUser.setRole(user.getRole());
-            String imgUrl = imageUploadService.uploadImage(file);
-            if (!imgUrl.equals("image-url")) {
-                checkUser.setUserImgUrl(imgUrl);
-            }
+    public String updateUser(UserDTO updateUserDTO, User checkUser) {
+        if (updateUserDTO.getFullName() != null) {
+            checkUser.setFullName(updateUserDTO.getFullName());
+        }
+        if (updateUserDTO.getEmail() != null) {
+            checkUser.setEmail(updateUserDTO.getEmail());
+        }
+        if (updateUserDTO.getPhone() != null) {
+            checkUser.setPhone(updateUserDTO.getPhone());
+        }
+        if (updateUserDTO.getDescription() != null) {
+            checkUser.setDescription(updateUserDTO.getDescription());
+        }
+        if (updateUserDTO.getAge() != null) {
+            checkUser.setAge(updateUserDTO.getAge());
+        }
+        if (updateUserDTO.getBirthday() != null) {
+            checkUser.setBirthday(updateUserDTO.getBirthday());
+        }
+        if (updateUserDTO.getJob() != null) {
+            checkUser.setJob(updateUserDTO.getJob());
+        }
+        try {
             userRepository.save(checkUser);
-            return "Update thanh cong";
-        } else {
-            return "Update that bai";
+            return "done";
+        } catch (Exception e) {
+            return "Lỗi khi cập nhật: " + e.getMessage();
         }
     }
 
@@ -152,53 +171,4 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
-    @Override
-    public String fillUserBaseInfo(ApprovedResidentDTO approvedResidentDTO) {
-
-//        Long userId = approvedResidentDTO.getUserId();
-//        String apartmentName = approvedResidentDTO.getApartmentName();
-//        Resident resident = approvedResidentDTO.getResident();
-//
-//        User user = getUserById(userId);
-//        Apartment apartment = apartmentService.getApartmentByName(apartmentName);
-//
-//        resident.setApartment(apartment);
-//        resident.setFullName(user.getFullName());
-//        resident.setUser(user);
-//
-//        if (user.getRole().equals("resident")) {
-//            apartment.setHouseholder(user.getFullName());
-//            apartment.setUser(user);
-//            apartment.setStatus("rented");
-//            int currentNumber = apartment.getTotalNumber();
-//            int totalNumber = currentNumber + 1;
-//            apartment.setTotalNumber(totalNumber);
-//            apartmentRepository.save(apartment);
-//        }
-//        residentRepository.save(resident);
-        return "Success";
-    }
-
-//    @Override
-//    public boolean approvedUser(List<ApprovedResidentDTO> approvedResidentDTO) {
-//        Long userId;
-//        String apartmentName;
-//        for(ApprovedResidentDTO a: approvedResidentDTO) {
-//            Resident resident = a.getResident();
-//            userId = a.getUserId();
-//            apartmentName = a.getApartmentName();
-//            User user = getUserById(userId);
-//            Apartment apartment = apartmentService.getApartmentByName(apartmentName);
-//            user.setRole("visitor");
-//            updateUserBecomeResident(user, resident, apartment);
-//            userRepository.save(user);
-//        }
-//        return true;
-//    }
-
-//    private void updateUserBecomeResident(User user, Resident resident, Apartment apartment){
-//        resident.setApartment(apartment);
-//        resident.setUser(user);
-//        residentRepository.save(resident);
-//    }
 }

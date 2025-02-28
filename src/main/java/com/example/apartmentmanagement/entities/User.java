@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -27,12 +28,14 @@ public class User {
 
     private String userName;
 
+    @Nationalized
     private String fullName;
 
     private String password;
 
     private String email;
 
+    @Nationalized
     private String description;
 
     private String phone;
@@ -48,11 +51,13 @@ public class User {
      */
     private String idNumber;
 
+    @Nationalized
     private String job;
 
     /**
      * @param role: phan quyen dua tren param nay (resident, owner, )
      */
+    @Nationalized
     private String role;
 
     @ManyToOne
@@ -70,7 +75,6 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Payment> payments;
-
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Report> reports;

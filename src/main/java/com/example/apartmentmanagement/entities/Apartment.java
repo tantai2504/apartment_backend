@@ -10,6 +10,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Nationalized;
 
 import java.util.List;
 
@@ -25,8 +26,10 @@ public class Apartment {
     @Column(name = "apartment_id")
     private Long apartmentId;
 
+    @Nationalized
     private String apartmentName;
 
+    @Nationalized
     private String householder;
 
     /**
@@ -37,6 +40,7 @@ public class Apartment {
     /**
      * @param status: trang thai cua can ho: rented (duoc thue), unrented (chua duoc thue)
      */
+    @Nationalized
     private String status;
 
     private String aptImgUrl;

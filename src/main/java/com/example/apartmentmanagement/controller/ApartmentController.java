@@ -109,35 +109,4 @@ public class ApartmentController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cannot find apartment");
         }
     }
-
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Object> updateApartment(
-            @PathVariable("id") Long id,
-            @Valid @ModelAttribute Apartment apartment,
-            @RequestParam(value = "file", required = false) MultipartFile imageFile,
-            BindingResult bindingResult){
-        if (bindingResult.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-        }
-        Apartment existed = apartmentService.getApartmentById(id);
-        if (existed != null) {
-            apartmentService.updateApartment(existed, apartment, imageFile);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Update successfully!");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cannot found apartment");
-        }
-    }
-
-    @DeleteMapping("delete/{id}")
-    public ResponseEntity<Object> deleteApartment(@PathVariable("id") Long id){
-        Apartment existed = apartmentService.getApartmentById(id);
-        if (existed != null) {
-            apartmentService.deleteApartment(id);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Delete successfully!");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cannot found apartment");
-        }
-    }
 }

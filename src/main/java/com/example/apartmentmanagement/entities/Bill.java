@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,6 +25,7 @@ public class Bill {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long billId;
 
+    @Nationalized
     private String billContent;
 
     private float electricBill;
@@ -36,8 +38,11 @@ public class Bill {
 
     private LocalDateTime billDate;
 
+    @Nationalized
+    private String status;
+
     @OneToOne
-    @JoinColumn(name = "payment_id", referencedColumnName = "paymentId", nullable = false)
+    @JoinColumn(name = "payment_id", referencedColumnName = "paymentId")
     private Payment payment;
 
     @ManyToOne

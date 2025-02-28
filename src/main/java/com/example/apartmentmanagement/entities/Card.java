@@ -9,6 +9,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalDate;
 
@@ -23,6 +24,7 @@ public class Card {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long cardId;
 
+    @Nationalized
     private String cardBaseId;
 
     /**
@@ -35,6 +37,7 @@ public class Card {
      */
     private LocalDate expirationDate;
 
+    @Nationalized
     private String cardStatus;
 
     @OneToOne

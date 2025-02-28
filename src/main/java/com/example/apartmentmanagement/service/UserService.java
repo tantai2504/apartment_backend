@@ -19,14 +19,10 @@ public interface UserService {
 
     UserDTO getUserDTOById (Long id);
 
-//    boolean approvedUser(List<ApprovedResidentDTO> approvedResidentDTO);
+    boolean updateImage(User user, MultipartFile imageFile);
 
-    String updateUser(Long userId, User user, MultipartFile file);
+    String updateUser(UserDTO userDTO, User user);
 
     User getUserByName(String name);
-
-    // Điền thông tin chi tiết để gửi lại cho phía admin sau khi nhận được đơn yêu cầu điền thông tin từ admin
-    // Diễn ra sau khi đã hoàn tất quá trình đặt cọc, booking ký hợp đồng
-    String fillUserBaseInfo(ApprovedResidentDTO approvedResidentDTO);
 
 }

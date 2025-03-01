@@ -1,21 +1,16 @@
 package com.example.apartmentmanagement.serviceImpl;
 
-import com.example.apartmentmanagement.dto.ApprovedResidentDTO;
 import com.example.apartmentmanagement.dto.UserDTO;
 import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.repository.ApartmentRepository;
 import com.example.apartmentmanagement.repository.UserRepository;
-import com.example.apartmentmanagement.service.ApartmentService;
 import com.example.apartmentmanagement.service.UserService;
 import com.example.apartmentmanagement.util.AESUtil;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -31,8 +26,24 @@ public class UserServiceImpl implements UserService {
     private ImageUploadService imageUploadService;
 
     @Override
-    public List<User> showAllUser() {
-        return userRepository.findAll();
+    public List<UserDTO> showAllUser() {
+        return userRepository.findAll().stream().map(user -> {
+            UserDTO dto = new UserDTO();
+            dto.setUserName(user.getUserName());
+            dto.setFullName(user.getFullName());
+            dto.setPassword(null);
+            dto.setEmail(user.getEmail());
+            dto.setDescription(user.getDescription());
+            dto.setPhone(user.getPhone());
+            dto.setUserImgUrl(user.getUserImgUrl());
+            dto.setAge(user.getAge());
+            dto.setBirthday(user.getBirthday());
+            dto.setIdNumber(user.getIdNumber());
+            dto.setJob(user.getJob());
+            dto.setRole(user.getRole());
+            dto.setApartmentName(user.getApartment() != null ? user.getApartment().getApartmentName() : null);
+            return dto;
+        }).toList();
     }
 
     @Override
@@ -168,6 +179,12 @@ public class UserServiceImpl implements UserService {
     @Override
     public User getUserByName(String name) {
         User user = userRepository.findByUserName(name);
+        return user;
+    }
+
+    @Override
+    public User getUserByFullName(String fullName) {
+        User user = userRepository.findByFullName(fullName);
         return user;
     }
 

@@ -28,14 +28,10 @@ public class PaymentServiceImpl implements PaymentService {
     public Payment processPayment(Long billId, String username) {
         Bill bill = billRepository.findById(billId).orElse(null);
 
-        // Kiểm tra hóa đơn đã thanh toán chưa
         if (bill.getPayment() != null) {
             throw new RuntimeException("Hóa đơn đã được thanh toán");
         }
-
-        // Lấy thông tin user từ username
         User user = userRepository.findByUserName(username);
-
 
         Payment payment = new Payment();
         payment.setPaymentCheck(true);

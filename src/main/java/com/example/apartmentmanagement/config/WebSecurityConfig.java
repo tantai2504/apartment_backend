@@ -25,6 +25,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
         registry.addMapping("/**")
                 .allowedOrigins("http://localhost:3000")
                 .allowedMethods("*")
+                .allowedHeaders("*")
                 .allowCredentials(true);
     }
 
@@ -34,8 +35,8 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .csrf(csrf -> csrf.disable())
                 .cors(withDefaults())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/login", "/bill/getAll", "/bill/view_bill_list",
-                                "/bill/view_detail","/api/logout", "/payment/process","/user/**",
+                        .requestMatchers("/api/login", "/bill/getAll", "/bill/view_bill_list", "/bill/create",
+                                "/api/logout", "/payment/process","/user/**", "/notification/**",
                                 "/public/**").permitAll()
                         .anyRequest().authenticated()
                 )

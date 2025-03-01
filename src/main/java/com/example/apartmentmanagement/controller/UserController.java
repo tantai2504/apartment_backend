@@ -1,7 +1,6 @@
 package com.example.apartmentmanagement.controller;
 
 import com.cloudinary.Cloudinary;
-import com.example.apartmentmanagement.dto.ApprovedResidentDTO;
 import com.example.apartmentmanagement.dto.UserDTO;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.service.UserService;
@@ -79,6 +78,11 @@ public class UserController {
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Cập nhật ảnh thất bại!"));
         }
+    }
+
+    @GetMapping("/user_list")
+    public List<UserDTO> getUserList() {
+        return userService.showAllUser();
     }
 
 }

@@ -39,7 +39,8 @@ public class Notification {
      */
     private boolean notificationCheck;
 
-    @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "userId", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "user_Id", nullable = false)
     private User user;
+
 }

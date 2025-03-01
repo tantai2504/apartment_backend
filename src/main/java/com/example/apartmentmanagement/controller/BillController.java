@@ -1,15 +1,15 @@
 package com.example.apartmentmanagement.controller;
 
 import com.example.apartmentmanagement.dto.BillDTO;
+import com.example.apartmentmanagement.dto.BillRequestDTO;
 import com.example.apartmentmanagement.entities.Bill;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.service.BillService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -47,5 +47,19 @@ public class BillController {
         }
         User user = (User) sessionUser;
         return billService.viewBillList(month, year, user.getUserId());
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<Object> createBill(@RequestBody BillRequestDTO request) {
+        String result = billService.addBill(request.getBillContent(),
+                request.getUserName(),
+                request.getElectricCons(),
+                request.getWaterCons(),
+                request.getOthers());
+        if (result.equals("success")) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        }
     }
 }

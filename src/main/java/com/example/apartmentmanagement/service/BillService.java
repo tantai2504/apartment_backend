@@ -7,8 +7,6 @@ import java.util.List;
 
 public interface BillService {
 
-    float calculateElectricityBill(int kWh);
-
     List<BillDTO> getAllBillsWithinSpecTime(int month, int year);
 
     // Xem danh sach bill cua user da dang nhap vao
@@ -16,6 +14,6 @@ public interface BillService {
 
     void updateBill(Bill bill);
 
-    String addBill(Bill bill);
+    String addBill(String billContent, String userName, int electricCons, int waterCons, float otherCost);
 
 }

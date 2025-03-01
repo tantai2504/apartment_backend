@@ -64,8 +64,8 @@ public class User {
     @JoinColumn(name = "apartment_id", referencedColumnName = "apartment_id")
     private Apartment apartment;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Notification notification;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> notifications;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Card card;

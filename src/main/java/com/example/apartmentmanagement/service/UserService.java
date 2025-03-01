@@ -1,6 +1,5 @@
 package com.example.apartmentmanagement.service;
 
-import com.example.apartmentmanagement.dto.ApprovedResidentDTO;
 import com.example.apartmentmanagement.dto.UserDTO;
 import com.example.apartmentmanagement.entities.User;
 import org.springframework.web.multipart.MultipartFile;
@@ -9,7 +8,7 @@ import java.util.List;
 
 public interface UserService {
 
-    List<User> showAllUser();
+    List<UserDTO> showAllUser();
 
     String addUser(User user, MultipartFile imageFile, Long apartmentId);
 
@@ -24,5 +23,7 @@ public interface UserService {
     String updateUser(UserDTO userDTO, User user);
 
     User getUserByName(String name);
+
+    User getUserByFullName(String fullName);
 
 }

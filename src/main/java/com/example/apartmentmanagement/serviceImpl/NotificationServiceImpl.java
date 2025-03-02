@@ -28,11 +28,11 @@ public class NotificationServiceImpl implements NotificationService {
         User user = userRepository.findById(userId).orElse(null);
         return user.getNotifications().stream().map(notification -> new NotificationDTO(
                 notification.getNotificationId(),
+                user.getUserName(),
                 notification.getNotificationContent(),
-                notification.getNotificationType(),
                 notification.isNotificationCheck(),
                 notification.getNotificationDate(),
-                user.getUserName()
+                notification.getNotificationType()
         )).collect(Collectors.toList());
     }
 
@@ -41,9 +41,6 @@ public class NotificationServiceImpl implements NotificationService {
         Notification newNotification = new Notification();
         newNotification.setNotificationContent(notificationContent);
         User user = userRepository.findById(userId).get();
-//        if (notiType.equals("1")) {
-//            newNotification.setNotificationContent("Thông báo hóa đơn mới");
-//        }
         newNotification.setNotificationType(notiType);
         newNotification.setNotificationDate(LocalDateTime.now());
         newNotification.setNotificationCheck(false);
@@ -51,4 +48,16 @@ public class NotificationServiceImpl implements NotificationService {
         notificationRepository.save(newNotification);
         return "done";
     }
+
+    @Override
+    public String deleteNotification(Long notificationId) {
+        notificationRepository.deleteById(notificationId);
+        return "done";
+    }
+
+    @Override
+    public Notification getNotification(Long notificationId) {
+        return notificationRepository.findById(notificationId).orElse(null);
+    }
+
 }

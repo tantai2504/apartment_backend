@@ -55,7 +55,7 @@ public class User {
     private String job;
 
     /**
-     * @param role: phan quyen dua tren param nay (resident, owner, )
+     * @param role: phan quyen dua tren param nay (resident, owner)
      */
     @Nationalized
     private String role;

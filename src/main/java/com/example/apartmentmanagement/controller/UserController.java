@@ -45,10 +45,16 @@ public class UserController {
         }
     }
 
+    @GetMapping("/find")
+    public List<UserDTO> findAll(String username) {
+        return userService.getUserByFullName(username);
+    }
+
     @GetMapping("/user_profile")
     public ResponseEntity<Object> getUserInfo(HttpSession session) {
         User user = (User) session.getAttribute("user");
         Long userId = user.getUserId();
+        
         UserDTO userDto = userService.getUserDTOById(userId);
         if (userDto != null) {
             return ResponseEntity.ok(userDto);
@@ -83,6 +89,12 @@ public class UserController {
     @GetMapping("/user_list")
     public List<UserDTO> getUserList() {
         return userService.showAllUser();
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<Object> deleteUser(Long userId, HttpSession session) {
+        userService.deleteUserById(userId);
+        return ResponseEntity.ok().build();
     }
 
 }

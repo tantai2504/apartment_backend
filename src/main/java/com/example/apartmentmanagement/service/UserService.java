@@ -24,6 +24,8 @@ public interface UserService {
 
     User getUserByName(String name);
 
-    User getUserByFullName(String fullName);
+    List<UserDTO> getUserByFullName(String fullName);
+
+    String deleteUserById(Long id);
 
 }

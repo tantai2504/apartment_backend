@@ -49,6 +49,12 @@ public class BillController {
         return billService.viewBillList(month, year, user.getUserId());
     }
 
+    /**
+     * (Staff) Tao hoa don cho user
+     *
+     * @param request
+     * @return
+     */
     @PostMapping("/create")
     public ResponseEntity<Object> createBill(@RequestBody BillRequestDTO request) {
         String result = billService.addBill(request.getBillContent(),

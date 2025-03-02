@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
@@ -183,9 +184,30 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserByFullName(String fullName) {
-        User user = userRepository.findByFullName(fullName);
-        return user;
+    public List<UserDTO> getUserByFullName(String fullName) {
+        return userRepository.searchByUserName(fullName).stream().map(user -> {
+            return new UserDTO(
+                    user.getUserName(),
+                    user.getFullName(),
+                    null,
+                    user.getEmail(),
+                    user.getDescription(),
+                    user.getPhone(),
+                    user.getUserImgUrl(),
+                    user.getAge(),
+                    user.getBirthday(),
+                    user.getIdNumber(),
+                    user.getJob(),
+                    user.getApartment() != null ? user.getApartment().getApartmentName() : null,
+                    user.getRole()
+            );
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public String deleteUserById(Long id) {
+        userRepository.deleteById(id);
+        return "done";
     }
 
 }

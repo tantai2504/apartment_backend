@@ -9,9 +9,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Nationalized;
 
+import java.time.LocalDate;
 import java.util.Date;
-
 @Entity
 @Table(name = "facility")
 @Getter
@@ -23,17 +24,18 @@ public class Facility {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long facilityId;
 
+    @Nationalized
     private String facilityType;
 
     /**
      * @param issuanceDate: ngay ky hop dong
      */
-    private Date startDate;
+    private LocalDate startDate;
 
     /**
      * @param expirationDate: ngay het han
      */
-    private Date endDate;
+    private LocalDate endDate;
 
     @ManyToOne
     @JoinColumn(name = "user_Id", nullable = false)

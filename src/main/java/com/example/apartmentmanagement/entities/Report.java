@@ -9,7 +9,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Nationalized;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -23,9 +26,10 @@ public class Report {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long reportId;
 
+    @Nationalized
     private String reportContent;
 
-    private Date reportDate;
+    private LocalDateTime reportDate;
 
     /**
      * @param reportCheck: kiem tra report da duoc phan hoi hay chua

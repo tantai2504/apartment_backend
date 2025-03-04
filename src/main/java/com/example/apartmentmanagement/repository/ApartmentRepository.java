@@ -8,4 +8,5 @@ import java.util.List;
 
 @Repository
 public interface ApartmentRepository extends JpaRepository<Apartment, Long> {
+    Apartment findApartmentByApartmentNameContaining (String name);
 }

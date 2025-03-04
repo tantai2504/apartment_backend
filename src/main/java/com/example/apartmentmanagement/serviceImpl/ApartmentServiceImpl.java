@@ -24,7 +24,14 @@ public class ApartmentServiceImpl implements ApartmentService{
     private UserRepository userRepository;
 
     @Override
-    public String addApartment(Apartment apartment, Long userId, MultipartFile imageFile) {
+    public String addApartment(Apartment apartment) {
+        apartment.setStatus("unrented");
+        apartmentRepository.save(apartment);
+        return "Add successfully";
+    }
+
+    @Override
+    public String addResidentIntoApartment(Apartment apartment, Long userId, MultipartFile imageFile) {
         List<Apartment> apartmentList = apartmentRepository.findAll();
 
         for (Apartment a : apartmentList) {
@@ -47,12 +54,13 @@ public class ApartmentServiceImpl implements ApartmentService{
         } else {
             apartment.setAptImgUrl(imgUrl);
         }
-
         User user = null;
         if (userId != null) {
             user = userRepository.findById(userId).orElse(null);
         }
-        apartment.setUser(user);
+        List<User> userList = new ArrayList<>();
+        userList.add(user);
+        apartment.setUsers(userList);
         apartmentRepository.save(apartment);
         return "Add successfully";
     }
@@ -84,7 +92,6 @@ public class ApartmentServiceImpl implements ApartmentService{
         existedApartment.setApartmentName(apartment.getApartmentName());
         existedApartment.setHouseholder(apartment.getHouseholder());
         existedApartment.setTotalNumber(apartment.getTotalNumber());
-
         if (imageFile != null) {
             String imgUrl = imageUploadService.uploadImage(imageFile);
             apartment.setAptImgUrl(imgUrl);
@@ -97,6 +104,11 @@ public class ApartmentServiceImpl implements ApartmentService{
     @Override
     public void deleteApartment(Long id) {
         apartmentRepository.deleteById(id);
+    }
+
+    @Override
+    public Apartment getApartmentByName(String name) {
+        return apartmentRepository.findApartmentByApartmentNameContaining(name);
     }
 
     @Override

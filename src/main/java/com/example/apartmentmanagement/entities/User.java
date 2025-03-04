@@ -4,12 +4,15 @@ package com.example.apartmentmanagement.entities;
  * Entity user: tai khoan co ban truy cap vao trang web
  */
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Nationalized;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity
@@ -25,32 +28,44 @@ public class User {
 
     private String userName;
 
+    @Nationalized
+    private String fullName;
+
     private String password;
 
     private String email;
 
+    @Nationalized
     private String description;
 
     private String phone;
 
     private String userImgUrl;
 
+    private String age;
+
+    private LocalDate birthday;
+
     /**
-     * @param role: phan quyen dua tren param nay (visitor, resident, admin, facilityOwner)
+     * @param idNumber: can cuoc cong dan
      */
+    private String idNumber;
+
+    @Nationalized
+    private String job;
+
+    /**
+     * @param role: phan quyen dua tren param nay (resident, owner)
+     */
+    @Nationalized
     private String role;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Resident resident;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @ManyToOne
+    @JoinColumn(name = "apartment_id", referencedColumnName = "apartment_id")
     private Apartment apartment;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Booking booking;
-
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private Notification notification;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Notification> notifications;
 
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private Card card;
@@ -60,15 +75,6 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Payment> payments;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Post> posts;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Comment> comments;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Rating> ratings;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Report> reports;

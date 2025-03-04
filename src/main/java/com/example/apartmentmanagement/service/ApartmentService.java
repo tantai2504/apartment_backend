@@ -6,7 +6,10 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface ApartmentService {
-    String addApartment(Apartment apartment, Long userId, MultipartFile imageFile);
+
+    String addApartment(Apartment apartment);
+
+    String addResidentIntoApartment(Apartment apartment, Long userId, MultipartFile imageFile);
 
     String checkApartmentExisted(Apartment apartment);
 
@@ -17,6 +20,8 @@ public interface ApartmentService {
     void updateApartment (Apartment existedApartment, Apartment apartment, MultipartFile imageFile);
 
     void deleteApartment (Long id);
+
+    Apartment getApartmentByName (String name);
 
     List<Apartment> totalUnrentedApartment ();
 }

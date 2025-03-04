@@ -1,7 +1,7 @@
 package com.example.apartmentmanagement.entities;
 
 /***
- * Entity booking: dat lich xem truoc can ho
+ * Entity consumption: luu du lieu tieu thu hang thang
  */
 
 import jakarta.persistence.*;
@@ -9,24 +9,19 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Nationalized;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
-@Table(name = "booking")
+@Table(name = "consumption")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Booking {
+public class Consumption {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long bookingId;
+    private Long consumptionId;
 
-    private Date scheduleDate;
-
-    @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "userId", nullable = false)
-    private User user;
 }
-

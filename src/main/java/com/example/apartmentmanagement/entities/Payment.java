@@ -9,7 +9,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Nationalized;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -28,9 +31,10 @@ public class Payment {
      */
     private boolean paymentCheck;
 
+    @Nationalized
     private String paymentInfo;
 
-    private Date paymentDate;
+    private LocalDateTime paymentDate;
 
     @ManyToOne
     @JoinColumn(name = "user_Id", nullable = false)

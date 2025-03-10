@@ -1,16 +1,21 @@
 package com.example.apartmentmanagement.serviceImpl;
 
 import com.example.apartmentmanagement.dto.UserDTO;
+import com.example.apartmentmanagement.dto.VerifyUserDTO;
 import com.example.apartmentmanagement.entities.Apartment;
+import com.example.apartmentmanagement.entities.ContractImages;
 import com.example.apartmentmanagement.entities.User;
+import com.example.apartmentmanagement.entities.VerificationForm;
 import com.example.apartmentmanagement.repository.ApartmentRepository;
 import com.example.apartmentmanagement.repository.UserRepository;
+import com.example.apartmentmanagement.repository.VerificationFormRepository;
 import com.example.apartmentmanagement.service.UserService;
 import com.example.apartmentmanagement.util.AESUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -25,6 +30,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ImageUploadService imageUploadService;
+
+    @Autowired
+    private VerificationFormRepository verificationFormRepository;
 
     @Override
     public List<UserDTO> showAllUser() {
@@ -48,7 +56,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String addUser(User user, MultipartFile imageFile, Long apartmentId) {
+    public String addUser(User user, MultipartFile imageFile, Long apartmentId, String verificationOwner) {
         if (user.getUserName() == null || user.getPassword() == null) {
             throw new IllegalArgumentException("User name and password must not be null");
         }
@@ -80,6 +88,10 @@ public class UserServiceImpl implements UserService {
                     return "Da co nguoi dung ten chu can ho";
                 }
             }
+
+            VerificationForm verificationForm = verificationFormRepository.findVerificationFormByFullNameEqualsIgnoreCase(verificationOwner);
+
+            user.setVerificationForm(verificationForm);
 
             user.setApartment(apartment);
 
@@ -208,6 +220,30 @@ public class UserServiceImpl implements UserService {
     public String deleteUserById(Long id) {
         userRepository.deleteById(id);
         return "done";
+    }
+
+    @Override
+    public String verifyUser(VerifyUserDTO verifyUserDTO, List<MultipartFile> imageFile) {
+        VerificationForm verificationForm = new VerificationForm();
+        verificationForm.setFullName(verifyUserDTO.getFullName());
+        verificationForm.setEmail(verifyUserDTO.getEmail());
+        verificationForm.setContractEndDate(verifyUserDTO.getContractEndDate());
+        verificationForm.setContractStartDate(verifyUserDTO.getContractStartDate());
+        verificationForm.setPhoneNumber(verifyUserDTO.getPhoneNumber());
+
+        verificationForm = verificationFormRepository.save(verificationForm);
+
+        List<ContractImages> contractImages = new ArrayList<>();
+
+        for (MultipartFile file : imageFile) {
+            ContractImages contractImage = new ContractImages();
+            contractImage.setImageUrl(imageUploadService.uploadImage(file));
+            contractImages.add(contractImage);
+        }
+
+        verificationForm.setContractImages(contractImages);
+
+        return "success";
     }
 
 }

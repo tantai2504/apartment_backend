@@ -1,5 +1,6 @@
 package com.example.apartmentmanagement.controller;
 
+import com.example.apartmentmanagement.dto.UserDTO;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.util.AESUtil;
 import jakarta.servlet.http.HttpSession;
@@ -47,4 +48,5 @@ public class HomeController {
         session.invalidate();
         return "Logged out";
     }
+
 }

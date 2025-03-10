@@ -1,7 +1,7 @@
 package com.example.apartmentmanagement.entities;
 
 /***
- * Entity consumption: luu du lieu tieu thu hang thang
+ * Entity consumption: luu du lieu tieu thu dien nuoc (kWh) hang thang
  */
 
 import jakarta.persistence.*;
@@ -12,6 +12,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "consumption")
@@ -24,4 +25,13 @@ public class Consumption {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long consumptionId;
 
+    private LocalDateTime consumptionDate;
+
+    private String waterConsumption;
+
+    private String electricConsumption;
+
+    @ManyToOne
+    @JoinColumn(name = "user_Id", nullable = false)
+    private User user;
 }

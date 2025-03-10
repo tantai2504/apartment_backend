@@ -2,6 +2,7 @@ package com.example.apartmentmanagement.controller;
 
 import com.cloudinary.Cloudinary;
 import com.example.apartmentmanagement.dto.UserDTO;
+import com.example.apartmentmanagement.dto.VerifyUserDTO;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -31,13 +32,8 @@ public class UserController {
             @Valid @ModelAttribute User user,
             @RequestPart(value = "file", required = false) MultipartFile imageFile,
             @RequestParam(value = "apartment_id", required = false) Long apartmentId,
-            BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-        }
-        String result = userService.addUser(user, imageFile, apartmentId);
+            @RequestParam(value = "fullName") String verificationOwner) {
+        String result = userService.addUser(user, imageFile, apartmentId, verificationOwner);
         if (result.equals("Add Successfully")) {
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } else {
@@ -97,5 +93,14 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @PostMapping("/verify_user")
+    public ResponseEntity<String> verifyUser(VerifyUserDTO verifyUserDTO, @RequestPart("imageFile") List<MultipartFile> imageFiles){
+        String result = userService.verifyUser(verifyUserDTO, imageFiles);
+        if (result.equals("success")) {
+            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+        } else {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Có lỗi xảy ra trong quá trình phê duyệt");
+        }
+    }
 }
 

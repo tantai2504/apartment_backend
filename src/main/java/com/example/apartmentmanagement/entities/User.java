@@ -60,6 +60,10 @@ public class User {
     @Nationalized
     private String role;
 
+    @OneToOne
+    @JoinColumn(name = "verification_form_id", referencedColumnName = "verification_form_id")
+    private VerificationForm verificationForm;
+
     @ManyToOne
     @JoinColumn(name = "apartment_id", referencedColumnName = "apartment_id")
     private Apartment apartment;
@@ -75,6 +79,9 @@ public class User {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Payment> payments;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Consumption> consumptions;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Report> reports;

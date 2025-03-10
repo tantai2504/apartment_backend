@@ -1,5 +1,6 @@
 package com.example.apartmentmanagement.serviceImpl;
 
+import com.example.apartmentmanagement.dto.ReportDTO;
 import com.example.apartmentmanagement.entities.Report;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.repository.ReportRepository;
@@ -31,17 +32,23 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public Report createReport(Report report) {
+    public ReportDTO createReport(ReportDTO reportDTO) {
         // Kiểm tra user tồn tại (nếu cần)
-        Long userId = report.getUser().getUserId();
+        Long userId = reportDTO.getUserId();
         User user = userInfoRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-
         // Gắn user cho report
+
+
+        Report report = new Report();
         report.setUser(user);
+        report.setReportContent(reportDTO.getReportContent());
+        report.setReportDate(reportDTO.getReportDate());
+        report.setReportCheck(reportDTO.isReportCheck());
+        reportRepository.save(report);
 
         // Lưu
-        return reportRepository.save(report);
+        return reportDTO;
     }
 
     @Override

@@ -1,9 +1,13 @@
 package com.example.apartmentmanagement.controller;
 
+import com.example.apartmentmanagement.dto.ReportDTO;
 import com.example.apartmentmanagement.entities.Report;
 import com.example.apartmentmanagement.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -29,13 +33,13 @@ public class ReportController {
         return reportService.getReportById(id);
     }
 
-    @PostMapping(consumes = {MediaType.APPLICATION_JSON_VALUE, MediaType.TEXT_PLAIN_VALUE})
-    public Report createReport(@RequestBody String requestBody) {
+    @PostMapping("/post")
+    public ResponseEntity<Object> createReport(@RequestBody ReportDTO reportDTO) {
         try {
-            Report report = objectMapper.readValue(requestBody, Report.class);
-            return reportService.createReport(report);
+            ReportDTO result = reportService.createReport(reportDTO);
+            return new ResponseEntity<>(result, HttpStatus.CREATED);
         } catch (Exception e) {
-            throw new RuntimeException("Error processing request body: " + e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 

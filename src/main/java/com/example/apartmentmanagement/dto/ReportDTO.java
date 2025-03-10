@@ -12,11 +12,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReportDTO {
-    private Long reportId;
     private String reportContent;
     private LocalDateTime reportDate;
     private boolean reportCheck;
     private Long userId;
 }
-
-

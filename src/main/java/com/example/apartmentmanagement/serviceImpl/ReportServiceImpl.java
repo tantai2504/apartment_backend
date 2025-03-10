@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class ReportServiceImpl implements ReportService {
@@ -19,83 +18,68 @@ public class ReportServiceImpl implements ReportService {
     private ReportRepository reportRepository;
 
     @Autowired
-    private UserRepository userRepository;
+    private UserRepository userInfoRepository; // Giả sử bạn quản lý User ở đây
 
-    // 🔹 Chuyển đổi từ `Report` sang `ReportDTO`
-    private ReportDTO convertToDto(Report report) {
-        return new ReportDTO(
-                report.getReportId(),
-                report.getReportContent(),
-                report.getReportDate(),
-                report.isReportCheck(),
-                report.getUser().getUserId()
-        );
-    }
-
-    // 🔹 Chuyển đổi từ `ReportDTO` sang `Report`
-    private Report convertToEntity(ReportDTO reportDTO, User user) {
-        Report report = new Report();
-        report.setReportId(reportDTO.getReportId());
-        report.setReportContent(reportDTO.getReportContent());
-        report.setReportDate(reportDTO.getReportDate());
-        report.setReportCheck(reportDTO.isReportCheck());
-        report.setUser(user);
-        return report;
+    @Override
+    public List<Report> getAllReports() {
+        return reportRepository.findAll();
     }
 
     @Override
-    public List<ReportDTO> getAllReports() {
-        return reportRepository.findAll().stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public ReportDTO getReportById(Long id) {
-        Report report = reportRepository.findById(id)
+    public Report getReportById(Long id) {
+        return reportRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Report not found with id: " + id));
-        return convertToDto(report);
     }
 
     @Override
     public ReportDTO createReport(ReportDTO reportDTO) {
-        User user = userRepository.findById(reportDTO.getUserId())
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + reportDTO.getUserId()));
+        // Kiểm tra user tồn tại (nếu cần)
+        Long userId = reportDTO.getUserId();
+        User user = userInfoRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        // Gắn user cho report
 
-        Report report = convertToEntity(reportDTO, user);
+
+        Report report = new Report();
+        report.setUser(user);
+        report.setReportContent(reportDTO.getReportContent());
+        report.setReportDate(reportDTO.getReportDate());
+        report.setReportCheck(reportDTO.isReportCheck());
         reportRepository.save(report);
-        return convertToDto(report);
+
+        // Lưu
+        return reportDTO;
     }
 
     @Override
-    public ReportDTO updateReport(Long id, ReportDTO newReportData) {
-        Report report = reportRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Report not found with id: " + id));
+    public Report updateReport(Long id, Report newReportData) {
+        Report existingReport = getReportById(id);
 
-        // Cập nhật nội dung nếu có
+        // Cập nhật nội dung
         if (newReportData.getReportContent() != null) {
-            report.setReportContent(newReportData.getReportContent());
+            existingReport.setReportContent(newReportData.getReportContent());
         }
+        // Cập nhật ngày
         if (newReportData.getReportDate() != null) {
-            report.setReportDate(newReportData.getReportDate());
+            existingReport.setReportDate(newReportData.getReportDate());
         }
-        report.setReportCheck(newReportData.isReportCheck());
+        // Cập nhật trạng thái
+        existingReport.setReportCheck(newReportData.isReportCheck());
 
-        // Cập nhật User nếu có
-        if (newReportData.getUserId() != null) {
-            User user = userRepository.findById(newReportData.getUserId())
-                    .orElseThrow(() -> new RuntimeException("User not found with id: " + newReportData.getUserId()));
-            report.setUser(user);
+        // Cho phép đổi user nếu muốn
+        if (newReportData.getUser() != null) {
+            Long userId = newReportData.getUser().getUserId();
+            User user = userInfoRepository.findById(userId)
+                    .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+            existingReport.setUser(user);
         }
 
-        reportRepository.save(report);
-        return convertToDto(report);
+        return reportRepository.save(existingReport);
     }
 
     @Override
     public void deleteReport(Long id) {
-        Report report = reportRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Report not found with id: " + id));
+        Report report = getReportById(id);
         reportRepository.delete(report);
     }
 }

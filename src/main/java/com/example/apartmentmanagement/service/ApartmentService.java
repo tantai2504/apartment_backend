@@ -1,5 +1,6 @@
 package com.example.apartmentmanagement.service;
 
+import com.example.apartmentmanagement.dto.ApartmentDTO;
 import com.example.apartmentmanagement.entities.Apartment;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -13,7 +14,7 @@ public interface ApartmentService {
 
     String checkApartmentExisted(Apartment apartment);
 
-    List<Apartment> showApartment();
+    List<ApartmentDTO> showApartment();
 
     Apartment getApartmentById (Long id);
 
@@ -23,5 +24,5 @@ public interface ApartmentService {
 
     Apartment getApartmentByName (String name);
 
-    List<Apartment> totalUnrentedApartment ();
+    List<ApartmentDTO> totalUnrentedApartment ();
 }

@@ -26,9 +26,10 @@ public class BillController {
      * @param year
      * @return
      */
-    @GetMapping("/getAll")
-    public List<BillDTO> getBill(@RequestParam int month, @RequestParam int year) {
-        return billService.getAllBillsWithinSpecTime(month, year);
+    @GetMapping("/getAll/{userId}")
+    public List<BillDTO> getBill(@RequestParam int month, @RequestParam int year,
+                                 @PathVariable Long userId) {
+        return billService.getAllBillsWithinSpecTime(userId, month, year);
     }
 
     /**
@@ -66,6 +67,16 @@ public class BillController {
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } else {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        }
+    }
+
+    @DeleteMapping("/delete/{billId}")
+    public ResponseEntity<Object> deleteBill(@PathVariable Long billId) {
+        try {
+            String result = billService.deleteBill(billId);
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(result);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 }

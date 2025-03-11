@@ -1,5 +1,6 @@
 package com.example.apartmentmanagement.controller;
 
+import com.example.apartmentmanagement.dto.ApartmentDTO;
 import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.service.ApartmentService;
 import jakarta.validation.Valid;
@@ -25,8 +26,9 @@ public class ApartmentController {
      * @return List can ho
      */
     @GetMapping("/getAll")
-    public List<Apartment> showAllApartment(){
-        return apartmentService.showApartment();
+    public ResponseEntity<List<ApartmentDTO>> showAllApartment(){
+        List<ApartmentDTO> apartments = apartmentService.showApartment();
+        return ResponseEntity.ok(apartments);
     }
 
     /**
@@ -42,8 +44,12 @@ public class ApartmentController {
     }
 
     @GetMapping("/getAll/unrented")
-    public List<Apartment> showAllUnrentedApartment(){
-        return apartmentService.totalUnrentedApartment();
+    public ResponseEntity<List<ApartmentDTO>> showAllUnrentedApartment() {
+        List<ApartmentDTO> apartments = apartmentService.totalUnrentedApartment();
+        if (apartments.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return ResponseEntity.ok(apartments);
     }
 
     /**
@@ -65,34 +71,6 @@ public class ApartmentController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
         }
         String result = apartmentService.addApartment(apartment);
-        if (result.equals("Add successfully")) {
-            return ResponseEntity.status(HttpStatus.CREATED).body("Add successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
-        }
-    }
-
-    /**
-     * Them cu dan moi vao can ho
-     *
-     * @param apartment
-     * @param userId
-     * @param imageFile
-     * @param bindingResult
-     * @return
-     */
-    @PostMapping("/add")
-    public ResponseEntity<Object> addResidentIntoApartment(
-            @Valid @ModelAttribute Apartment apartment,
-            @RequestParam(value = "user_id", required = false) Long userId,
-            @RequestParam(value = "file", required = false) MultipartFile imageFile,
-            BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-        }
-        String result = apartmentService.addResidentIntoApartment(apartment, userId, imageFile);
         if (result.equals("Add successfully")) {
             return ResponseEntity.status(HttpStatus.CREATED).body("Add successfully");
         } else {

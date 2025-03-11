@@ -11,6 +11,9 @@ import org.springframework.web.bind.annotation.*;
 
 import com.example.apartmentmanagement.service.UserService;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/api")
 @CrossOrigin(origins = "http://localhost:3000", allowCredentials = "true")
@@ -20,33 +23,36 @@ public class HomeController {
     private UserService userService;
 
     @PostMapping("/login")
-    public String login(@RequestParam String userName, @RequestParam String password, HttpSession session) {
+    public ResponseEntity<Object> login(@RequestParam String userName, @RequestParam String password, HttpSession session) {
         User user = userService.getUserByName(userName);
         if (user != null) {
             String decryptedPassword = AESUtil.decrypt(user.getPassword());
             if (password.equals(decryptedPassword)) {
                 session.setAttribute("user", user);
                 System.out.println("Session ID after login: " + session.getId());
-                return "Login successful";
+                Map<String, String> response = new HashMap<>();
+                response.put("userName", user.getUserName());
+                response.put("password", password);
+                return ResponseEntity.ok(response);
             }
         }
-        return "Invalid credentials";
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Login failed");
     }
-
-    @GetMapping("/user")
-    public ResponseEntity<String> getUser(HttpSession session) {
-        Object user = session.getAttribute("user");
-        if (user != null) {
-            return ResponseEntity.ok("Logged in as: " + user);
-        }
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in");
-    }
+//
+//    @GetMapping("/user")
+//    public ResponseEntity<String> getUser(HttpSession session) {
+//        Object user = session.getAttribute("user");
+//        if (user != null) {
+//            return ResponseEntity.ok("Logged in as: " + user);
+//        }
+//        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Not logged in");
+//    }
 
 
     @PostMapping("/logout")
-    public String logout(HttpSession session) {
+    public ResponseEntity<Object> logout(HttpSession session) {
         session.invalidate();
-        return "Logged out";
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).body("Logged out");
     }
 
 }

@@ -19,10 +19,11 @@ public class NotificationController {
     private NotificationService notificationService;
 
     @GetMapping("/view_all")
-    public List<NotificationDTO> showAllNotifications(HttpSession session) {
+    public ResponseEntity<Object> showAllNotifications(HttpSession session) {
         User user = (User) session.getAttribute("user");
         Long userId = user.getUserId();
-        return notificationService.getNotifications(userId);
+        List<NotificationDTO> dtos = notificationService.getNotifications(userId);
+        return ResponseEntity.ok(dtos);
     }
 
     @DeleteMapping("/delete")

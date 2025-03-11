@@ -1,5 +1,6 @@
 package com.example.apartmentmanagement.serviceImpl;
 
+import com.example.apartmentmanagement.dto.ApartmentDTO;
 import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.repository.ApartmentRepository;
@@ -77,8 +78,16 @@ public class ApartmentServiceImpl implements ApartmentService{
     }
 
     @Override
-    public List<Apartment> showApartment() {
-         return apartmentRepository.findAll();
+    public List<ApartmentDTO> showApartment() {
+        return apartmentRepository.findAll().stream().map(apartment -> new ApartmentDTO(
+                apartment.getApartmentId(),
+                apartment.getApartmentName(),
+                apartment.getHouseholder(),
+                apartment.getTotalNumber(),
+                apartment.getStatus(),
+                apartment.getAptImgUrl(),
+                apartment.getUsers().stream().map(User::getUserName).toList()
+        )).toList();
     }
 
     @Override
@@ -112,14 +121,17 @@ public class ApartmentServiceImpl implements ApartmentService{
     }
 
     @Override
-    public List<Apartment> totalUnrentedApartment() {
-        List<Apartment> apartmentList = new ArrayList<>();
-        List<Apartment> totalApartment = apartmentRepository.findAll();
-        for (Apartment a: totalApartment) {
-            if (a.getStatus().equals("unrented")) {
-                apartmentList.add(a);
-            }
-        }
-        return apartmentList;
+    public List<ApartmentDTO> totalUnrentedApartment() {
+        return apartmentRepository.findAll().stream().
+                filter(apartment -> apartment.getStatus().equals("unrented")).
+                map(apartment -> new ApartmentDTO(
+                apartment.getApartmentId(),
+                apartment.getApartmentName(),
+                apartment.getHouseholder(),
+                apartment.getTotalNumber(),
+                apartment.getStatus(),
+                apartment.getAptImgUrl(),
+                apartment.getUsers().stream().map(User::getUserName).toList()
+        )).toList();
     }
 }

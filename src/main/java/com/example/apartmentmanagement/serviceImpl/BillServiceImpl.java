@@ -9,9 +9,11 @@ import com.example.apartmentmanagement.repository.BillRepository;
 import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.service.BillService;
 import com.example.apartmentmanagement.service.NotificationService;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.swing.text.html.parser.Entity;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -34,8 +36,9 @@ public class BillServiceImpl implements BillService {
     private NotificationService notificationService;
 
     @Override
-    public List<BillDTO> getAllBillsWithinSpecTime(int month, int year) {
-        List<Bill> bills = billRepository.findAll();
+    public List<BillDTO> getAllBillsWithinSpecTime(Long userId, int month, int year) {
+        User user = userRepository.findById(userId).get();
+        List<Bill> bills = user.getBills();
 
         return bills.stream()
                 .filter(bill -> bill.getBillDate().getMonthValue() == month && bill.getBillDate().getYear() == year)
@@ -80,6 +83,13 @@ public class BillServiceImpl implements BillService {
     @Override
     public void updateBill(Bill bill) {
 
+    }
+
+    @Override
+    public String deleteBill(Long id) {
+        Bill bill = billRepository.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy bill này"));
+        billRepository.delete(bill);
+        return "done";
     }
 
     @Override

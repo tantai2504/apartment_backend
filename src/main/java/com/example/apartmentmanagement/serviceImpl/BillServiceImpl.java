@@ -81,15 +81,15 @@ public class BillServiceImpl implements BillService {
 
 
     @Override
-    public void updateBill(Bill bill) {
-
+    public BillDTO updateBill(Bill bill) {
+        BillDTO billDTO =  new BillDTO();
+        return billDTO;
     }
 
     @Override
-    public String deleteBill(Long id) {
+    public void deleteBill(Long id) {
         Bill bill = billRepository.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy bill này"));
         billRepository.delete(bill);
-        return "done";
     }
 
     @Override

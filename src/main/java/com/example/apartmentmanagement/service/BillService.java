@@ -12,9 +12,9 @@ public interface BillService {
     // Xem danh sach bill cua user da dang nhap vao
     List<BillDTO> viewBillList(int month, int year, Long userId);
 
-    void updateBill(Bill bill);
+    BillDTO updateBill(Bill bill);
 
-    String deleteBill(Long id);
+    void deleteBill(Long id);
 
     String addBill(String billContent, String userName, int electricCons, int waterCons, float otherCost);
 

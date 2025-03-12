@@ -1,7 +1,9 @@
 package com.example.apartmentmanagement.serviceImpl;
 
+import com.example.apartmentmanagement.dto.CreateNewAccountDTO;
 import com.example.apartmentmanagement.dto.UserDTO;
-import com.example.apartmentmanagement.dto.VerifyUserDTO;
+import com.example.apartmentmanagement.dto.VerifyUserRequestDTO;
+import com.example.apartmentmanagement.dto.VerifyUserResponseDTO;
 import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.ContractImages;
 import com.example.apartmentmanagement.entities.User;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -56,49 +59,60 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String addUser(User user, MultipartFile imageFile, Long apartmentId, String verificationOwner) {
-        if (user.getUserName() == null || user.getPassword() == null) {
-            throw new IllegalArgumentException("User name and password must not be null");
+    public CreateNewAccountDTO addUser(CreateNewAccountDTO newAccountDTO) {
+        VerificationForm verificationForm = verificationFormRepository.findVerificationFormByFullNameEqualsIgnoreCase(newAccountDTO.getFullName());
+        if (newAccountDTO.getUserName() == null || newAccountDTO.getPassword() == null) {
+            throw new RuntimeException("Yêu cầu nhập đủ tài khoản/email và mật khẩu");
         }
-        if (!checkUserExisted(user)) {
-            return "Da co user nay";
-        } else {
-            String imgUrl = imageUploadService.uploadImage(imageFile);
 
-            if (imgUrl.equals("image-url")) {
-                user.setUserImgUrl("");
-            } else {
-                user.setUserImgUrl(imgUrl);
+        System.out.println("Apartment: " + newAccountDTO.getApartmentId());
+
+        List<User> users = userRepository.findAll();
+        for (User u : users) {
+            if (u.getUserName().equals(newAccountDTO.getUserName())) {
+                throw new RuntimeException("Đã có username này");
             }
-            String encryptPass = AESUtil.encrypt(user.getPassword());
-            user.setPassword(encryptPass);
-
-            Apartment apartment = apartmentRepository.findById(apartmentId).get();
-
-            apartment.setTotalNumber(apartment.getTotalNumber() + 1);
-            if (apartment.getTotalNumber()>0) {
-                apartment.setStatus("rented");
-            }
-            if (apartment.getHouseholder() == null) {
-                if (user.getRole().equals("Chủ sở hữu")){
-                    apartment.setHouseholder(user.getFullName());
-                }
-            } else {
-                if (user.getRole().equals("Chủ sở hữu")){
-                    return "Da co nguoi dung ten chu can ho";
-                }
-            }
-
-            VerificationForm verificationForm = verificationFormRepository.findVerificationFormByFullNameEqualsIgnoreCase(verificationOwner);
-
-            user.setVerificationForm(verificationForm);
-
-            user.setApartment(apartment);
-
-            userRepository.save(user);
-
-            return "Add Successfully";
         }
+
+        User user = new User();
+        user.setUserName(newAccountDTO.getUserName());
+
+        String encryptPass = AESUtil.encrypt(newAccountDTO.getPassword());
+        user.setPassword(encryptPass);
+
+        Apartment apartment = apartmentRepository.findById(newAccountDTO.getApartmentId())
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy Apartment với ID này"));
+
+        if (apartment.getHouseholder() == null && newAccountDTO.getRole().equals("Chủ sở hữu")) {
+            apartment.setHouseholder(newAccountDTO.getFullName());
+        } else if (apartment.getHouseholder() != null && newAccountDTO.getRole().equals("Chủ sở hữu")) {
+            throw new RuntimeException("Đã có người đứng tên chủ căn hộ, không thể thêm chủ sở hữu mới.");
+        }
+
+        apartment.setTotalNumber(apartment.getTotalNumber() + 1);
+        if (apartment.getTotalNumber() > 0) {
+            apartment.setStatus("rented");
+        }
+
+        user.setRole(newAccountDTO.getRole());
+
+
+
+        user.setVerificationForm(verificationForm);
+        user.setApartment(apartment);
+
+        userRepository.save(user);
+
+        CreateNewAccountDTO responseDTO = new CreateNewAccountDTO(
+                user.getUserName(),
+                newAccountDTO.getPassword(),
+                user.getEmail(),
+                user.getApartment().getApartmentId(),
+                user.getFullName(),
+                user.getRole()
+        );
+
+        return responseDTO;
     }
 
     @Override
@@ -223,27 +237,44 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public String verifyUser(VerifyUserDTO verifyUserDTO, List<MultipartFile> imageFile) {
+    public User getUserByEmailOrUserName(String emailOrUserName) {
+        User user = userRepository.findByUserNameOrEmail(emailOrUserName);
+        return user;
+    }
+
+    @Override
+    public VerifyUserResponseDTO verifyUser(VerifyUserRequestDTO verifyUserDTO, List<MultipartFile> imageFiles) {
         VerificationForm verificationForm = new VerificationForm();
+        verificationForm.setVerificationFormName(verifyUserDTO.getVerificationFormName());
         verificationForm.setFullName(verifyUserDTO.getFullName());
         verificationForm.setEmail(verifyUserDTO.getEmail());
-        verificationForm.setContractEndDate(verifyUserDTO.getContractEndDate());
-        verificationForm.setContractStartDate(verifyUserDTO.getContractStartDate());
         verificationForm.setPhoneNumber(verifyUserDTO.getPhoneNumber());
+        verificationForm.setContractStartDate(verifyUserDTO.getContractStartDate());
+        verificationForm.setContractEndDate(verifyUserDTO.getContractEndDate());
 
         verificationForm = verificationFormRepository.save(verificationForm);
 
         List<ContractImages> contractImages = new ArrayList<>();
-
-        for (MultipartFile file : imageFile) {
+        for (MultipartFile file : imageFiles) {
             ContractImages contractImage = new ContractImages();
             contractImage.setImageUrl(imageUploadService.uploadImage(file));
+            contractImage.setVerificationForm(verificationForm);
             contractImages.add(contractImage);
         }
 
         verificationForm.setContractImages(contractImages);
+        verificationForm = verificationFormRepository.save(verificationForm);
 
-        return "success";
+        return new VerifyUserResponseDTO(
+                verificationForm.getVerificationFormName(),
+                verificationForm.getFullName(),
+                verificationForm.getEmail(),
+                verificationForm.getPhoneNumber(),
+                verificationForm.getContractStartDate(),
+                verificationForm.getContractEndDate(),
+                contractImages.stream().map(ContractImages::getImageUrl).toList()
+        );
     }
+
 
 }

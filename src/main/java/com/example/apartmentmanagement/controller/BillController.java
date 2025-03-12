@@ -11,7 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/bill")
@@ -20,16 +23,25 @@ public class BillController {
     private BillService billService;
 
     /**
-     * (Staff) Xem danh sach bill trong khoang thoi gian cu the
+     * (Staff) Xem danh sach bill cua user bat ky trong khoang thoi gian cu the
      *
      * @param month
      * @param year
      * @return
      */
     @GetMapping("/getAll/{userId}")
-    public List<BillDTO> getBill(@RequestParam int month, @RequestParam int year,
+    public ResponseEntity<Object> getBill(@RequestParam int month, @RequestParam int year,
                                  @PathVariable Long userId) {
-        return billService.getAllBillsWithinSpecTime(userId, month, year);
+        List<BillDTO> billDTOS = billService.getAllBillsWithinSpecTime(userId, month, year);
+        Map<String, Object> response = new HashMap<>();
+        if (billDTOS.isEmpty()) {
+            response.put("message", "Chưa thanh toán hoá đơn nào");
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        response.put("data", billDTOS);
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -41,13 +53,19 @@ public class BillController {
      * @return
      */
     @GetMapping("/view_bill_list")
-    public List<BillDTO> getBillList(@RequestParam int month, @RequestParam int year, HttpSession session) {
+    public ResponseEntity<Object> getBillList(@RequestParam int month, @RequestParam int year, HttpSession session) {
         Object sessionUser = session.getAttribute("user");
-        if (sessionUser == null) {
-            throw new RuntimeException("User not found in session");
-        }
         User user = (User) sessionUser;
-        return billService.viewBillList(month, year, user.getUserId());
+        List<BillDTO> billDTOS = billService.viewBillList(month, year, user.getUserId());
+        Map<String, Object> response = new HashMap<>();
+        if (billDTOS.isEmpty()) {
+            response.put("message", "Chưa thanh toán hoá đơn nào");
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        response.put("data", billDTOS);
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -63,20 +81,30 @@ public class BillController {
                 request.getElectricCons(),
                 request.getWaterCons(),
                 request.getOthers());
+        Map<String, Object> response = new HashMap<>();
         if (result.equals("success")) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+            response.put("status", HttpStatus.CREATED.value());
+            response.put("data", request);
+            response.put("message", "Tạo hoá đơn thành công");
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", "Khởi tạo thất bại");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 
     @DeleteMapping("/delete/{billId}")
     public ResponseEntity<Object> deleteBill(@PathVariable Long billId) {
+        Map<String, Object> response = new HashMap<>();
         try {
             String result = billService.deleteBill(billId);
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(result);
+            response.put("status", HttpStatus.NO_CONTENT.value());
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+            response.put("message", "Không tìm thấy hoá đơn này");
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
 }

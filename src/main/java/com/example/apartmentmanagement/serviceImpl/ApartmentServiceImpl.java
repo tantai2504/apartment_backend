@@ -116,9 +116,20 @@ public class ApartmentServiceImpl implements ApartmentService{
     }
 
     @Override
-    public Apartment getApartmentByName(String name) {
-        return apartmentRepository.findApartmentByApartmentNameContaining(name);
+    public List<ApartmentDTO> getApartmentByName(String name) {
+        return apartmentRepository.findApartmentByApartmentNameContaining(name).stream()
+                .map(apartment -> new ApartmentDTO(
+                        apartment.getApartmentId(),
+                        apartment.getApartmentName(),
+                        apartment.getHouseholder(),
+                        apartment.getTotalNumber(),
+                        apartment.getStatus(),
+                        apartment.getAptImgUrl(),
+                        apartment.getUsers().stream().map(User::getUserName).toList()
+                ))
+                .toList();
     }
+
 
     @Override
     public List<ApartmentDTO> totalUnrentedApartment() {

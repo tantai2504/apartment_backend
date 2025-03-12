@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -21,8 +22,10 @@ public class VerificationForm {
     @Column(name = "verification_form_id")
     private Long verificationFormId;
 
+    @Nationalized
     private String verificationFormName;
 
+    @Nationalized
     private String fullName;
 
     private String email;
@@ -33,7 +36,7 @@ public class VerificationForm {
 
     private LocalDateTime contractEndDate;
 
-    @OneToOne(mappedBy = "verificationForm", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "verificationForm", cascade = CascadeType.ALL, orphanRemoval = true)
     private User user;
 
     @OneToMany(mappedBy = "verificationForm", cascade = CascadeType.ALL, orphanRemoval = true)

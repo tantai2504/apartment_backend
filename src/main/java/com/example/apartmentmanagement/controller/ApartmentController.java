@@ -26,9 +26,17 @@ public class ApartmentController {
      * @return List can ho
      */
     @GetMapping("/getAll")
-    public ResponseEntity<List<ApartmentDTO>> showAllApartment(){
+    public ResponseEntity<Object> showAllApartment(){
         List<ApartmentDTO> apartments = apartmentService.showApartment();
-        return ResponseEntity.ok(apartments);
+        Map<String, Object> response = new HashMap<>();
+        if (apartments.isEmpty()) {
+            response.put("message", "Không có căn hộ nào");
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        response.put("data", apartments);
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
     }
 
     /**
@@ -38,53 +46,77 @@ public class ApartmentController {
      * @return Apartment
      */
     @GetMapping("/find")
-    public ResponseEntity<Apartment> findApartmentByName(@RequestParam String name) {
-        Apartment apartment = apartmentService.getApartmentByName(name);
-        return ResponseEntity.ok(apartment);
+    public ResponseEntity<Object> findApartmentByName(@RequestParam String name) {
+        List<ApartmentDTO> apartment = apartmentService.getApartmentByName(name);
+        Map<String, Object> response = new HashMap<>();
+        if (apartment.isEmpty()) {
+            response.put("message", "Không tìm thấy căn hộ này");
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        response.put("data", apartment);
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/getAll/unrented")
-    public ResponseEntity<List<ApartmentDTO>> showAllUnrentedApartment() {
+    public ResponseEntity<Object> showAllUnrentedApartment() {
         List<ApartmentDTO> apartments = apartmentService.totalUnrentedApartment();
+        Map<String, Object> response = new HashMap<>();
         if (apartments.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+            response.put("message", "Tất cả các căn hộ đều đã được cho thuê");
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         }
-        return ResponseEntity.ok(apartments);
+        response.put("data", apartments);
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
     }
+//
+//    /**
+//     * Tao moi can ho
+//     *
+//     * @param apartment
+//     * @param imageFile
+//     * @param bindingResult
+//     * @return
+//     */
+//    @PostMapping("/createApartment")
+//    public ResponseEntity<Object> createApartment(
+//            @Valid @ModelAttribute Apartment apartment,
+//            @RequestParam(value = "file", required = false) MultipartFile imageFile,
+//            BindingResult bindingResult) {
+//        if (bindingResult.hasErrors()) {
+//            Map<String, String> errors = new HashMap<>();
+//            bindingResult.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
+//        }
+//        String result = apartmentService.addApartment(apartment);
+//        if (result.equals("Add successfully")) {
+//            return ResponseEntity.status(HttpStatus.CREATED).body("Add successfully");
+//        } else {
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+//        }
+//    }
 
     /**
-     * Tao moi can ho
+     * Tìm kiếm căn hộ theo id
      *
-     * @param apartment
-     * @param imageFile
-     * @param bindingResult
+     * @param id
      * @return
      */
-    @PostMapping("/createApartment")
-    public ResponseEntity<Object> createApartment(
-            @Valid @ModelAttribute Apartment apartment,
-            @RequestParam(value = "file", required = false) MultipartFile imageFile,
-            BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            Map<String, String> errors = new HashMap<>();
-            bindingResult.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-        }
-        String result = apartmentService.addApartment(apartment);
-        if (result.equals("Add successfully")) {
-            return ResponseEntity.status(HttpStatus.CREATED).body("Add successfully");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
-        }
-    }
-
     @GetMapping("/get/{id}")
     public ResponseEntity<Object> findApartmentById(@PathVariable("id") Long id) {
         Apartment existed = apartmentService.getApartmentById(id);
+        Map<String, Object> response = new HashMap<>();
         if (existed != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(existed);
+            response.put("data", existed);
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Cannot find apartment");
+            response.put("message", "Không tìm thấy căn hộ này");
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
 }

@@ -1,8 +1,11 @@
 package com.example.apartmentmanagement.service;
 
+import com.example.apartmentmanagement.dto.CreateNewAccountDTO;
 import com.example.apartmentmanagement.dto.UserDTO;
-import com.example.apartmentmanagement.dto.VerifyUserDTO;
+import com.example.apartmentmanagement.dto.VerifyUserRequestDTO;
+import com.example.apartmentmanagement.dto.VerifyUserResponseDTO;
 import com.example.apartmentmanagement.entities.User;
+import com.example.apartmentmanagement.entities.VerificationForm;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -11,7 +14,7 @@ public interface UserService {
 
     List<UserDTO> showAllUser();
 
-    String addUser(User user, MultipartFile imageFile, Long apartmentId, String verificationOwner);
+    CreateNewAccountDTO addUser(CreateNewAccountDTO newAccountDTO);
 
     boolean checkUserExisted(User user);
 
@@ -29,6 +32,8 @@ public interface UserService {
 
     String deleteUserById(Long id);
 
-    String verifyUser(VerifyUserDTO verifyUserDTO, List<MultipartFile> imageFile);
+    User getUserByEmailOrUserName(String email);
+
+    VerifyUserResponseDTO verifyUser(VerifyUserRequestDTO verifyUserDTO, List<MultipartFile> imageFile);
 
 }

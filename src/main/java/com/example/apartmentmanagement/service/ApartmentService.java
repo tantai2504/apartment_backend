@@ -22,7 +22,7 @@ public interface ApartmentService {
 
     void deleteApartment (Long id);
 
-    Apartment getApartmentByName (String name);
+    List<ApartmentDTO> getApartmentByName (String name);
 
     List<ApartmentDTO> totalUnrentedApartment ();
 }

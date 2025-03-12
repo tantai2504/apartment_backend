@@ -4,6 +4,7 @@ import com.example.apartmentmanagement.dto.BillDTO;
 import com.example.apartmentmanagement.dto.BillRequestDTO;
 import com.example.apartmentmanagement.entities.Bill;
 import com.example.apartmentmanagement.entities.User;
+import com.example.apartmentmanagement.repository.BillRepository;
 import com.example.apartmentmanagement.service.BillService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,8 @@ import java.util.Map;
 public class BillController {
     @Autowired
     private BillService billService;
+    @Autowired
+    private BillRepository billRepository;
 
     /**
      * (Staff) Xem danh sach bill cua user bat ky trong khoang thoi gian cu the
@@ -94,15 +97,36 @@ public class BillController {
         }
     }
 
+    @GetMapping("/")
+
+//    @PutMapping("/update/{billid}")
+//    public ResponseEntity<Object> updateBill(@PathVariable Long billid, @RequestBody BillRequestDTO request) {
+//
+//    }
+
+    /**
+     * (User) xoá hoá đơn đã thanh toán
+     *
+     * @param billId
+     * @param session
+     * @return
+     */
     @DeleteMapping("/delete/{billId}")
-    public ResponseEntity<Object> deleteBill(@PathVariable Long billId) {
+    public ResponseEntity<Object> deleteBill(@PathVariable Long billId, HttpSession session) {
+        User user = (User) session.getAttribute("user");
         Map<String, Object> response = new HashMap<>();
         try {
-            String result = billService.deleteBill(billId);
+            Bill bill = billRepository.findById(billId).get();
+            if (!bill.getUser().getUserId().equals(user.getUserId())) {
+                response.put("message", "Không có quyền xoá hoá đơn này");
+                response.put("status", HttpStatus.FORBIDDEN.value());
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
+            }
+            billService.deleteBill(billId);
             response.put("status", HttpStatus.NO_CONTENT.value());
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
         } catch (RuntimeException e) {
-            response.put("message", "Không tìm thấy hoá đơn này");
+            response.put("message", e.getMessage());
             response.put("status", HttpStatus.NOT_FOUND.value());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }

@@ -12,7 +12,6 @@ import lombok.Setter;
 public class CreateNewAccountDTO {
     private String userName;
     private String password;
-    private String email;
     private Long apartmentId;
     private String fullName;
     private String role;

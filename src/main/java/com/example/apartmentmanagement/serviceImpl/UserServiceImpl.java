@@ -38,6 +38,11 @@ public class UserServiceImpl implements UserService {
     private VerificationFormRepository verificationFormRepository;
 
     @Override
+    public void saveUser(User user) {
+        userRepository.save(user); // Lưu người dùng vào database
+    }
+
+    @Override
     public List<UserDTO> showAllUser() {
         return userRepository.findAll().stream().map(user -> {
             UserDTO dto = new UserDTO();

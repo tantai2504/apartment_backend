@@ -1,6 +1,8 @@
 package com.example.apartmentmanagement.controller;
 
+import com.example.apartmentmanagement.dto.ForgotPasswordDTO;
 import com.example.apartmentmanagement.dto.LoginRequestDTO;
+import com.example.apartmentmanagement.dto.ResetPasswordDTO;
 import com.example.apartmentmanagement.dto.UserDTO;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.serviceImpl.EmailService;

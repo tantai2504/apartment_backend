@@ -97,6 +97,20 @@ public class BillController {
         }
     }
 
+    @GetMapping("/")
+
+//    @PutMapping("/update/{billid}")
+//    public ResponseEntity<Object> updateBill(@PathVariable Long billid, @RequestBody BillRequestDTO request) {
+//
+//    }
+
+    /**
+     * (User) xoá hoá đơn đã thanh toán
+     *
+     * @param billId
+     * @param session
+     * @return
+     */
     @DeleteMapping("/delete/{billId}")
     public ResponseEntity<Object> deleteBill(@PathVariable Long billId, HttpSession session) {
         User user = (User) session.getAttribute("user");

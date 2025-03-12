@@ -6,18 +6,14 @@ import com.example.apartmentmanagement.dto.UserDTO;
 import com.example.apartmentmanagement.dto.VerifyUserRequestDTO;
 import com.example.apartmentmanagement.dto.VerifyUserResponseDTO;
 import com.example.apartmentmanagement.entities.User;
-import com.example.apartmentmanagement.entities.VerificationForm;
 import com.example.apartmentmanagement.service.UserService;
 import jakarta.servlet.http.HttpSession;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
@@ -117,7 +113,7 @@ public class UserController {
             response.put("status", HttpStatus.CREATED.value());
             response.put("data", result);
             response.put("message", "Đã lưu thông tin");
-            return ResponseEntity.status(HttpStatus.CREATED).body(result);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException e) {
             response.put("status", HttpStatus.BAD_REQUEST.value());
             response.put("message", "Lỗi");

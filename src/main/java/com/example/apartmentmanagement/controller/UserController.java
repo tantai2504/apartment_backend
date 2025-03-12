@@ -1,9 +1,12 @@
 package com.example.apartmentmanagement.controller;
 
 import com.cloudinary.Cloudinary;
+import com.example.apartmentmanagement.dto.CreateNewAccountDTO;
 import com.example.apartmentmanagement.dto.UserDTO;
-import com.example.apartmentmanagement.dto.VerifyUserDTO;
+import com.example.apartmentmanagement.dto.VerifyUserRequestDTO;
+import com.example.apartmentmanagement.dto.VerifyUserResponseDTO;
 import com.example.apartmentmanagement.entities.User;
+import com.example.apartmentmanagement.entities.VerificationForm;
 import com.example.apartmentmanagement.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
@@ -14,6 +17,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,16 +33,18 @@ public class UserController {
     private Cloudinary cloudinary;
 
     @PostMapping("/add")
-    public ResponseEntity<Object> addUser(
-            @Valid @ModelAttribute User user,
-            @RequestPart(value = "file", required = false) MultipartFile imageFile,
-            @RequestParam(value = "apartment_id", required = false) Long apartmentId,
-            @RequestParam(value = "fullName") String verificationOwner) {
-        String result = userService.addUser(user, imageFile, apartmentId, verificationOwner);
-        if (result.equals("Add Successfully")) {
+    public ResponseEntity<Object> addUser(@RequestBody CreateNewAccountDTO newAccountDTO) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            CreateNewAccountDTO result = userService.addUser(newAccountDTO);
+            response.put("status", HttpStatus.CREATED.value());
+            response.put("data", result);
+            response.put("message", "Đã cấp tài khoản thành công");
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
+        } catch (RuntimeException e) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 
@@ -75,7 +82,6 @@ public class UserController {
     public ResponseEntity<Object> updateImage(@RequestPart("file") MultipartFile file, HttpSession session) {
         User user = (User) session.getAttribute("user");
         boolean result = userService.updateImage(user, file);
-
         if (result) {
             return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Cập nhật ảnh thành công!"));
         } else {
@@ -96,12 +102,26 @@ public class UserController {
     }
 
     @PostMapping("/verify_user")
-    public ResponseEntity<String> verifyUser(VerifyUserDTO verifyUserDTO, @RequestPart("imageFile") List<MultipartFile> imageFiles){
-        String result = userService.verifyUser(verifyUserDTO, imageFiles);
-        if (result.equals("success")) {
+    public ResponseEntity<Object> verifyUser(@RequestParam("verificationFormName") String verificationFormName,
+                                             @RequestParam("fullName") String fullName,
+                                             @RequestParam("email") String email,
+                                             @RequestParam("phoneNumber") String phoneNumber,
+                                             @RequestParam("contractStartDate") LocalDateTime contractStartDate,
+                                             @RequestParam("contractEndDate") LocalDateTime contractEndDate,
+                                             @RequestPart("imageFile") List<MultipartFile> imageFiles){
+        Map<String, Object> response = new HashMap<>();
+        VerifyUserRequestDTO verifyUserDTO = new VerifyUserRequestDTO(
+                verificationFormName, fullName, email, phoneNumber, contractStartDate, contractEndDate);
+        try {
+            VerifyUserResponseDTO result = userService.verifyUser(verifyUserDTO, imageFiles);
+            response.put("status", HttpStatus.CREATED.value());
+            response.put("data", result);
+            response.put("message", "Đã lưu thông tin");
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Có lỗi xảy ra trong quá trình phê duyệt");
+        } catch (RuntimeException e) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", "Lỗi");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 }

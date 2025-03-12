@@ -13,5 +13,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     User findByUserName(String username);
 
-    User findByFullName(String fullName);
+    @Query("SELECT u FROM User u WHERE u.userName = :input OR u.email = :input")
+    User findByUserNameOrEmail(@Param("input") String input);
+
 }

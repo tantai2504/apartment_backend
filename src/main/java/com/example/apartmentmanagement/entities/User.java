@@ -46,32 +46,27 @@ public class User {
 
     private LocalDate birthday;
 
-    /**
-     * @param idNumber: can cuoc cong dan
-     */
+    //CCCD
     private String idNumber;
 
     @Nationalized
     private String job;
 
-    /**
-     * @param role: phan quyen dua tren param nay (resident, owner)
-     */
     @Nationalized
     private String role;
 
     @OneToOne
-    @JoinColumn(name = "verification_form_id", referencedColumnName = "verification_form_id")
+    @JoinColumn(name = "verification_form_id", nullable = false, unique = true)
     private VerificationForm verificationForm;
 
     @ManyToOne
-    @JoinColumn(name = "apartment_id", referencedColumnName = "apartment_id")
+    @JoinColumn(name = "apartment_id")
     private Apartment apartment;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> notifications;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private Card card;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)

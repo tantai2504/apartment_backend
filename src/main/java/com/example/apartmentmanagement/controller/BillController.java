@@ -34,7 +34,7 @@ public class BillController {
      */
     @GetMapping("/getAll/{userId}")
     public ResponseEntity<Object> getBill(@RequestParam int month, @RequestParam int year,
-                                 @PathVariable Long userId) {
+                                          @PathVariable Long userId) {
         List<BillDTO> billDTOS = billService.getAllBillsWithinSpecTime(userId, month, year);
         Map<String, Object> response = new HashMap<>();
         if (billDTOS.isEmpty()) {
@@ -97,6 +97,20 @@ public class BillController {
         }
     }
 
+    @GetMapping("/")
+
+//    @PutMapping("/update/{billid}")
+//    public ResponseEntity<Object> updateBill(@PathVariable Long billid, @RequestBody BillRequestDTO request) {
+//
+//    }
+
+    /**
+     * (User) xoá hoá đơn đã thanh toán
+     *
+     * @param billId
+     * @param session
+     * @return
+     */
     @DeleteMapping("/delete/{billId}")
     public ResponseEntity<Object> deleteBill(@PathVariable Long billId, HttpSession session) {
         User user = (User) session.getAttribute("user");

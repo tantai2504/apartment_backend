@@ -89,7 +89,11 @@ public class BillServiceImpl implements BillService {
     @Override
     public void deleteBill(Long id) {
         Bill bill = billRepository.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy bill này"));
-        billRepository.delete(bill);
+        if (bill.getStatus().equals("unpayed")) {
+            throw new RuntimeException("Phải thanh toán hoá đơn trước");
+        } else {
+            billRepository.delete(bill);
+        }
     }
 
     @Override

@@ -80,7 +80,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User user = new User();
-        user.setUserName(newAccountDTO.getUserName());
+        user.setUserName(verificationForm.getEmail());
 
         String encryptPass = AESUtil.encrypt(newAccountDTO.getPassword());
         user.setPassword(encryptPass);
@@ -101,8 +101,6 @@ public class UserServiceImpl implements UserService {
 
         user.setRole(newAccountDTO.getRole());
 
-
-
         user.setVerificationForm(verificationForm);
         user.setApartment(apartment);
 
@@ -111,7 +109,6 @@ public class UserServiceImpl implements UserService {
         CreateNewAccountDTO responseDTO = new CreateNewAccountDTO(
                 user.getUserName(),
                 newAccountDTO.getPassword(),
-                user.getEmail(),
                 user.getApartment().getApartmentId(),
                 user.getFullName(),
                 user.getRole()

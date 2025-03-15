@@ -97,6 +97,7 @@ public class BillController {
         }
     }
 
+<<<<<<< HEAD
     @GetMapping("/get_bill_info/{billId}")
     public ResponseEntity<Object> getBillInfo(@RequestParam int month, @RequestParam int year, @PathVariable Long billId) {
         BillDTO billDTO = billService.getBillById(billId);
@@ -116,6 +117,14 @@ public class BillController {
     public ResponseEntity<Object> updateBill(@PathVariable Long billid, @RequestBody BillRequestDTO request) {
         return null;
     }
+=======
+    @GetMapping("/")
+
+//    @PutMapping("/update/{billid}")
+//    public ResponseEntity<Object> updateBill(@PathVariable Long billid, @RequestBody BillRequestDTO request) {
+//
+//    }
+>>>>>>> d86a5f25c358436b7a2f568ac9a1d4560f3aae47
 
     /**
      * (User) xoá hoá đơn đã thanh toán

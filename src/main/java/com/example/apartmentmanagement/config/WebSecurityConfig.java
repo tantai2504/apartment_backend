@@ -30,8 +30,10 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .cors(withDefaults())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/login", "/bill/**", "/apartment/**",
-                                "/api/log_out", "/payment/process","/user/**", "/notification/**", "/api/reports/**",
-                                "/public/**","/api/replies/report/**", "/api/replies/report/**", "/api/replies/**").permitAll()
+                                "/api/log_out", "/payment/process", "/user/**", "/notification/**", "/api/reports/**",
+                                "/public/**","/api/replies/report/**", "/api/replies/report/**", "/api/replies/**",
+                                "/ws/**", "/chat/**", "/app/**")
+                        .permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -49,5 +51,4 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
         return http.build();
     }
-
 }

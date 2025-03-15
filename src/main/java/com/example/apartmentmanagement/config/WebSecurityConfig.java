@@ -29,9 +29,13 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .csrf(csrf -> csrf.disable())
                 .cors(withDefaults())
                 .authorizeHttpRequests(auth -> auth
+
                         .requestMatchers("/api/login", "/bill/**", "/apartment/**","/api/forgot_password","/api/reset_password",
                                 "/api/log_out", "/payment/process","/user/**", "/notification/**", "/api/reports/**",
-                                "/public/**","/api/replies/report/**", "/api/replies/report/**", "/api/replies/**").permitAll()
+                                "/public/**","/api/replies/report/**", "/api/replies/report/**", "/api/replies/**",
+                                "/ws/**", "/chat/**", "/app/**")
+                        .permitAll()
+
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -49,5 +53,4 @@ public class WebSecurityConfig implements WebMvcConfigurer {
 
         return http.build();
     }
-
 }

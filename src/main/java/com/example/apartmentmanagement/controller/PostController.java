@@ -30,7 +30,7 @@ public class PostController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         } else {
             response.put("status", HttpStatus.OK.value());
-            response.put("posts", posts);
+            response.put("data", posts);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
     }
@@ -45,7 +45,7 @@ public class PostController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         } else {
             response.put("status", HttpStatus.OK.value());
-            response.put("post", postDTO);
+            response.put("data", postDTO);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
     }

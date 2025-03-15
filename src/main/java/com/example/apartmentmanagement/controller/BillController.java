@@ -97,12 +97,25 @@ public class BillController {
         }
     }
 
-    @GetMapping("/")
+    @GetMapping("/get_bill_info/{billId}")
+    public ResponseEntity<Object> getBillInfo(@RequestParam int month, @RequestParam int year, @PathVariable Long billId) {
+        BillDTO billDTO = billService.getBillById(billId);
+        Map<String, Object> response = new HashMap<>();
+        if (billDTO == null) {
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            response.put("message", "Không tìm thấy hoá đơn này");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        } else {
+            response.put("status", HttpStatus.OK.value());
+            response.put("data", billDTO);
+            return ResponseEntity.ok(response);
+        }
+    }
 
-//    @PutMapping("/update/{billid}")
-//    public ResponseEntity<Object> updateBill(@PathVariable Long billid, @RequestBody BillRequestDTO request) {
-//
-//    }
+    @PutMapping("/update/{billid}")
+    public ResponseEntity<Object> updateBill(@PathVariable Long billid, @RequestBody BillRequestDTO request) {
+        return null;
+    }
 
     /**
      * (User) xoá hoá đơn đã thanh toán

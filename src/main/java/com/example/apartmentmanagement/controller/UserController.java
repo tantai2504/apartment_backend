@@ -97,10 +97,16 @@ public class UserController {
     public ResponseEntity<Object> updateImage(@RequestPart("file") MultipartFile file, HttpSession session) {
         User user = (User) session.getAttribute("user");
         boolean result = userService.updateImage(user, file);
+        Map<String, Object> response = new HashMap<>();
         if (result) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Cập nhật ảnh thành công!"));
+            response.put("status", HttpStatus.CREATED.value());
+            response.put("data", user.getUserImgUrl());
+            response.put("message", "Update ảnh thành công");
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Cập nhật ảnh thất bại!"));
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", "Update ảnh thất bại");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 

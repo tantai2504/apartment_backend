@@ -1,7 +1,7 @@
 package com.example.apartmentmanagement.entities;
 
 /***
- * Entity facility: dich vu, tien ich tu ben thu ba
+ * Entity post: Bài đăng cho thuê hoặc bán căn hộ
  */
 
 import jakarta.persistence.*;
@@ -12,32 +12,38 @@ import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
+import java.util.List;
+
 @Entity
-@Table(name = "facility")
+@Table(name = "post")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Facility {
+public class Post {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long facilityId;
+    private Long postId;
 
     @Nationalized
-    private String facilityType;
+    private String title;
 
-    /**
-     * @param issuanceDate: ngay ky hop dong
-     */
-    private LocalDate startDate;
+    @Nationalized
+    private String content;
 
-    /**
-     * @param expirationDate: ngay het han
-     */
-    private LocalDate endDate;
+    private boolean depositCheck;
+
+    @Nationalized
+    private String postType;
+
+    private LocalDateTime postDate;
 
     @ManyToOne
     @JoinColumn(name = "user_Id", nullable = false)
     private User user;
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<PostImages> postImages;
 }

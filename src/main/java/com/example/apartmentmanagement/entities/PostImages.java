@@ -1,7 +1,7 @@
 package com.example.apartmentmanagement.entities;
 
 /***
- * Entity consumption: luu du lieu tieu thu dien nuoc (kWh) hang thang
+ * Entity post_images: Hình ảnh của bài đăng
  */
 
 import jakarta.persistence.*;
@@ -13,25 +13,22 @@ import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 @Entity
-@Table(name = "consumption")
+@Table(name = "post_images")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Consumption {
+public class PostImages {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long consumptionId;
+    private Long postImagesId;
 
-    private LocalDateTime consumptionDate;
-
-    private float waterConsumption;
-
-    private float electricConsumption;
+    private String postImagesUrl;
 
     @ManyToOne
-    @JoinColumn(name = "user_Id", nullable = false)
-    private User user;
+    @JoinColumn(name = "post_id", nullable = false)
+    private Post post;
 }

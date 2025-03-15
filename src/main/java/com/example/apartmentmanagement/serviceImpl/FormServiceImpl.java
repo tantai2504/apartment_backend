@@ -44,10 +44,36 @@ public class FormServiceImpl implements FormService {
             form.setUser(user);
 
             return formRepository.save(form);
-
         } catch (IOException e) {
             throw new RuntimeException("File upload failed", e);
         }
+    }
+
+    @Override
+    public Form editForm(Long formId, String formType, MultipartFile file) {
+        try {
+            Form form = formRepository.findById(formId)
+                    .orElseThrow(() -> new RuntimeException("Form not found"));
+
+            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+
+            form.setFormType(formType);
+            form.setFileUrl(uploadResult.get("secure_url").toString());
+            form.setFileName(file.getOriginalFilename());
+            form.setCreatedAt(new Date());
+
+            return formRepository.save(form);
+        } catch (IOException e) {
+            throw new RuntimeException("File upload failed", e);
+        }
+    }
+
+    @Override
+    public void deleteForm(Long formId) {
+        if (!formRepository.existsById(formId)) {
+            throw new RuntimeException("Form not found");
+        }
+        formRepository.deleteById(formId);
     }
 
     @Override
@@ -59,5 +85,25 @@ public class FormServiceImpl implements FormService {
     public Form getFormById(Long formId) {
         return formRepository.findById(formId)
                 .orElseThrow(() -> new RuntimeException("Form not found"));
+    }
+
+    @Override
+    public List<Form> filterForms(String formType) {
+        return formRepository.findByFormType(formType);
+    }
+
+    @Override
+    public void sendFeedback(Long formId, String feedback) {
+        Form form = formRepository.findById(formId)
+                .orElseThrow(() -> new RuntimeException("Form not found"));
+        form.setFormType(form.getFormType() + " | Feedback: " + feedback);
+        formRepository.save(form);
+    }
+
+    @Override
+    public String getFileUrl(Long formId) {
+        Form form = formRepository.findById(formId)
+                .orElseThrow(() -> new RuntimeException("Form not found"));
+        return form.getFileUrl();
     }
 }

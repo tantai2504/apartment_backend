@@ -83,9 +83,9 @@ public class UserServiceImpl implements UserService {
         Apartment apartment = apartmentRepository.findById(newAccountDTO.getApartmentId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy Apartment với ID này"));
 
-        if (apartment.getHouseholder() == null && newAccountDTO.getRole().equals("Chủ sở hữu")) {
+        if (apartment.getHouseholder() == null && newAccountDTO.getRole().equals("Owner")) {
             apartment.setHouseholder(newAccountDTO.getFullName());
-        } else if (apartment.getHouseholder() != null && newAccountDTO.getRole().equals("Chủ sở hữu")) {
+        } else if (apartment.getHouseholder() != null && newAccountDTO.getRole().equals("Owner")) {
             throw new RuntimeException("Đã có người đứng tên chủ căn hộ, không thể thêm chủ sở hữu mới.");
         }
 

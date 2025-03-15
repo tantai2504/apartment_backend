@@ -32,52 +32,6 @@ public class ApartmentServiceImpl implements ApartmentService{
     }
 
     @Override
-    public String addResidentIntoApartment(Apartment apartment, Long userId, MultipartFile imageFile) {
-        List<Apartment> apartmentList = apartmentRepository.findAll();
-
-        for (Apartment a : apartmentList) {
-            if (apartment.getApartmentName().equals(a.getApartmentName())) {
-                return "Existed apartment";
-            }
-        }
-
-        if (apartment.getTotalNumber() == 0 &&
-                (apartment.getHouseholder() == null || apartment.getHouseholder().isEmpty())) {
-            apartment.setHouseholder("");
-            apartment.setStatus("unrented");
-        } else {
-            apartment.setStatus("rented");
-        }
-
-        String imgUrl = imageUploadService.uploadImage(imageFile);
-        if (imgUrl.equals("image-url")) {
-            apartment.setAptImgUrl("");
-        } else {
-            apartment.setAptImgUrl(imgUrl);
-        }
-        User user = null;
-        if (userId != null) {
-            user = userRepository.findById(userId).orElse(null);
-        }
-        List<User> userList = new ArrayList<>();
-        userList.add(user);
-        apartment.setUsers(userList);
-        apartmentRepository.save(apartment);
-        return "Add successfully";
-    }
-
-    @Override
-    public String checkApartmentExisted(Apartment apartment) {
-        List<Apartment> apartmentList = apartmentRepository.findAll();
-        for (Apartment a : apartmentList) {
-            if (apartment.getApartmentName().equals(a.getApartmentName())) {
-                return "Existed apartment";
-            }
-        }
-        return "Not existed";
-    }
-
-    @Override
     public List<ApartmentDTO> showApartment() {
         return apartmentRepository.findAll().stream().map(apartment -> new ApartmentDTO(
                 apartment.getApartmentId(),
@@ -96,24 +50,24 @@ public class ApartmentServiceImpl implements ApartmentService{
         return apartment;
     }
 
-    @Override
-    public void updateApartment(Apartment existedApartment, Apartment apartment, MultipartFile imageFile) {
-        existedApartment.setApartmentName(apartment.getApartmentName());
-        existedApartment.setHouseholder(apartment.getHouseholder());
-        existedApartment.setTotalNumber(apartment.getTotalNumber());
-        if (imageFile != null) {
-            String imgUrl = imageUploadService.uploadImage(imageFile);
-            apartment.setAptImgUrl(imgUrl);
-        } else {
-            apartment.setAptImgUrl(" ");
-        }
-        apartmentRepository.save(existedApartment);
-    }
-
-    @Override
-    public void deleteApartment(Long id) {
-        apartmentRepository.deleteById(id);
-    }
+//    @Override
+//    public void updateApartment(Apartment existedApartment, Apartment apartment, MultipartFile imageFile) {
+//        existedApartment.setApartmentName(apartment.getApartmentName());
+//        existedApartment.setHouseholder(apartment.getHouseholder());
+//        existedApartment.setTotalNumber(apartment.getTotalNumber());
+//        if (imageFile != null) {
+//            String imgUrl = imageUploadService.uploadImage(imageFile);
+//            apartment.setAptImgUrl(imgUrl);
+//        } else {
+//            apartment.setAptImgUrl(" ");
+//        }
+//        apartmentRepository.save(existedApartment);
+//    }
+//
+//    @Override
+//    public void deleteApartment(Long id) {
+//        apartmentRepository.deleteById(id);
+//    }
 
     @Override
     public List<ApartmentDTO> getApartmentByName(String name) {

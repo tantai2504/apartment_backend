@@ -1,6 +1,7 @@
 package com.example.apartmentmanagement.serviceImpl;
 
 import com.example.apartmentmanagement.dto.BillDTO;
+import com.example.apartmentmanagement.dto.BillRequestDTO;
 import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.Bill;
 import com.example.apartmentmanagement.entities.User;
@@ -58,6 +59,31 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
+    public BillDTO getBillById(Long id) {
+        Bill bill = billRepository.findById(id).get();
+        BillDTO billDTO = new BillDTO(
+                bill.getBillId(),
+                bill.getBillContent(),
+                bill.getElectricBill(),
+                bill.getWaterBill(),
+                bill.getOthers(),
+                bill.getTotal(),
+                bill.getBillDate(),
+                bill.getStatus(),
+                bill.getUser().getUserName(),
+                bill.getApartment().getApartmentName()
+        );
+        return billDTO;
+    }
+
+    @Override
+    public BillRequestDTO updateBill(Long id, BillRequestDTO billRequestDTO) {
+        Bill bill = billRepository.findById(id).get();
+        bill.setBillContent(billRequestDTO.getBillContent());
+        return null;
+    }
+
+    @Override
     public List<BillDTO> viewBillList(int month, int year, Long userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null || user.getBills() == null) return List.of();
@@ -80,11 +106,11 @@ public class BillServiceImpl implements BillService {
     }
 
 
-    @Override
-    public BillDTO updateBill(Bill bill) {
-        BillDTO billDTO =  new BillDTO();
-        return billDTO;
-    }
+//    @Override
+//    public BillDTO updateBill(Bill bill) {
+//        BillDTO billDTO =  new BillDTO();
+//        return billDTO;
+//    }
 
     @Override
     public void deleteBill(Long id) {

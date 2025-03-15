@@ -45,21 +45,34 @@ public class UserController {
     }
 
     @GetMapping("/find")
-    public ResponseEntity<List<UserDTO>> findAll(String username) {
+    public ResponseEntity<Object> findAll(String username) {
         List<UserDTO> userDTOS = userService.getUserByFullName(username);
-        return ResponseEntity.ok(userDTOS);
+        Map<String, Object> response = new HashMap<>();
+        if (userDTOS != null) {
+            response.put("status", HttpStatus.OK.value());
+            response.put("data", userDTOS);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } else {
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            response.put("message", "Không tìm thấy user phù hợp");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
     }
 
     @GetMapping("/user_profile")
     public ResponseEntity<Object> getUserInfo(HttpSession session) {
         User user = (User) session.getAttribute("user");
         Long userId = user.getUserId();
-        
         UserDTO userDto = userService.getUserDTOById(userId);
+        Map<String, Object> response = new HashMap<>();
         if (userDto != null) {
-            return ResponseEntity.ok(userDto);
+            response.put("status", HttpStatus.OK.value());
+            response.put("data", userDto);
+            return ResponseEntity.ok(response);
         } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            response.put("message", "Không tìm thấy thông tin cư dân này");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
 
@@ -67,10 +80,16 @@ public class UserController {
     public ResponseEntity<Object> updateUserBaseProfile(@RequestBody UserDTO userDTO, HttpSession session) {
         User user = (User) session.getAttribute("user");
         String result = userService.updateUser(userDTO, user);
+        Map<String, Object> response = new HashMap<>();
         if (result.equals("Update thành công")) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Cập nhật thành công!"));
+            response.put("status", HttpStatus.CREATED.value());
+            response.put("data", userDTO);
+            response.put("message", result);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Cập nhật thất bại!"));
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", "Lỗi khi cập nhật dữ liệu");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 
@@ -78,17 +97,32 @@ public class UserController {
     public ResponseEntity<Object> updateImage(@RequestPart("file") MultipartFile file, HttpSession session) {
         User user = (User) session.getAttribute("user");
         boolean result = userService.updateImage(user, file);
+        Map<String, Object> response = new HashMap<>();
         if (result) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("message", "Cập nhật ảnh thành công!"));
+            response.put("status", HttpStatus.CREATED.value());
+            response.put("data", user.getUserImgUrl());
+            response.put("message", "Update ảnh thành công");
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "Cập nhật ảnh thất bại!"));
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", "Update ảnh thất bại");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 
     @GetMapping("/user_list")
     public ResponseEntity<Object> getUserList() {
         List<UserDTO> dtos = userService.showAllUser();
-        return ResponseEntity.ok(dtos);
+        Map<String, Object> response = new HashMap<>();
+        if(dtos != null) {
+            response.put("status", HttpStatus.OK.value());
+            response.put("data", dtos);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } else {
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            response.put("message", "Không có user nào");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
     }
 
     @DeleteMapping("/delete")

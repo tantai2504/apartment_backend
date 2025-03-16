@@ -51,7 +51,8 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDTO getPostById(Long id) {
-        Post post = postRepository.findById(id).get();
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy bài đăng với ID: " + id));
         PostDTO dto = new PostDTO(
                 post.getPostId(),
                 post.getTitle(),

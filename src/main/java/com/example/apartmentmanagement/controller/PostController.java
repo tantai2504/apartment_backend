@@ -25,9 +25,9 @@ public class PostController {
         List<PostDTO> posts = postService.getPosts();
         Map<String, Object> response = new HashMap<>();
         if (posts.isEmpty()) {
-            response.put("message", "Người dùng này không có post nào");
-            response.put("status", HttpStatus.NOT_FOUND.value());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            response.put("message", "Chưa có post nào");
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } else {
             response.put("status", HttpStatus.OK.value());
             response.put("data", posts);
@@ -37,15 +37,15 @@ public class PostController {
 
     @GetMapping("/{postId}")
     public ResponseEntity<Object> getPostById(@PathVariable Long postId) {
-        PostDTO postDTO = postService.getPostById(postId);
         Map<String, Object> response = new HashMap<>();
-        if (postDTO == null) {
-            response.put("message", "Không tìm thấy post này");
-            response.put("status", HttpStatus.NOT_FOUND.value());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        } else {
+        try {
+            PostDTO postDTO = postService.getPostById(postId);
             response.put("status", HttpStatus.OK.value());
             response.put("data", postDTO);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (RuntimeException e) {
+            response.put("message", e.getMessage());
+            response.put("status", HttpStatus.OK.value());
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
     }

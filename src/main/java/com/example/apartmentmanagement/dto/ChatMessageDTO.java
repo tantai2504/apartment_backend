@@ -4,16 +4,18 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ChatMessageDTO {
-    private String sender;
+    private Long id;
+    private Long senderId;
+    private String senderName;
+    private Long receiverId;
+    private String receiverName;
     private String content;
-    private String chatId;
-    private MessageType type;
-
-    public enum MessageType {
-        CHAT, JOIN, LEAVE
-    }
+    private LocalDateTime timestamp;
+    private boolean isRead;
 }

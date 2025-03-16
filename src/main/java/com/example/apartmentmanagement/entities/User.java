@@ -56,7 +56,7 @@ public class User {
     private String role;
 
     @OneToOne
-    @JoinColumn(name = "verification_form_id", nullable = false, unique = true)
+    @JoinColumn(name = "verification_form_id", nullable = true, unique = true)
     private VerificationForm verificationForm;
 
     @ManyToOne

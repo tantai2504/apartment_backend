@@ -96,6 +96,11 @@ public class HomeController {
         }
     }
 
+    @PostMapping("/register")
+    public ResponseEntity<Object> register(@RequestBody UserDTO userDTO) {
+        return null;
+    }
+
     @PostMapping("/log_out")
     public ResponseEntity<Object> logout(HttpSession session) {
         Map<String, Object> response = new HashMap<>();

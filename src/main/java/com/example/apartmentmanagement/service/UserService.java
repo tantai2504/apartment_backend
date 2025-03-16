@@ -1,9 +1,6 @@
 package com.example.apartmentmanagement.service;
 
-import com.example.apartmentmanagement.dto.CreateNewAccountDTO;
-import com.example.apartmentmanagement.dto.UserDTO;
-import com.example.apartmentmanagement.dto.VerifyUserRequestDTO;
-import com.example.apartmentmanagement.dto.VerifyUserResponseDTO;
+import com.example.apartmentmanagement.dto.*;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.entities.VerificationForm;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,7 +13,7 @@ public interface UserService {
 
     CreateNewAccountDTO addUser(CreateNewAccountDTO newAccountDTO);
 
-    boolean checkUserExisted(User user);
+    RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO);
 
     User getUserById (Long id);
 

@@ -50,6 +50,29 @@ public class PostController {
         }
     }
 
+    @PutMapping("/update/{postId}")
+    public ResponseEntity<Object> updatePost(@PathVariable Long postId,
+                                             @RequestParam ("title") String title,
+                                             @RequestParam ("content") String content,
+                                             @RequestParam ("depositCheck") boolean depositCheck,
+                                             @RequestParam ("postType") String postType,
+                                             @RequestParam ("userName") String userName,
+                                             @RequestPart("imageFile") List<MultipartFile> imageFiles) {
+        PostRequestDTO postRequestDTO = new PostRequestDTO(title, content, depositCheck, postType, userName);
+        Map<String, Object> response = new HashMap<>();
+        try {
+            PostDTO postDTO = postService.updatePost(postId, postRequestDTO, imageFiles);
+            response.put("status", HttpStatus.CREATED.value());
+            response.put("data", postDTO);
+            response.put("message", "Cập nhật thành công");
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
     @PostMapping("/add_post")
     public ResponseEntity<Object> addPost(@RequestParam ("title") String title,
                                           @RequestParam ("content") String content,

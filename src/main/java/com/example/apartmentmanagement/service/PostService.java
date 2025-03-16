@@ -11,9 +11,9 @@ public interface PostService {
 
     PostDTO getPostById(Long id);
 
-    PostDTO createPost(PostRequestDTO postDTO, List<MultipartFile> imageFiles);
+    PostDTO createPost(PostRequestDTO postRequestDTO, List<MultipartFile> imageFiles);
 
-    PostDTO updatePost(Long id, PostDTO postDTO);
+    PostDTO updatePost(Long id, PostRequestDTO postRequestDTO, List<MultipartFile> imageFiles);
 
     void deletePost(Long id);
 }

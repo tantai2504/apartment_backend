@@ -1,9 +1,6 @@
 package com.example.apartmentmanagement.serviceImpl;
 
-import com.example.apartmentmanagement.dto.CreateNewAccountDTO;
-import com.example.apartmentmanagement.dto.UserDTO;
-import com.example.apartmentmanagement.dto.VerifyUserRequestDTO;
-import com.example.apartmentmanagement.dto.VerifyUserResponseDTO;
+import com.example.apartmentmanagement.dto.*;
 import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.ContractImages;
 import com.example.apartmentmanagement.entities.User;
@@ -113,14 +110,23 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean checkUserExisted(User user) {
-        List<User> userList = userRepository.findAll();
-        for (User u : userList) {
-            if (user.getUserName().equals(u.getUserName())) {
-                return false;
+    public RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO) {
+        User user = new User();
+        List<User> users = userRepository.findAll();
+        for (User u : users) {
+            if (u.getUserName().equals(registerRequestDTO.getUserName())) {
+                throw new RuntimeException("Đã có username này");
             }
         }
-        return true;
+
+        if (!registerRequestDTO.getRe_password().equals(registerRequestDTO.getPassword())) {
+            throw new RuntimeException("Mật khẩu không trùng khớp");
+        }
+
+        user.setUserName(registerRequestDTO.getUserName());
+
+        user.setPassword(registerRequestDTO.getPassword());
+        return null;
     }
 
     @Override
@@ -272,6 +278,4 @@ public class UserServiceImpl implements UserService {
                 contractImages.stream().map(ContractImages::getImageUrl).toList()
         );
     }
-
-
 }

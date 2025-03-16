@@ -1,7 +1,7 @@
 package com.example.apartmentmanagement.controller;
 
 import com.example.apartmentmanagement.dto.LoginRequestDTO;
-import com.example.apartmentmanagement.dto.UserDTO;
+import com.example.apartmentmanagement.dto.RegisterRequestDTO;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.util.AESUtil;
 import jakarta.servlet.http.HttpSession;
@@ -11,7 +11,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.example.apartmentmanagement.service.UserService;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -97,7 +96,8 @@ public class HomeController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Object> register(@RequestBody UserDTO userDTO) {
+    public ResponseEntity<Object> register(@RequestBody RegisterRequestDTO registerRequestDTO) {
+
         return null;
     }
 
@@ -110,7 +110,6 @@ public class HomeController {
             response.put("status", HttpStatus.UNAUTHORIZED.value());
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
-
         session.invalidate();
         response.put("message", "Đăng xuất thành công");
         response.put("status", HttpStatus.OK.value());

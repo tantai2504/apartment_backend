@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -100,14 +101,17 @@ public class PostServiceImpl implements PostService {
         }
         post.setUser(user);
 
-        List<String> postImagesUrl = imageUploadService.uploadMultipleImages(imageFiles);
+        postImagesRepository.deleteByPost(post);
 
-        List<PostImages> postImagesList = postImagesUrl.stream().map(url -> {
-            PostImages postImage = new PostImages();
-            postImage.setPostImagesUrl(url);
-            postImage.setPost(post);
-            return postImage;
-        }).collect(Collectors.toList());
+        List<String> postImagesUrl = imageUploadService.uploadMultipleImages(imageFiles);
+        List<PostImages> postImagesList = new ArrayList<>();
+
+        for (String imageUrl : postImagesUrl) {
+            PostImages postImages = new PostImages();
+            postImages.setPostImagesUrl(imageUrl);
+            postImages.setPost(post);
+            postImagesList.add(postImages);
+        }
 
         post.setPostImages(postImagesList);
 
@@ -128,8 +132,44 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDTO updatePost(Long id, PostDTO postDTO) {
-        return null;
+    public PostDTO updatePost(Long id, PostRequestDTO postDTO, List<MultipartFile> imageFiles) {
+        Post post = postRepository.findById(id).get();
+        PostDTO dto = new PostDTO();
+        if (postDTO == null) {
+            throw new RuntimeException("Dữ liệu bài đăng không được để trống");
+        }
+
+        if (postDTO.getTitle() == null || postDTO.getTitle().trim().isEmpty()) {
+            throw new RuntimeException("Tiêu đề bài đăng không được để trống");
+        }
+
+        if (postDTO.getPostType() == null) {
+            throw new RuntimeException("Loại bài đăng không được để trống");
+        }
+
+        if (postDTO.getContent() == null || postDTO.getContent().trim().isEmpty()) {
+            throw new RuntimeException("Nội dung bài đăng không được để trống");
+        }
+
+        if (postDTO.getUserName() == null || postDTO.getUserName().trim().isEmpty()) {
+            throw new RuntimeException("Tên người dùng không được để trống");
+        }
+
+        post.setTitle(postDTO.getTitle());
+        post.setPostType(postDTO.getPostType());
+        post.setPostDate(LocalDateTime.now());
+        post.setDepositCheck(postDTO.isDepositCheck());
+        post.setContent(postDTO.getContent());
+
+        User user = userRepository.findByUserNameOrEmail(postDTO.getUserName());
+        if (user == null) {
+            throw new RuntimeException("Không tìm thấy username này");
+        }
+        post.setUser(user);
+
+        List<String> postImagesUrl = imageUploadService.uploadMultipleImages(imageFiles);
+
+        return dto;
     }
 
     @Override

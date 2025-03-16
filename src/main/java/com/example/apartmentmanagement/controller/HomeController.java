@@ -67,6 +67,34 @@ public class HomeController {
         }
     }
 
+    @GetMapping("/getUser")
+    public ResponseEntity<Object> getUser(@RequestParam (value = "id") Long id) {
+        Map<String, Object> response = new HashMap<>();
+        User user = userService.getUserById(id);
+        if (user != null) {
+            Map<String, Object> dto = new HashMap<>();
+            dto.put("user", user.getUserName());
+            dto.put("password", AESUtil.decrypt(user.getPassword()));
+            dto.put("fullName", user.getFullName());
+            dto.put("email", user.getEmail());
+            dto.put("phone", user.getPhone());
+            dto.put("role", user.getRole());
+            dto.put("description", user.getDescription());
+            dto.put("userImgUrl", user.getUserImgUrl());
+            dto.put("age", user.getAge());
+            dto.put("birthday", user.getBirthday());
+            dto.put("idNumber", user.getIdNumber());
+            dto.put("job", user.getJob());
+            dto.put("apartment", user.getApartment().getApartmentName());
+            response.put("data", dto);
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.ok(response);
+        } else {
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            response.put("message", "Không tìm thấy user này");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
 
     @PostMapping("/log_out")
     public ResponseEntity<Object> logout(HttpSession session) {

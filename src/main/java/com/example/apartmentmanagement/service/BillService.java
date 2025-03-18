@@ -12,6 +12,8 @@ public interface BillService {
 
     BillDTO getBillById(Long id);
 
+    void processPaymentSuccess(Long billId, String paymentInfo);
+
     BillRequestDTO updateBill(Long id, BillRequestDTO billRequestDTO);
 
     List<BillDTO> viewBillList(int month, int year, Long userId);

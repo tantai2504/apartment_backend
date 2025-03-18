@@ -49,6 +49,7 @@ public class HomeController {
             System.out.println("Session ID after login: " + session.getId());
 
             Map<String, Object> dto = new HashMap<>();
+            dto.put("userId", user.getUserId());
             dto.put("user", user.getUserName());
             dto.put("password", password);
             dto.put("fullName", user.getFullName());

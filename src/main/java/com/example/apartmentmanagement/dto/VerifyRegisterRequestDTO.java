@@ -9,11 +9,10 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class RegisterRequestDTO {
+public class VerifyRegisterRequestDTO {
     private String userName;
     private String password;
     private String re_password;
     private String email;
     private String phone;
-    private String otp;
 }

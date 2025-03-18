@@ -57,29 +57,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public CreateNewAccountDTO addUser(CreateNewAccountDTO newAccountDTO) {
-        VerificationForm verificationForm = verificationFormRepository.findVerificationFormByFullNameEqualsIgnoreCase(newAccountDTO.getFullName());
-        if (newAccountDTO.getUserName() == null || newAccountDTO.getPassword() == null) {
-            throw new RuntimeException("Yêu cầu nhập đủ tài khoản/email và mật khẩu");
-        }
-
-        System.out.println("Apartment: " + newAccountDTO.getApartmentId());
-
+        VerificationForm verificationForm = verificationFormRepository.findVerificationFormByUserNameContainingIgnoreCase(newAccountDTO.getUserName());
         List<User> users = userRepository.findAll();
-        for (User u : users) {
-            if (u.getUserName().equals(newAccountDTO.getUserName())) {
-                throw new RuntimeException("Đã có username này");
+        for (User user : users) {
+            if (!user.getUserName().equals(newAccountDTO.getUserName())) {
+                throw new RuntimeException("Chưa có user này trong hệ thống");
             }
         }
-
-        User user = new User();
-        user.setUserName(verificationForm.getEmail());
-
-        String encryptPass = AESUtil.encrypt(newAccountDTO.getPassword());
-        user.setPassword(encryptPass);
+        User user = userRepository.findByUserName(newAccountDTO.getUserName());
 
         Apartment apartment = apartmentRepository.findById(newAccountDTO.getApartmentId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy Apartment với ID này"));
-
         if (apartment.getHouseholder() == null && newAccountDTO.getRole().equals("Owner")) {
             apartment.setHouseholder(newAccountDTO.getFullName());
         } else if (apartment.getHouseholder() != null && newAccountDTO.getRole().equals("Owner")) {
@@ -92,7 +80,6 @@ public class UserServiceImpl implements UserService {
         }
 
         user.setRole(newAccountDTO.getRole());
-
         user.setVerificationForm(verificationForm);
         user.setApartment(apartment);
 
@@ -112,21 +99,39 @@ public class UserServiceImpl implements UserService {
     @Override
     public RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO) {
         User user = new User();
+        user.setUserName(registerRequestDTO.getUserName());
+        user.setEmail(registerRequestDTO.getEmail());
+        user.setPhone(registerRequestDTO.getPhone());
+        user.setPassword(AESUtil.encrypt(registerRequestDTO.getPassword()));
+        userRepository.save(user);
+        RegisterResponseDTO responseDTO = new RegisterResponseDTO(
+                user.getUserId(),
+                user.getUserName(),
+                user.getPassword(),
+                user.getEmail(),
+                user.getPhone()
+        );
+        return responseDTO;
+    }
+
+    @Override
+    public VerifyRegisterRequestDTO verifyRegister(RegisterRequestDTO verifyRegisterRequestDTO) {
         List<User> users = userRepository.findAll();
         for (User u : users) {
-            if (u.getUserName().equals(registerRequestDTO.getUserName())) {
+            if (u.getUserName().equals(verifyRegisterRequestDTO.getUserName())) {
                 throw new RuntimeException("Đã có username này");
             }
         }
-
-        if (!registerRequestDTO.getRe_password().equals(registerRequestDTO.getPassword())) {
+        if (!verifyRegisterRequestDTO.getPassword().equals(verifyRegisterRequestDTO.getRe_password())) {
             throw new RuntimeException("Mật khẩu không trùng khớp");
         }
-
-        user.setUserName(registerRequestDTO.getUserName());
-
-        user.setPassword(registerRequestDTO.getPassword());
-        return null;
+        return new VerifyRegisterRequestDTO(
+                verifyRegisterRequestDTO.getUserName(),
+                verifyRegisterRequestDTO.getEmail(),
+                verifyRegisterRequestDTO.getPassword(),
+                verifyRegisterRequestDTO.getRe_password(),
+                verifyRegisterRequestDTO.getPhone()
+        );
     }
 
     @Override
@@ -247,13 +252,17 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public VerifyUserResponseDTO verifyUser(VerifyUserRequestDTO verifyUserDTO, List<MultipartFile> imageFiles) {
+
+        User user = getUserByEmailOrUserName(verifyUserDTO.getEmail());
+
         VerificationForm verificationForm = new VerificationForm();
         verificationForm.setVerificationFormName(verifyUserDTO.getVerificationFormName());
-        verificationForm.setFullName(verifyUserDTO.getFullName());
-        verificationForm.setEmail(verifyUserDTO.getEmail());
-        verificationForm.setPhoneNumber(verifyUserDTO.getPhoneNumber());
+        verificationForm.setFullName(user.getFullName());
+        verificationForm.setEmail(user.getEmail());
+        verificationForm.setPhoneNumber(user.getPhone());
         verificationForm.setContractStartDate(verifyUserDTO.getContractStartDate());
         verificationForm.setContractEndDate(verifyUserDTO.getContractEndDate());
+        verificationForm.setVerified(false);
 
         verificationForm = verificationFormRepository.save(verificationForm);
 

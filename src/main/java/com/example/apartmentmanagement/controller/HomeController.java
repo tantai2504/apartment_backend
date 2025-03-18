@@ -8,8 +8,6 @@ import com.example.apartmentmanagement.dto.ForgotPasswordDTO;
 import com.example.apartmentmanagement.dto.LoginRequestDTO;
 import com.example.apartmentmanagement.dto.ResetPasswordDTO;
 import com.example.apartmentmanagement.dto.RegisterRequestDTO;
-import com.example.apartmentmanagement.entities.User;
-import com.example.apartmentmanagement.serviceImpl.EmailService_Han;
 import com.example.apartmentmanagement.util.AESUtil;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +34,6 @@ public class HomeController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private EmailService_Han emailService;
     private final Map<String, String> otpStorage = new HashMap<>();
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody LoginRequestDTO loginRequestDTO, HttpSession session) {
@@ -92,7 +88,7 @@ public class HomeController {
         if (user != null) {
             Map<String, Object> dto = new HashMap<>();
             dto.put("user", user.getUserName());
-            dto.put("password", AESUtil.decrypt(user.getPassword()));
+            dto.put("password", user.getPassword());
             dto.put("fullName", user.getFullName());
             dto.put("email", user.getEmail());
             dto.put("phone", user.getPhone());

@@ -36,4 +36,6 @@ public interface UserService {
     VerifyUserResponseDTO verifyUser(VerifyUserRequestDTO verifyUserDTO, List<MultipartFile> imageFile);
 
     void saveUser(User user);
+
+
 }

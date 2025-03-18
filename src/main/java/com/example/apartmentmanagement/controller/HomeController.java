@@ -55,7 +55,7 @@ public class HomeController {
             Map<String, Object> dto = new HashMap<>();
             dto.put("userId", user.getUserId());
             dto.put("user", user.getUserName());
-            dto.put("password", password);
+            dto.put("password", user.getPassword());
             dto.put("fullName", user.getFullName());
             dto.put("email", user.getEmail());
             dto.put("phone", user.getPhone());
@@ -99,7 +99,9 @@ public class HomeController {
             dto.put("birthday", user.getBirthday());
             dto.put("idNumber", user.getIdNumber());
             dto.put("job", user.getJob());
-            dto.put("apartment", user.getApartment().getApartmentName());
+            dto.put("apartment",
+                    (user.getApartment() != null) ? user.getApartment().getApartmentName() : "Chưa sinh sống tại apartment nào"
+            );
             response.put("data", dto);
             response.put("status", HttpStatus.OK.value());
             return ResponseEntity.ok(response);

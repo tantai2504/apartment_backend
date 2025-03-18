@@ -151,7 +151,7 @@ public class UserServiceImpl implements UserService {
         userDTO = new UserDTO(
                 user.getUserName(),
                 user.getFullName(),
-                user.getPassword(),
+                AESUtil.decrypt(user.getPassword()),
                 user.getEmail(),
                 user.getDescription(),
                 user.getPhone(),
@@ -160,7 +160,7 @@ public class UserServiceImpl implements UserService {
                 user.getBirthday(),
                 user.getIdNumber(),
                 user.getJob(),
-                user.getApartment().getApartmentName(),
+                (user.getApartment() != null) ? user.getApartment().getApartmentName() : "Chưa sinh sống tại apartment nào",
                 user.getRole()
         );
         return userDTO;
@@ -207,6 +207,9 @@ public class UserServiceImpl implements UserService {
         }
         if (updateUserDTO.getJob() != null) {
             checkUser.setJob(updateUserDTO.getJob());
+        }
+        if (updateUserDTO.getIdNumber() != null) {
+            checkUser.setIdNumber(updateUserDTO.getIdNumber());
         }
         try {
             userRepository.save(checkUser);

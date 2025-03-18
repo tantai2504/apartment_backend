@@ -15,6 +15,8 @@ public interface UserService {
 
     RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO);
 
+    VerifyRegisterRequestDTO verifyRegister(RegisterRequestDTO verifyRegisterRequestDTO);
+
     User getUserById (Long id);
 
     UserDTO getUserDTOById (Long id);

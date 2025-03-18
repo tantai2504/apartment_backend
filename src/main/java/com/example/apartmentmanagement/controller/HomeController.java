@@ -4,6 +4,12 @@ import com.example.apartmentmanagement.dto.*;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.service.EmailService;
 import com.example.apartmentmanagement.service.OTPService;
+import com.example.apartmentmanagement.dto.ForgotPasswordDTO;
+import com.example.apartmentmanagement.dto.LoginRequestDTO;
+import com.example.apartmentmanagement.dto.ResetPasswordDTO;
+import com.example.apartmentmanagement.dto.RegisterRequestDTO;
+import com.example.apartmentmanagement.entities.User;
+import com.example.apartmentmanagement.serviceImpl.EmailService_Han;
 import com.example.apartmentmanagement.util.AESUtil;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +21,7 @@ import com.example.apartmentmanagement.service.UserService;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 @RestController
 @RequestMapping("/api")
@@ -29,6 +36,9 @@ public class HomeController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private EmailService_Han emailService;
+    private final Map<String, String> otpStorage = new HashMap<>();
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody LoginRequestDTO loginRequestDTO, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
@@ -47,6 +57,7 @@ public class HomeController {
             System.out.println("Session ID after login: " + session.getId());
 
             Map<String, Object> dto = new HashMap<>();
+            dto.put("userId", user.getUserId());
             dto.put("user", user.getUserName());
             dto.put("password", password);
             dto.put("fullName", user.getFullName());
@@ -152,6 +163,56 @@ public class HomeController {
         }
         session.invalidate();
         response.put("message", "Đăng xuất thành công");
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/forgot_password")
+    public ResponseEntity<Object> forgotPassword(@RequestBody ForgotPasswordDTO forgotPasswordDTO) {
+        Map<String, Object> response = new HashMap<>();
+        String email = forgotPasswordDTO.getEmail();
+        User user = userService.getUserByEmailOrUserName(email);
+
+        if (user == null) {
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            response.put("message", "Email không tồn tại trong hệ thống");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        String otp = String.valueOf(new Random().nextInt(900000) + 100000); // Tạo mã OTP 6 chữ số
+        otpStorage.put(email, otp);
+        emailService.sendOtpEmail(email, otp);
+
+        response.put("message", "Mã OTP đã được gửi đến email của bạn");
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/reset_password")
+    public ResponseEntity<Object> resetPassword(@RequestBody ResetPasswordDTO resetPasswordDTO) {
+        Map<String, Object> response = new HashMap<>();
+        String email = resetPasswordDTO.getEmail();
+        String otp = resetPasswordDTO.getOtp();
+        String newPassword = resetPasswordDTO.getNewPassword();
+
+        if (!otpStorage.containsKey(email) || !otpStorage.get(email).equals(otp)) {
+            response.put("status", HttpStatus.UNAUTHORIZED.value());
+            response.put("message", "Mã OTP không hợp lệ hoặc đã hết hạn");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        User user = userService.getUserByEmailOrUserName(email);
+        if (user == null) {
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            response.put("message", "Người dùng không tồn tại");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        user.setPassword(AESUtil.encrypt(newPassword));
+        userService.saveUser(user);
+        otpStorage.remove(email);
+
+        response.put("message", "Mật khẩu đã được thay đổi thành công");
         response.put("status", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }

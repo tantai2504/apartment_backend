@@ -51,7 +51,8 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDTO getPostById(Long id) {
-        Post post = postRepository.findById(id).get();
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy bài đăng với ID: " + id));
         PostDTO dto = new PostDTO(
                 post.getPostId(),
                 post.getTitle(),
@@ -101,8 +102,6 @@ public class PostServiceImpl implements PostService {
         }
         post.setUser(user);
 
-        postImagesRepository.deleteByPost(post);
-
         List<String> postImagesUrl = imageUploadService.uploadMultipleImages(imageFiles);
         List<PostImages> postImagesList = new ArrayList<>();
 
@@ -133,24 +132,21 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public PostDTO updatePost(Long id, PostRequestDTO postDTO, List<MultipartFile> imageFiles) {
-        Post post = postRepository.findById(id).get();
-        PostDTO dto = new PostDTO();
+        Post post = postRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy bài đăng với ID: " + id));
+
         if (postDTO == null) {
             throw new RuntimeException("Dữ liệu bài đăng không được để trống");
         }
-
         if (postDTO.getTitle() == null || postDTO.getTitle().trim().isEmpty()) {
             throw new RuntimeException("Tiêu đề bài đăng không được để trống");
         }
-
         if (postDTO.getPostType() == null) {
             throw new RuntimeException("Loại bài đăng không được để trống");
         }
-
         if (postDTO.getContent() == null || postDTO.getContent().trim().isEmpty()) {
             throw new RuntimeException("Nội dung bài đăng không được để trống");
         }
-
         if (postDTO.getUserName() == null || postDTO.getUserName().trim().isEmpty()) {
             throw new RuntimeException("Tên người dùng không được để trống");
         }
@@ -167,13 +163,38 @@ public class PostServiceImpl implements PostService {
         }
         post.setUser(user);
 
-        List<String> postImagesUrl = imageUploadService.uploadMultipleImages(imageFiles);
+        if (imageFiles != null && !imageFiles.isEmpty()) {
+            post.getPostImages().clear();
 
-        return dto;
+            List<String> postImagesUrl = imageUploadService.uploadMultipleImages(imageFiles);
+            List<PostImages> postImagesList = postImagesUrl.stream().map(url -> {
+                PostImages postImage = new PostImages();
+                postImage.setPostImagesUrl(url);
+                postImage.setPost(post);
+                return postImage;
+            }).toList();
+
+            post.getPostImages().addAll(postImagesList);
+        }
+
+
+        postRepository.save(post);
+
+        return new PostDTO(
+                post.getPostId(),
+                post.getTitle(),
+                post.getContent(),
+                post.isDepositCheck(),
+                post.getPostType(),
+                post.getPostDate(),
+                post.getUser().getUserName(),
+                post.getPostImages().stream().map(PostImages::getPostImagesUrl).toList()
+        );
     }
+
 
     @Override
     public void deletePost(Long id) {
-
+        postRepository.deleteById(id);
     }
 }

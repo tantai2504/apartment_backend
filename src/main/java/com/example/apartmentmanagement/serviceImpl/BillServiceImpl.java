@@ -4,9 +4,11 @@ import com.example.apartmentmanagement.dto.BillDTO;
 import com.example.apartmentmanagement.dto.BillRequestDTO;
 import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.Bill;
+import com.example.apartmentmanagement.entities.Payment;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.repository.ApartmentRepository;
 import com.example.apartmentmanagement.repository.BillRepository;
+import com.example.apartmentmanagement.repository.PaymentRepository;
 import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.service.BillService;
 import com.example.apartmentmanagement.service.NotificationService;
@@ -35,6 +37,8 @@ public class BillServiceImpl implements BillService {
 
     @Autowired
     private NotificationService notificationService;
+    @Autowired
+    private PaymentRepository paymentRepository;
 
     @Override
     public List<BillDTO> getAllBillsWithinSpecTime(Long userId, int month, int year) {
@@ -77,6 +81,31 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
+    public void processPaymentSuccess(Long billId, String paymentInfo) {
+        Bill bill = billRepository.findById(billId)
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy hóa đơn"));
+
+        if ("paid".equalsIgnoreCase(bill.getStatus())) {
+            throw new IllegalStateException("Hóa đơn này đã được thanh toán");
+        }
+
+        // Tạo bản ghi Payment
+        Payment payment = new Payment();
+        payment.setPaymentCheck(true);
+        payment.setPaymentInfo(paymentInfo);
+        payment.setPaymentDate(LocalDateTime.now());
+        payment.setUser(bill.getUser());
+        payment.setBill(bill);
+        paymentRepository.save(payment);
+
+        bill.setStatus("paid");
+        bill.setPayment(payment);
+
+        billRepository.save(bill);
+    }
+
+
+    @Override
     public BillRequestDTO updateBill(Long id, BillRequestDTO billRequestDTO) {
         Bill bill = billRepository.findById(id).get();
         bill.setBillContent(billRequestDTO.getBillContent());
@@ -99,23 +128,16 @@ public class BillServiceImpl implements BillService {
                         bill.getTotal(),
                         bill.getBillDate(),
                         bill.getStatus(),
-                        user.getFullName(),
+                        user.getUserName(),
                         bill.getApartment().getApartmentName()
                 ))
                 .collect(Collectors.toList());
     }
 
-
-//    @Override
-//    public BillDTO updateBill(Bill bill) {
-//        BillDTO billDTO =  new BillDTO();
-//        return billDTO;
-//    }
-
     @Override
     public void deleteBill(Long id) {
         Bill bill = billRepository.findById(id).orElseThrow(() -> new RuntimeException("Không tìm thấy bill này"));
-        if (bill.getStatus().equals("unpayed")) {
+        if (bill.getStatus().equals("unpaid")) {
             throw new RuntimeException("Phải thanh toán hoá đơn trước");
         } else {
             billRepository.delete(bill);
@@ -140,7 +162,7 @@ public class BillServiceImpl implements BillService {
         newBill.setTotal(electricCost + waterCost + otherCost);
 
         newBill.setBillDate(LocalDateTime.now());
-        newBill.setStatus("unpayed");
+        newBill.setStatus("unpaid");
 
         newBill.setUser(user);
         newBill.setApartment(apartment);

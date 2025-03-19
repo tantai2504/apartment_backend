@@ -27,6 +27,8 @@ public class PostDTO {
 
     private boolean depositCheck;
 
+    private float price;
+
     private String postType;
 
     private LocalDateTime postDate;

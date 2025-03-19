@@ -41,6 +41,7 @@ public class PostServiceImpl implements PostService {
                 post.getTitle(),
                 post.getContent(),
                 post.isDepositCheck(),
+                post.getPrice(),
                 post.getPostType(),
                 post.getPostDate(),
                 post.getUser().getUserName(),
@@ -58,6 +59,7 @@ public class PostServiceImpl implements PostService {
                 post.getTitle(),
                 post.getContent(),
                 post.isDepositCheck(),
+                post.getPrice(),
                 post.getPostType(),
                 post.getPostDate(),
                 post.getUser().getUserName(),
@@ -92,6 +94,7 @@ public class PostServiceImpl implements PostService {
 
         post.setTitle(postDTO.getTitle());
         post.setPostType(postDTO.getPostType());
+        post.setPrice(postDTO.getPrice());
         post.setPostDate(LocalDateTime.now());
         post.setDepositCheck(postDTO.isDepositCheck());
         post.setContent(postDTO.getContent());
@@ -122,6 +125,7 @@ public class PostServiceImpl implements PostService {
                 post.getTitle(),
                 post.getContent(),
                 post.isDepositCheck(),
+                post.getPrice(),
                 post.getPostType(),
                 post.getPostDate(),
                 post.getUser().getUserName(),
@@ -154,6 +158,7 @@ public class PostServiceImpl implements PostService {
         post.setTitle(postDTO.getTitle());
         post.setPostType(postDTO.getPostType());
         post.setPostDate(LocalDateTime.now());
+        post.setPrice(postDTO.getPrice());
         post.setDepositCheck(postDTO.isDepositCheck());
         post.setContent(postDTO.getContent());
 
@@ -185,6 +190,7 @@ public class PostServiceImpl implements PostService {
                 post.getTitle(),
                 post.getContent(),
                 post.isDepositCheck(),
+                post.getPrice(),
                 post.getPostType(),
                 post.getPostDate(),
                 post.getUser().getUserName(),

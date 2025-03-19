@@ -15,6 +15,8 @@ public class PostRequestDTO {
 
     private String content;
 
+    private float price;
+
     private boolean depositCheck;
 
     private String postType;

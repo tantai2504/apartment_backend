@@ -133,15 +133,16 @@ public class UserController {
 
     @PostMapping("/verify_user")
     public ResponseEntity<Object> verifyUser(@RequestParam("verificationFormName") String verificationFormName,
-                                             @RequestParam("fullName") String fullName,
+                                             @RequestParam("verificationFormType") int verificationFormType,
                                              @RequestParam("email") String email,
                                              @RequestParam("phoneNumber") String phoneNumber,
+                                             @RequestParam("apartmentName") String apartmentName,
                                              @RequestParam("contractStartDate") LocalDateTime contractStartDate,
                                              @RequestParam("contractEndDate") LocalDateTime contractEndDate,
                                              @RequestPart("imageFile") List<MultipartFile> imageFiles){
         Map<String, Object> response = new HashMap<>();
         VerifyUserRequestDTO verifyUserDTO = new VerifyUserRequestDTO(
-                verificationFormName, fullName, email, phoneNumber, contractStartDate, contractEndDate);
+                verificationFormName, verificationFormType, apartmentName, email, phoneNumber, contractStartDate, contractEndDate);
         try {
             VerifyUserResponseDTO result = userService.verifyUser(verifyUserDTO, imageFiles);
             response.put("status", HttpStatus.CREATED.value());

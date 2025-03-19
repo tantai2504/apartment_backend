@@ -2,9 +2,11 @@ package com.example.apartmentmanagement.serviceImpl;
 
 import com.example.apartmentmanagement.dto.PostDTO;
 import com.example.apartmentmanagement.dto.PostRequestDTO;
+import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.Post;
 import com.example.apartmentmanagement.entities.PostImages;
 import com.example.apartmentmanagement.entities.User;
+import com.example.apartmentmanagement.repository.ApartmentRepository;
 import com.example.apartmentmanagement.repository.PostImagesRepository;
 import com.example.apartmentmanagement.repository.PostRepository;
 import com.example.apartmentmanagement.repository.UserRepository;
@@ -34,6 +36,9 @@ public class PostServiceImpl implements PostService {
     @Autowired
     private PostRepository postRepository;
 
+    @Autowired
+    private ApartmentRepository apartmentRepository;
+
     @Override
     public List<PostDTO> getPosts() {
         return postRepository.findAll().stream().map(post -> new PostDTO(
@@ -41,6 +46,8 @@ public class PostServiceImpl implements PostService {
                 post.getTitle(),
                 post.getContent(),
                 post.isDepositCheck(),
+                post.getApartmentName(),
+                post.getPrice(),
                 post.getPostType(),
                 post.getPostDate(),
                 post.getUser().getUserName(),
@@ -58,6 +65,8 @@ public class PostServiceImpl implements PostService {
                 post.getTitle(),
                 post.getContent(),
                 post.isDepositCheck(),
+                post.getApartmentName(),
+                post.getPrice(),
                 post.getPostType(),
                 post.getPostDate(),
                 post.getUser().getUserName(),
@@ -89,12 +98,20 @@ public class PostServiceImpl implements PostService {
         if (postDTO.getUserName() == null || postDTO.getUserName().trim().isEmpty()) {
             throw new RuntimeException("Tên người dùng không được để trống");
         }
+        List<Apartment> apartments = apartmentRepository.findAll();
+        for (Apartment apartment : apartments) {
+            if (!apartment.getApartmentName().equals(postDTO.getApartmentName())) {
+                throw new RuntimeException("Không tồn tại căn hộ này trong hệ thống");
+            }
+        }
 
         post.setTitle(postDTO.getTitle());
         post.setPostType(postDTO.getPostType());
+        post.setPrice(postDTO.getPrice());
         post.setPostDate(LocalDateTime.now());
         post.setDepositCheck(postDTO.isDepositCheck());
         post.setContent(postDTO.getContent());
+        post.setApartmentName(postDTO.getApartmentName());
 
         User user = userRepository.findByUserNameOrEmail(postDTO.getUserName());
         if (user == null) {
@@ -122,6 +139,8 @@ public class PostServiceImpl implements PostService {
                 post.getTitle(),
                 post.getContent(),
                 post.isDepositCheck(),
+                post.getApartmentName(),
+                post.getPrice(),
                 post.getPostType(),
                 post.getPostDate(),
                 post.getUser().getUserName(),
@@ -154,6 +173,7 @@ public class PostServiceImpl implements PostService {
         post.setTitle(postDTO.getTitle());
         post.setPostType(postDTO.getPostType());
         post.setPostDate(LocalDateTime.now());
+        post.setPrice(postDTO.getPrice());
         post.setDepositCheck(postDTO.isDepositCheck());
         post.setContent(postDTO.getContent());
 
@@ -185,6 +205,8 @@ public class PostServiceImpl implements PostService {
                 post.getTitle(),
                 post.getContent(),
                 post.isDepositCheck(),
+                post.getApartmentName(),
+                post.getPrice(),
                 post.getPostType(),
                 post.getPostDate(),
                 post.getUser().getUserName(),

@@ -124,7 +124,7 @@ public class HomeController {
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (RuntimeException e) {
             response.put("status", HttpStatus.BAD_REQUEST.value());
-            response.put("message", "Nhập đầy đủ các trường");
+            response.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }

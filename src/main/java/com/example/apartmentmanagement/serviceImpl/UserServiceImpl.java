@@ -127,10 +127,14 @@ public class UserServiceImpl implements UserService {
             if (u.getUserName().equals(verifyRegisterRequestDTO.getUserName())) {
                 throw new RuntimeException("Đã có username này");
             }
+            if (u.getEmail().equals(verifyRegisterRequestDTO.getEmail())) {
+                throw new RuntimeException("Đã có email này");
+            }
         }
         if (!verifyRegisterRequestDTO.getPassword().equals(verifyRegisterRequestDTO.getRe_password())) {
             throw new RuntimeException("Mật khẩu không trùng khớp");
         }
+
         return new VerifyRegisterRequestDTO(
                 verifyRegisterRequestDTO.getUserName(),
                 verifyRegisterRequestDTO.getEmail(),
@@ -266,11 +270,14 @@ public class UserServiceImpl implements UserService {
 
         VerificationForm verificationForm = new VerificationForm();
         verificationForm.setVerificationFormName(verifyUserDTO.getVerificationFormName());
+        verificationForm.setVerificationFormType(verifyUserDTO.getVerificationFormType());
         verificationForm.setFullName(user.getFullName());
         verificationForm.setEmail(user.getEmail());
         verificationForm.setPhoneNumber(user.getPhone());
         verificationForm.setContractStartDate(verifyUserDTO.getContractStartDate());
         verificationForm.setContractEndDate(verifyUserDTO.getContractEndDate());
+        verificationForm.setUserName(user.getUserName());
+        verificationForm.setApartmentName(verifyUserDTO.getApartmentName());
         verificationForm.setVerified(false);
 
         verificationForm = verificationFormRepository.save(verificationForm);

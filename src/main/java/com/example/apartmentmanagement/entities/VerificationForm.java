@@ -28,6 +28,8 @@ public class VerificationForm {
     @Nationalized
     private String fullName;
 
+    private String userName;
+
     private String email;
 
     private String phoneNumber;
@@ -35,6 +37,8 @@ public class VerificationForm {
     private LocalDateTime contractStartDate;
 
     private LocalDateTime contractEndDate;
+
+    private boolean verified;
 
     @OneToOne(mappedBy = "verificationForm", cascade = CascadeType.ALL, orphanRemoval = true)
     private User user;

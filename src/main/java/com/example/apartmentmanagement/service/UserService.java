@@ -15,6 +15,8 @@ public interface UserService {
 
     RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO);
 
+    VerifyRegisterRequestDTO verifyRegister(RegisterRequestDTO verifyRegisterRequestDTO);
+
     User getUserById (Long id);
 
     UserDTO getUserDTOById (Long id);
@@ -34,4 +36,6 @@ public interface UserService {
     VerifyUserResponseDTO verifyUser(VerifyUserRequestDTO verifyUserDTO, List<MultipartFile> imageFile);
 
     void saveUser(User user);
+
+
 }

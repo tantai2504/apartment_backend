@@ -1,12 +1,13 @@
 package com.example.apartmentmanagement.controller;
 
+import com.example.apartmentmanagement.dto.*;
+import com.example.apartmentmanagement.entities.User;
+import com.example.apartmentmanagement.service.EmailService;
+import com.example.apartmentmanagement.service.OTPService;
 import com.example.apartmentmanagement.dto.ForgotPasswordDTO;
 import com.example.apartmentmanagement.dto.LoginRequestDTO;
 import com.example.apartmentmanagement.dto.ResetPasswordDTO;
-import com.example.apartmentmanagement.dto.UserDTO;
 import com.example.apartmentmanagement.dto.RegisterRequestDTO;
-import com.example.apartmentmanagement.entities.User;
-import com.example.apartmentmanagement.serviceImpl.EmailService;
 import com.example.apartmentmanagement.util.AESUtil;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,10 +27,13 @@ import java.util.Random;
 public class HomeController {
 
     @Autowired
-    private UserService userService;
-
+    private OTPService otpService;
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private UserService userService;
+
     private final Map<String, String> otpStorage = new HashMap<>();
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody LoginRequestDTO loginRequestDTO, HttpSession session) {
@@ -49,8 +53,9 @@ public class HomeController {
             System.out.println("Session ID after login: " + session.getId());
 
             Map<String, Object> dto = new HashMap<>();
+            dto.put("userId", user.getUserId());
             dto.put("user", user.getUserName());
-            dto.put("password", password);
+            dto.put("password", user.getPassword());
             dto.put("fullName", user.getFullName());
             dto.put("email", user.getEmail());
             dto.put("phone", user.getPhone());
@@ -61,7 +66,9 @@ public class HomeController {
             dto.put("birthday", user.getBirthday());
             dto.put("idNumber", user.getIdNumber());
             dto.put("job", user.getJob());
-            dto.put("apartment", user.getApartment().getApartmentName());
+            dto.put("apartment",
+                    (user.getApartment() != null) ? user.getApartment().getApartmentName() : "Chưa sinh sống tại apartment nào"
+            );
             response.put("data", dto);
             response.put("message", "Đăng nhập thành công");
             response.put("status", HttpStatus.OK.value());
@@ -81,7 +88,7 @@ public class HomeController {
         if (user != null) {
             Map<String, Object> dto = new HashMap<>();
             dto.put("user", user.getUserName());
-            dto.put("password", AESUtil.decrypt(user.getPassword()));
+            dto.put("password", user.getPassword());
             dto.put("fullName", user.getFullName());
             dto.put("email", user.getEmail());
             dto.put("phone", user.getPhone());
@@ -92,7 +99,9 @@ public class HomeController {
             dto.put("birthday", user.getBirthday());
             dto.put("idNumber", user.getIdNumber());
             dto.put("job", user.getJob());
-            dto.put("apartment", user.getApartment().getApartmentName());
+            dto.put("apartment",
+                    (user.getApartment() != null) ? user.getApartment().getApartmentName() : "Chưa sinh sống tại apartment nào"
+            );
             response.put("data", dto);
             response.put("status", HttpStatus.OK.value());
             return ResponseEntity.ok(response);
@@ -104,9 +113,41 @@ public class HomeController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Object> register(@RequestBody RegisterRequestDTO registerRequestDTO) {
+    public ResponseEntity<Object> register(@RequestBody RegisterRequestDTO request) {
+        String otp = otpService.generateOtp(request.getEmail());
+        Map<String, Object> response = new HashMap<>();
+        try {
+            VerifyRegisterRequestDTO verifyRegisterRequestDTO = userService.verifyRegister(request);
+            emailService.sendOtpEmail(request.getEmail(), otp);
+            response.put("status", HttpStatus.OK.value());
+            response.put("message", "Đã gửi otp");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (RuntimeException e) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", "Nhập đầy đủ các trường");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
 
-        return null;
+    @PostMapping("/verify")
+    public ResponseEntity<Object> verifyOtp(@RequestBody RegisterRequestDTO request) {
+        String email = request.getEmail();
+        String otp = request.getOtp();
+        if (otpService.validateOtp(email, otp)) {
+            Map<String, Object> response = new HashMap<>();
+            try {
+                RegisterResponseDTO registerResponseDTO = userService.register(request);
+                response.put("status", HttpStatus.CREATED.value());
+                response.put("message", "Đăng ký thành công");
+                response.put("data", registerResponseDTO);
+                return ResponseEntity.ok(response);
+            } catch (RuntimeException e) {
+                response.put("status", HttpStatus.BAD_REQUEST.value());
+                response.put("message", e.getMessage());
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+            }
+        }
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid OTP");
     }
 
     @PostMapping("/log_out")

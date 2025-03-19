@@ -14,7 +14,9 @@ import java.time.LocalDateTime;
 public class VerifyUserRequestDTO {
     private String verificationFormName;
 
-    private String fullName;
+    private int verificationFormType;
+
+    private String apartmentName;
 
     private String email;
 

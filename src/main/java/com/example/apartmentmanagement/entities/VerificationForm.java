@@ -25,6 +25,13 @@ public class VerificationForm {
     @Nationalized
     private String verificationFormName;
 
+    /**
+     * @param verificationFormType: Loai hop dong (1: Cho thue, 2: So huu can ho)
+     */
+    private int verificationFormType;
+
+    private String apartmentName;
+
     @Nationalized
     private String fullName;
 

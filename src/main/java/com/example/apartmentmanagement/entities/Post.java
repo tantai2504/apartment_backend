@@ -40,6 +40,8 @@ public class Post {
 
     private LocalDateTime postDate;
 
+    private float price;
+
     @ManyToOne
     @JoinColumn(name = "user_Id", nullable = false)
     private User user;

@@ -270,11 +270,14 @@ public class UserServiceImpl implements UserService {
 
         VerificationForm verificationForm = new VerificationForm();
         verificationForm.setVerificationFormName(verifyUserDTO.getVerificationFormName());
+        verificationForm.setVerificationFormType(verifyUserDTO.getVerificationFormType());
         verificationForm.setFullName(user.getFullName());
         verificationForm.setEmail(user.getEmail());
         verificationForm.setPhoneNumber(user.getPhone());
         verificationForm.setContractStartDate(verifyUserDTO.getContractStartDate());
         verificationForm.setContractEndDate(verifyUserDTO.getContractEndDate());
+        verificationForm.setUserName(user.getUserName());
+        verificationForm.setApartmentName(verifyUserDTO.getApartmentName());
         verificationForm.setVerified(false);
 
         verificationForm = verificationFormRepository.save(verificationForm);

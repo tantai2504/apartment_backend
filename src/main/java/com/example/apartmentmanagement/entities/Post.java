@@ -42,6 +42,8 @@ public class Post {
 
     private float price;
 
+    private String apartmentName;
+
     @ManyToOne
     @JoinColumn(name = "user_Id", nullable = false)
     private User user;

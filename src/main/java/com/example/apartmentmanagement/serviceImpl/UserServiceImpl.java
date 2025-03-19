@@ -127,10 +127,14 @@ public class UserServiceImpl implements UserService {
             if (u.getUserName().equals(verifyRegisterRequestDTO.getUserName())) {
                 throw new RuntimeException("Đã có username này");
             }
+            if (u.getEmail().equals(verifyRegisterRequestDTO.getEmail())) {
+                throw new RuntimeException("Đã có email này");
+            }
         }
         if (!verifyRegisterRequestDTO.getPassword().equals(verifyRegisterRequestDTO.getRe_password())) {
             throw new RuntimeException("Mật khẩu không trùng khớp");
         }
+
         return new VerifyRegisterRequestDTO(
                 verifyRegisterRequestDTO.getUserName(),
                 verifyRegisterRequestDTO.getEmail(),

@@ -14,9 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -55,13 +53,32 @@ public class UserServiceImpl implements UserService {
             dto.setIdNumber(user.getIdNumber());
             dto.setJob(user.getJob());
             dto.setRole(user.getRole());
-            dto.setApartmentName(user.getApartment() != null ? user.getApartment().getApartmentName() : null);
+
+            // Dùng ApartmentResponseInUserDTO thay vì ApartmentDTO
+            List<ApartmentResponseInUserDTO> apartmentDTOList = Optional.ofNullable(user.getApartments())
+                    .map(apartments -> apartments.stream()
+                            .map(apartment -> new ApartmentResponseInUserDTO(
+                                    apartment.getApartmentId(),
+                                    apartment.getApartmentName(),
+                                    apartment.getHouseholder(),
+                                    apartment.getTotalNumber(),
+                                    apartment.getStatus(),
+                                    apartment.getAptImgUrl(),
+                                    apartment.getNumberOfBedrooms(),
+                                    apartment.getNumberOfBathrooms(),
+                                    apartment.getNote()
+                            ))
+                            .toList())
+                    .orElse(List.of());
+
+            dto.setApartment(apartmentDTOList);
             return dto;
         }).toList();
     }
 
+
     @Override
-    public CreateNewAccountDTO addUser(CreateNewAccountDTO newAccountDTO) {
+    public CreateNewAccountResponseDTO addUser(CreateNewAccountRequestDTO newAccountDTO) {
         VerificationForm verificationForm = verificationFormRepository.findVerificationFormByUserNameContainingIgnoreCase(newAccountDTO.getUserName());
         List<User> users = userRepository.findAll();
         for (User user : users) {
@@ -71,6 +88,7 @@ public class UserServiceImpl implements UserService {
         }
         User user = userRepository.findByUserName(newAccountDTO.getUserName());
 
+        List<Apartment> apartments = new ArrayList<>();
         Apartment apartment = apartmentRepository.findById(newAccountDTO.getApartmentId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy Apartment với ID này"));
         if (apartment.getHouseholder() == null && newAccountDTO.getRole().equals("Owner")) {
@@ -78,6 +96,7 @@ public class UserServiceImpl implements UserService {
         } else if (apartment.getHouseholder() != null && newAccountDTO.getRole().equals("Owner")) {
             throw new RuntimeException("Đã có người đứng tên chủ căn hộ, không thể thêm chủ sở hữu mới.");
         }
+        apartments.add(apartment);
 
         apartment.setTotalNumber(apartment.getTotalNumber() + 1);
         if (apartment.getTotalNumber() > 0) {
@@ -86,14 +105,28 @@ public class UserServiceImpl implements UserService {
 
         user.setRole(newAccountDTO.getRole());
         user.setVerificationForm(verificationForm);
-        user.setApartment(apartment);
+        user.setApartments(apartments);
 
         userRepository.save(user);
 
-        CreateNewAccountDTO responseDTO = new CreateNewAccountDTO(
+        List<ApartmentDTO> apartmentDTOList = user.getApartments().stream()
+                .map(apartment1 -> new ApartmentDTO(
+                        apartment.getApartmentId(),
+                        apartment.getApartmentName(),
+                        apartment.getHouseholder(),
+                        apartment.getTotalNumber(),
+                        apartment.getStatus(),
+                        apartment.getAptImgUrl(),
+                        apartment.getNumberOfBedrooms(),
+                        apartment.getNumberOfBathrooms(),
+                        apartment.getNote()
+                ))
+                .toList();
+
+        CreateNewAccountResponseDTO responseDTO = new CreateNewAccountResponseDTO(
                 user.getUserName(),
                 newAccountDTO.getPassword(),
-                user.getApartment().getApartmentId(),
+                apartmentDTOList,
                 user.getFullName(),
                 user.getRole()
         );
@@ -145,15 +178,70 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public User getUserById(Long id) {
-        return userRepository.findById(id).orElse(null);
+    public UserDTO getUserById(Long id) {
+        User user = userRepository.findById(id).orElse(null);
+        if (user == null) {
+            return null;
+        }
+
+        List<ApartmentResponseInUserDTO> apartmentDTOList = Optional.ofNullable(user.getApartments())
+                .map(apartments -> apartments.stream()
+                        .map(apartment -> new ApartmentResponseInUserDTO(
+                                apartment.getApartmentId(),
+                                apartment.getApartmentName(),
+                                apartment.getHouseholder(),
+                                apartment.getTotalNumber(),
+                                apartment.getStatus(),
+                                apartment.getAptImgUrl(),
+                                apartment.getNumberOfBedrooms(),
+                                apartment.getNumberOfBathrooms(),
+                                apartment.getNote()
+                        ))
+                        .toList())
+                .orElse(List.of());
+
+        return new UserDTO(
+                user.getUserId(),
+                user.getUserName(),
+                user.getFullName(),
+                null,
+                user.getEmail(),
+                user.getDescription(),
+                user.getPhone(),
+                user.getUserImgUrl(),
+                user.getAge(),
+                user.getBirthday(),
+                user.getIdNumber(),
+                user.getJob(),
+                apartmentDTOList,
+                user.getRole()
+        );
     }
+
 
     @Override
     public UserDTO getUserDTOById(Long id) {
-        UserDTO userDTO;
         User user = userRepository.findById(id).orElse(null);
-        userDTO = new UserDTO(
+        if (user == null) {
+            return null; // Tránh lỗi NullPointerException
+        }
+
+        List<ApartmentResponseInUserDTO> apartmentDTOList = user.getApartments().stream()
+                .map(apartment -> new ApartmentResponseInUserDTO(
+                        apartment.getApartmentId(),
+                        apartment.getApartmentName(),
+                        apartment.getHouseholder(),
+                        apartment.getTotalNumber(),
+                        apartment.getStatus(),
+                        apartment.getAptImgUrl(),
+                        apartment.getNumberOfBedrooms(),
+                        apartment.getNumberOfBathrooms(),
+                        apartment.getNote()
+                ))
+                .toList();
+
+        return new UserDTO(
+                user.getUserId(),
                 user.getUserName(),
                 user.getFullName(),
                 AESUtil.decrypt(user.getPassword()),
@@ -165,11 +253,11 @@ public class UserServiceImpl implements UserService {
                 user.getBirthday(),
                 user.getIdNumber(),
                 user.getJob(),
-                (user.getApartment() != null) ? user.getApartment().getApartmentName() : "Chưa sinh sống tại apartment nào",
+                apartmentDTOList,
                 user.getRole()
         );
-        return userDTO;
     }
+
 
     @Override
     public boolean updateImage(User user, MultipartFile imageFile) {
@@ -233,7 +321,24 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserDTO> getUserByFullName(String fullName) {
         return userRepository.searchByUserName(fullName).stream().map(user -> {
+            List<ApartmentResponseInUserDTO> apartmentDTOList = Optional.ofNullable(user.getApartments())
+                    .map(apartments -> apartments.stream()
+                            .map(apartment -> new ApartmentResponseInUserDTO(
+                                    apartment.getApartmentId(),
+                                    apartment.getApartmentName(),
+                                    apartment.getHouseholder(),
+                                    apartment.getTotalNumber(),
+                                    apartment.getStatus(),
+                                    apartment.getAptImgUrl(),
+                                    apartment.getNumberOfBedrooms(),
+                                    apartment.getNumberOfBathrooms(),
+                                    apartment.getNote()
+                            ))
+                            .toList())
+                    .orElse(List.of());
+
             return new UserDTO(
+                    user.getUserId(),
                     user.getUserName(),
                     user.getFullName(),
                     null,
@@ -245,11 +350,12 @@ public class UserServiceImpl implements UserService {
                     user.getBirthday(),
                     user.getIdNumber(),
                     user.getJob(),
-                    user.getApartment() != null ? user.getApartment().getApartmentName() : null,
+                    apartmentDTOList,
                     user.getRole()
             );
         }).collect(Collectors.toList());
     }
+
 
     @Override
     public String deleteUserById(Long id) {
@@ -268,16 +374,25 @@ public class UserServiceImpl implements UserService {
 
         User user = getUserByEmailOrUserName(verifyUserDTO.getEmail());
 
+        List<VerificationForm> verificationFormList = verificationFormRepository.findAll();
+
         VerificationForm verificationForm = new VerificationForm();
         verificationForm.setVerificationFormName(verifyUserDTO.getVerificationFormName());
         verificationForm.setVerificationFormType(verifyUserDTO.getVerificationFormType());
         verificationForm.setFullName(user.getFullName());
-        verificationForm.setEmail(user.getEmail());
+
+        for (VerificationForm verificationForm1 : verificationFormList) {
+            if (verificationForm1.getEmail().equals(verifyUserDTO.getEmail()) && verificationForm1.getApartmentName().equals(verifyUserDTO.getApartmentName())) {
+                throw new RuntimeException("Đã gửi request của user này");
+            }
+        }
+        verificationForm.setEmail(verifyUserDTO.getEmail());
+        verificationForm.setApartmentName(verifyUserDTO.getApartmentName());
         verificationForm.setPhoneNumber(user.getPhone());
         verificationForm.setContractStartDate(verifyUserDTO.getContractStartDate());
         verificationForm.setContractEndDate(verifyUserDTO.getContractEndDate());
         verificationForm.setUserName(user.getUserName());
-        verificationForm.setApartmentName(verifyUserDTO.getApartmentName());
+
         verificationForm.setVerified(false);
 
         verificationForm = verificationFormRepository.save(verificationForm);

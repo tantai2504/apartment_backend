@@ -37,6 +37,12 @@ public class Apartment {
      */
     private int totalNumber;
 
+    private int numberOfBedrooms;
+
+    private int numberOfBathrooms;
+
+    private String note;
+
     /**
      * @param status: trang thai cua can ho: rented (duoc thue), unrented (chua duoc thue)
      */
@@ -45,10 +51,12 @@ public class Apartment {
 
     private String aptImgUrl;
 
-    @OneToMany(mappedBy = "apartment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    @ManyToMany(mappedBy = "apartments")
     private List<User> users;
 
     @OneToMany(mappedBy = "apartment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Bill> bills;
 
+    @OneToMany(mappedBy = "apartment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Post> posts;
 }

@@ -59,9 +59,14 @@ public class User {
     @JoinColumn(name = "verification_form_id", nullable = true, unique = true)
     private VerificationForm verificationForm;
 
-    @ManyToOne
-    @JoinColumn(name = "apartment_id")
-    private Apartment apartment;
+    @ManyToMany
+    @JoinTable(
+            name = "user_apartment",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "apartment_id")
+    )
+    private List<Apartment> apartments;
+
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> notifications;

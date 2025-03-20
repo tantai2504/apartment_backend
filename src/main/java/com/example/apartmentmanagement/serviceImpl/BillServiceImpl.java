@@ -149,7 +149,8 @@ public class BillServiceImpl implements BillService {
         System.out.println("bill content" + billContent);
         User user = userRepository.findByUserName(name);
 
-        Apartment apartment = user.getApartment();
+        List<Apartment> apartments = user.getApartments();
+
         Bill newBill = new Bill();
 
         float electricCost = calculateElectricBill(electricCons);
@@ -165,7 +166,10 @@ public class BillServiceImpl implements BillService {
         newBill.setStatus("unpaid");
 
         newBill.setUser(user);
-        newBill.setApartment(apartment);
+
+        for (Apartment apartment : apartments) {
+            newBill.setApartment(apartment);
+        }
 
         String notificationContent = "Thông báo hóa đơn mới";
 

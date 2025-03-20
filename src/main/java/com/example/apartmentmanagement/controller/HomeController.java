@@ -1,6 +1,7 @@
 package com.example.apartmentmanagement.controller;
 
 import com.example.apartmentmanagement.dto.*;
+import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.service.EmailService;
 import com.example.apartmentmanagement.service.OTPService;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import com.example.apartmentmanagement.service.UserService;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -67,7 +69,9 @@ public class HomeController {
             dto.put("idNumber", user.getIdNumber());
             dto.put("job", user.getJob());
             dto.put("apartment",
-                    (user.getApartment() != null) ? user.getApartment().getApartmentName() : "Chưa sinh sống tại apartment nào"
+                    (user.getApartments() != null && !user.getApartments().isEmpty())
+                            ? user.getApartments().stream().map(Apartment::getApartmentName).toList()
+                            : List.of("Chưa sinh sống tại apartment nào")
             );
             response.put("data", dto);
             response.put("message", "Đăng nhập thành công");
@@ -80,29 +84,12 @@ public class HomeController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
-
     @GetMapping("/getUser")
-    public ResponseEntity<Object> getUser(@RequestParam (value = "id") Long id) {
+    public ResponseEntity<Object> getUser(@RequestParam(value = "id") Long id) {
         Map<String, Object> response = new HashMap<>();
-        User user = userService.getUserById(id);
+        UserDTO user = userService.getUserById(id);
         if (user != null) {
-            Map<String, Object> dto = new HashMap<>();
-            dto.put("user", user.getUserName());
-            dto.put("password", user.getPassword());
-            dto.put("fullName", user.getFullName());
-            dto.put("email", user.getEmail());
-            dto.put("phone", user.getPhone());
-            dto.put("role", user.getRole());
-            dto.put("description", user.getDescription());
-            dto.put("userImgUrl", user.getUserImgUrl());
-            dto.put("age", user.getAge());
-            dto.put("birthday", user.getBirthday());
-            dto.put("idNumber", user.getIdNumber());
-            dto.put("job", user.getJob());
-            dto.put("apartment",
-                    (user.getApartment() != null) ? user.getApartment().getApartmentName() : "Chưa sinh sống tại apartment nào"
-            );
-            response.put("data", dto);
+            response.put("data", user);
             response.put("status", HttpStatus.OK.value());
             return ResponseEntity.ok(response);
         } else {
@@ -111,6 +98,7 @@ public class HomeController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
+
 
     @PostMapping("/register")
     public ResponseEntity<Object> register(@RequestBody RegisterRequestDTO request) {

@@ -40,6 +40,9 @@ public class ApartmentServiceImpl implements ApartmentService{
                 apartment.getTotalNumber(),
                 apartment.getStatus(),
                 apartment.getAptImgUrl(),
+                apartment.getNumberOfBedrooms(),
+                apartment.getNumberOfBathrooms(),
+                apartment.getNote(),
                 apartment.getUsers().stream().map(User::getUserName).toList()
         )).toList();
     }
@@ -49,25 +52,6 @@ public class ApartmentServiceImpl implements ApartmentService{
         Apartment apartment = apartmentRepository.findById(id).orElse(null);
         return apartment;
     }
-
-//    @Override
-//    public void updateApartment(Apartment existedApartment, Apartment apartment, MultipartFile imageFile) {
-//        existedApartment.setApartmentName(apartment.getApartmentName());
-//        existedApartment.setHouseholder(apartment.getHouseholder());
-//        existedApartment.setTotalNumber(apartment.getTotalNumber());
-//        if (imageFile != null) {
-//            String imgUrl = imageUploadService.uploadImage(imageFile);
-//            apartment.setAptImgUrl(imgUrl);
-//        } else {
-//            apartment.setAptImgUrl(" ");
-//        }
-//        apartmentRepository.save(existedApartment);
-//    }
-//
-//    @Override
-//    public void deleteApartment(Long id) {
-//        apartmentRepository.deleteById(id);
-//    }
 
     @Override
     public List<ApartmentDTO> getApartmentByName(String name) {
@@ -79,6 +63,9 @@ public class ApartmentServiceImpl implements ApartmentService{
                         apartment.getTotalNumber(),
                         apartment.getStatus(),
                         apartment.getAptImgUrl(),
+                        apartment.getNumberOfBedrooms(),
+                        apartment.getNumberOfBathrooms(),
+                        apartment.getNote(),
                         apartment.getUsers().stream().map(User::getUserName).toList()
                 ))
                 .toList();
@@ -96,7 +83,33 @@ public class ApartmentServiceImpl implements ApartmentService{
                 apartment.getTotalNumber(),
                 apartment.getStatus(),
                 apartment.getAptImgUrl(),
+                apartment.getNumberOfBedrooms(),
+                apartment.getNumberOfBathrooms(),
+                apartment.getNote(),
                 apartment.getUsers().stream().map(User::getUserName).toList()
         )).toList();
+    }
+
+    @Override
+    public List<ApartmentDTO> getOwnApartment(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user.getRole().equals("admin")) {
+            return apartmentRepository.findAll().stream().
+                    filter(apartment -> apartment.getStatus().equals("unrented")).
+                    map(apartment -> new ApartmentDTO(
+                            apartment.getApartmentId(),
+                            apartment.getApartmentName(),
+                            apartment.getHouseholder(),
+                            apartment.getTotalNumber(),
+                            apartment.getStatus(),
+                            apartment.getAptImgUrl(),
+                            apartment.getNumberOfBedrooms(),
+                            apartment.getNumberOfBathrooms(),
+                            apartment.getNote(),
+                            apartment.getUsers().stream().map(User::getUserName).toList()
+                    )).toList();
+        } else {
+            return null;
+        }
     }
 }

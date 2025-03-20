@@ -1,10 +1,7 @@
 package com.example.apartmentmanagement.controller;
 
 import com.cloudinary.Cloudinary;
-import com.example.apartmentmanagement.dto.CreateNewAccountDTO;
-import com.example.apartmentmanagement.dto.UserDTO;
-import com.example.apartmentmanagement.dto.VerifyUserRequestDTO;
-import com.example.apartmentmanagement.dto.VerifyUserResponseDTO;
+import com.example.apartmentmanagement.dto.*;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.service.UserService;
 import jakarta.servlet.http.HttpSession;
@@ -29,10 +26,10 @@ public class UserController {
     private Cloudinary cloudinary;
 
     @PostMapping("/add")
-    public ResponseEntity<Object> addUser(@RequestBody CreateNewAccountDTO newAccountDTO) {
+    public ResponseEntity<Object> addUser(@RequestBody CreateNewAccountRequestDTO newAccountDTO) {
         Map<String, Object> response = new HashMap<>();
         try {
-            CreateNewAccountDTO result = userService.addUser(newAccountDTO);
+            CreateNewAccountResponseDTO result = userService.addUser(newAccountDTO);
             response.put("status", HttpStatus.CREATED.value());
             response.put("data", result);
             response.put("message", "Đã cấp tài khoản thành công");
@@ -72,6 +69,21 @@ public class UserController {
         } else {
             response.put("status", HttpStatus.NOT_FOUND.value());
             response.put("message", "Không tìm thấy thông tin cư dân này");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
+    @GetMapping("/get/{userId}")
+    public ResponseEntity<Object> getUserById(@PathVariable Long userId) {
+        Map<String, Object> response = new HashMap<>();
+        UserDTO user = userService.getUserById(userId);
+        if (user != null) {
+            response.put("status", HttpStatus.OK.value());
+            response.put("data", user);
+            return ResponseEntity.ok(response);
+        } else {
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            response.put("message", "Không tìm thấy user này");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }

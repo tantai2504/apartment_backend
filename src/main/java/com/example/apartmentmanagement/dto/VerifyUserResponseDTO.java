@@ -28,6 +28,8 @@ public class VerifyUserResponseDTO {
 
     private List<String> imageFiles;
 
+    private String userRole;
+
     private Long verificationFormId;
 
     private int verificationFormType;

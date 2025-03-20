@@ -5,14 +5,16 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class CreateNewAccountRequestDTO {
+public class AddNewResidentResponseDTO {
     private String userName;
     private String password;
-    private Long apartmentId;
+    private List<ApartmentDTO> apartmentDTOS;
     private String fullName;
     private String role;
 }

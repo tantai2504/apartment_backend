@@ -10,7 +10,7 @@ public interface UserService {
 
     List<UserDTO> showAllUser();
 
-    CreateNewAccountResponseDTO addUser(CreateNewAccountRequestDTO newAccountDTO);
+    AddNewResidentResponseDTO addUser(AddNewResidentRequestDTO newAccountDTO);
 
     RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO);
 
@@ -36,5 +36,6 @@ public interface UserService {
 
     void saveUser(User user);
 
+    List<VerifyUserResponseDTO> showAllVerifyUser();
 
 }

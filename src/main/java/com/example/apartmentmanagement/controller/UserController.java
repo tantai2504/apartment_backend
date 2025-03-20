@@ -49,7 +49,16 @@ public class UserController {
     @GetMapping("/list_resident")
     public ResponseEntity<Object> listResident() {
         Map<String, Object> response = new HashMap<>();
-        return ResponseEntity.ok(response);
+        List<VerifyUserResponseDTO> residentList = userService.showAllVerifyUser();
+        if (!residentList.isEmpty()) {
+            response.put("status", HttpStatus.OK.value());
+            response.put("data", residentList);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } else {
+            response.put("status", HttpStatus.OK.value());
+            response.put("message", "Không có cư dân nào cần được duyệt");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
     }
 
     @GetMapping("/find")

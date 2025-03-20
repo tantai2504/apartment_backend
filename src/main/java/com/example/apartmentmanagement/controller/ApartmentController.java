@@ -113,7 +113,6 @@ public class ApartmentController {
 //            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
 //        }
 //    }
-
     /**
      * Tìm kiếm căn hộ theo id
      *

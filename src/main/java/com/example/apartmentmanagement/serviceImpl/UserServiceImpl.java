@@ -106,22 +106,21 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public AddNewResidentResponseDTO addUser(AddNewResidentRequestDTO newAccountDTO) {
-        VerificationForm verificationForm = verificationFormRepository.findVerificationFormByUserNameContainingIgnoreCase(newAccountDTO.getUserName());
+    public AddNewResidentResponseDTO addUser(VerifyUserResponseDTO newAccountDTO) {
+        VerificationForm verificationForm = verificationFormRepository.findVerificationFormByUserNameContainingIgnoreCase(newAccountDTO.getUsername());
         List<User> users = userRepository.findAll();
         for (User user : users) {
-            if (!user.getUserName().equals(newAccountDTO.getUserName())) {
+            if (!user.getUserName().equals(newAccountDTO.getUsername())) {
                 throw new RuntimeException("Chưa có user này trong hệ thống");
             }
         }
-        User user = userRepository.findByUserName(newAccountDTO.getUserName());
+        User user = userRepository.findByUserName(newAccountDTO.getUsername());
 
         List<Apartment> apartments = new ArrayList<>();
-        Apartment apartment = apartmentRepository.findById(newAccountDTO.getApartmentId())
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy Apartment với ID này"));
-        if (apartment.getHouseholder() == null && newAccountDTO.getRole().equals("Owner")) {
-            apartment.setHouseholder(newAccountDTO.getUserName());
-        } else if (apartment.getHouseholder() != null && newAccountDTO.getRole().equals("Owner")) {
+        Apartment apartment = apartmentRepository.findApartmentByApartmentName(newAccountDTO.getApartmentName());
+        if (apartment.getHouseholder() == null && newAccountDTO.getUserRole().equals("Owner")) {
+            apartment.setHouseholder(newAccountDTO.getUserRole());
+        } else if (apartment.getHouseholder() != null && newAccountDTO.getUserRole().equals("Owner")) {
             throw new RuntimeException("Đã có người đứng tên chủ căn hộ, không thể thêm chủ sở hữu mới.");
         }
         apartments.add(apartment);
@@ -131,11 +130,15 @@ public class UserServiceImpl implements UserService {
             apartment.setStatus("rented");
         }
 
-        user.setRole(newAccountDTO.getRole());
+        user.setRole(newAccountDTO.getUserRole());
         user.setVerificationForm(verificationForm);
         user.setApartments(apartments);
 
+        verificationForm.setVerified(true);
+        verificationFormRepository.save(verificationForm);
+
         userRepository.save(user);
+
 
         List<ApartmentDTO> apartmentDTOList = user.getApartments().stream()
                 .map(apartment1 -> new ApartmentDTO(
@@ -153,10 +156,10 @@ public class UserServiceImpl implements UserService {
 
         AddNewResidentResponseDTO responseDTO = new AddNewResidentResponseDTO(
                 user.getUserName(),
-                newAccountDTO.getPassword(),
                 apartmentDTOList,
                 user.getFullName(),
-                user.getRole()
+                user.getRole(),
+                true
         );
 
         return responseDTO;
@@ -404,6 +407,13 @@ public class UserServiceImpl implements UserService {
 
         List<VerificationForm> verificationFormList = verificationFormRepository.findAll();
 
+        String setNewRole = "";
+        if (verifyUserDTO.getVerificationFormType()==1) {
+            setNewRole = "Rentor";
+        } else if (verifyUserDTO.getVerificationFormType()==2) {
+            setNewRole = "Owner";
+        }
+
         VerificationForm verificationForm = new VerificationForm();
         verificationForm.setVerificationFormName(verifyUserDTO.getVerificationFormName());
         verificationForm.setVerificationFormType(verifyUserDTO.getVerificationFormType());
@@ -444,6 +454,7 @@ public class UserServiceImpl implements UserService {
                 verificationForm.getContractStartDate(),
                 verificationForm.getContractEndDate(),
                 contractImages.stream().map(ContractImages::getImageUrl).toList(),
+                setNewRole,
                 verificationForm.getVerificationFormId(),
                 verificationForm.getVerificationFormType(),
                 verificationForm.getApartmentName(),

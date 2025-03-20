@@ -26,13 +26,13 @@ public class UserController {
     private Cloudinary cloudinary;
 
     @PostMapping("/add")
-    public ResponseEntity<Object> addUser(@RequestBody AddNewResidentRequestDTO newAccountDTO) {
+    public ResponseEntity<Object> addUser(@RequestBody VerifyUserResponseDTO verifyUserResponseDTO) {
         Map<String, Object> response = new HashMap<>();
         try {
-            AddNewResidentResponseDTO result = userService.addUser(newAccountDTO);
+            AddNewResidentResponseDTO result = userService.addUser(verifyUserResponseDTO);
             response.put("status", HttpStatus.CREATED.value());
             response.put("data", result);
-            response.put("message", "Đã cấp tài khoản thành công");
+            response.put("message", "Đã duyệt thành công");
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
         } catch (RuntimeException e) {
             response.put("status", HttpStatus.BAD_REQUEST.value());

@@ -72,6 +72,21 @@ public class ApartmentController {
         response.put("status", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }
+
+    @GetMapping("/get_own_apartment/")
+    public ResponseEntity<Object> getOwnApartment(@RequestParam Long userId) {
+        List<ApartmentDTO> apartments = apartmentService.totalUnrentedApartment();
+        Map<String, Object> response = new HashMap<>();
+        if (apartments.isEmpty()) {
+            response.put("message", "Tất cả các căn hộ đều đã được cho thuê");
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        response.put("data", apartments);
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
+    }
+
 //
 //    /**
 //     * Tao moi can ho

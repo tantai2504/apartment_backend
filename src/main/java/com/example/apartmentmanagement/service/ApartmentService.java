@@ -17,4 +17,6 @@ public interface ApartmentService {
     List<ApartmentDTO> getApartmentByName (String name);
 
     List<ApartmentDTO> totalUnrentedApartment ();
+
+    List<ApartmentDTO> getOwnApartment (Long userId);
 }

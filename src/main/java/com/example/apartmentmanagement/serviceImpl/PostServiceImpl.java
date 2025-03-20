@@ -1,5 +1,6 @@
 package com.example.apartmentmanagement.serviceImpl;
 
+import com.example.apartmentmanagement.dto.ApartmentDTO;
 import com.example.apartmentmanagement.dto.PostDTO;
 import com.example.apartmentmanagement.dto.PostRequestDTO;
 import com.example.apartmentmanagement.entities.Apartment;
@@ -46,7 +47,7 @@ public class PostServiceImpl implements PostService {
                 post.getTitle(),
                 post.getContent(),
                 post.isDepositCheck(),
-                post.getApartmentName(),
+                convertToApartmentDTO(post.getApartment()),
                 post.getPrice(),
                 post.getPostType(),
                 post.getPostDate(),
@@ -65,7 +66,7 @@ public class PostServiceImpl implements PostService {
                 post.getTitle(),
                 post.getContent(),
                 post.isDepositCheck(),
-                post.getApartmentName(),
+                convertToApartmentDTO(post.getApartment()),
                 post.getPrice(),
                 post.getPostType(),
                 post.getPostDate(),
@@ -78,6 +79,8 @@ public class PostServiceImpl implements PostService {
     @Override
     public PostDTO createPost(PostRequestDTO postDTO, List<MultipartFile> imageFiles) {
         Post post = new Post();
+
+        System.out.println("apartment: " + postDTO.getApartmentName());
 
         if (postDTO == null) {
             throw new RuntimeException("Dữ liệu bài đăng không được để trống");
@@ -98,12 +101,8 @@ public class PostServiceImpl implements PostService {
         if (postDTO.getUserName() == null || postDTO.getUserName().trim().isEmpty()) {
             throw new RuntimeException("Tên người dùng không được để trống");
         }
-        List<Apartment> apartments = apartmentRepository.findAll();
-        for (Apartment apartment : apartments) {
-            if (!apartment.getApartmentName().equals(postDTO.getApartmentName())) {
-                throw new RuntimeException("Không tồn tại căn hộ này trong hệ thống");
-            }
-        }
+
+        Apartment apartment = apartmentRepository.findApartmentByApartmentName(postDTO.getApartmentName());
 
         post.setTitle(postDTO.getTitle());
         post.setPostType(postDTO.getPostType());
@@ -111,7 +110,7 @@ public class PostServiceImpl implements PostService {
         post.setPostDate(LocalDateTime.now());
         post.setDepositCheck(postDTO.isDepositCheck());
         post.setContent(postDTO.getContent());
-        post.setApartmentName(postDTO.getApartmentName());
+        post.setApartment(apartment);
 
         User user = userRepository.findByUserNameOrEmail(postDTO.getUserName());
         if (user == null) {
@@ -139,7 +138,7 @@ public class PostServiceImpl implements PostService {
                 post.getTitle(),
                 post.getContent(),
                 post.isDepositCheck(),
-                post.getApartmentName(),
+                convertToApartmentDTO(post.getApartment()),
                 post.getPrice(),
                 post.getPostType(),
                 post.getPostDate(),
@@ -197,7 +196,6 @@ public class PostServiceImpl implements PostService {
             post.getPostImages().addAll(postImagesList);
         }
 
-
         postRepository.save(post);
 
         return new PostDTO(
@@ -205,7 +203,7 @@ public class PostServiceImpl implements PostService {
                 post.getTitle(),
                 post.getContent(),
                 post.isDepositCheck(),
-                post.getApartmentName(),
+                convertToApartmentDTO(post.getApartment()),
                 post.getPrice(),
                 post.getPostType(),
                 post.getPostDate(),
@@ -214,6 +212,20 @@ public class PostServiceImpl implements PostService {
         );
     }
 
+    private ApartmentDTO convertToApartmentDTO(Apartment apartment) {
+        if (apartment == null) return null;
+        return new ApartmentDTO(
+                apartment.getApartmentId(),
+                apartment.getApartmentName(),
+                apartment.getHouseholder(),
+                apartment.getTotalNumber(),
+                apartment.getStatus(),
+                apartment.getAptImgUrl(),
+                apartment.getNumberOfBedrooms(),
+                apartment.getNumberOfBathrooms(),
+                apartment.getNote()
+        );
+    }
 
     @Override
     public void deletePost(Long id) {

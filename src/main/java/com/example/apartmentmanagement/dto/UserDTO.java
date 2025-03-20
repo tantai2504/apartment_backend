@@ -7,12 +7,16 @@ import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserDTO {
+
+    private Long userId;
+
     private String userName;
 
     @Nationalized
@@ -41,17 +45,7 @@ public class UserDTO {
     @Nationalized
     private String job;
 
-    private String apartmentName;
+    private List<ApartmentResponseInUserDTO> apartment;
 
     private String role;
-
-    public UserDTO(String fullName, String email, String description, String phone, String job, String age, LocalDate birthday) {
-        this.fullName = fullName;
-        this.email = email;
-        this.description = description;
-        this.phone = phone;
-        this.job = job;
-        this.age = age;
-        this.birthday = birthday;
-    }
 }

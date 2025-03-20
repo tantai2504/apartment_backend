@@ -42,12 +42,14 @@ public class Post {
 
     private float price;
 
-    private String apartmentName;
-
     @ManyToOne
     @JoinColumn(name = "user_Id", nullable = false)
     private User user;
 
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostImages> postImages;
+
+    @ManyToOne
+    @JoinColumn(name = "apartment_id", nullable = false)
+    private Apartment apartment;
 }

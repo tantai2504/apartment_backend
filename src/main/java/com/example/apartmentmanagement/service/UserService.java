@@ -2,7 +2,6 @@ package com.example.apartmentmanagement.service;
 
 import com.example.apartmentmanagement.dto.*;
 import com.example.apartmentmanagement.entities.User;
-import com.example.apartmentmanagement.entities.VerificationForm;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -11,13 +10,13 @@ public interface UserService {
 
     List<UserDTO> showAllUser();
 
-    CreateNewAccountDTO addUser(CreateNewAccountDTO newAccountDTO);
+    CreateNewAccountResponseDTO addUser(CreateNewAccountRequestDTO newAccountDTO);
 
     RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO);
 
     VerifyRegisterRequestDTO verifyRegister(RegisterRequestDTO verifyRegisterRequestDTO);
 
-    User getUserById (Long id);
+    UserDTO getUserById (Long id);
 
     UserDTO getUserDTOById (Long id);
 

@@ -26,10 +26,10 @@ public class UserController {
     private Cloudinary cloudinary;
 
     @PostMapping("/add")
-    public ResponseEntity<Object> addUser(@RequestBody CreateNewAccountRequestDTO newAccountDTO) {
+    public ResponseEntity<Object> addUser(@RequestBody AddNewResidentRequestDTO newAccountDTO) {
         Map<String, Object> response = new HashMap<>();
         try {
-            CreateNewAccountResponseDTO result = userService.addUser(newAccountDTO);
+            AddNewResidentResponseDTO result = userService.addUser(newAccountDTO);
             response.put("status", HttpStatus.CREATED.value());
             response.put("data", result);
             response.put("message", "Đã cấp tài khoản thành công");
@@ -39,6 +39,17 @@ public class UserController {
             response.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
+    }
+
+    /**
+     * (Admin) Xem list cư dân mới do staff gửi về để xét duyệt
+     *
+     * @return
+     */
+    @GetMapping("/list_resident")
+    public ResponseEntity<Object> listResident() {
+        Map<String, Object> response = new HashMap<>();
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/find")

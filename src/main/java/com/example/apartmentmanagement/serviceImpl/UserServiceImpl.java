@@ -34,7 +34,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void saveUser(User user) {
-        userRepository.save(user); // Lưu người dùng vào database
+        userRepository.save(user);
+    }
+
+    @Override
+    public List<VerifyUserResponseDTO> showAllVerifyUser() {
+        return List.of();
     }
 
     @Override
@@ -78,7 +83,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public CreateNewAccountResponseDTO addUser(CreateNewAccountRequestDTO newAccountDTO) {
+    public AddNewResidentResponseDTO addUser(AddNewResidentRequestDTO newAccountDTO) {
         VerificationForm verificationForm = verificationFormRepository.findVerificationFormByUserNameContainingIgnoreCase(newAccountDTO.getUserName());
         List<User> users = userRepository.findAll();
         for (User user : users) {
@@ -123,7 +128,7 @@ public class UserServiceImpl implements UserService {
                 ))
                 .toList();
 
-        CreateNewAccountResponseDTO responseDTO = new CreateNewAccountResponseDTO(
+        AddNewResidentResponseDTO responseDTO = new AddNewResidentResponseDTO(
                 user.getUserName(),
                 newAccountDTO.getPassword(),
                 apartmentDTOList,
@@ -392,7 +397,7 @@ public class UserServiceImpl implements UserService {
         verificationForm.setContractStartDate(verifyUserDTO.getContractStartDate());
         verificationForm.setContractEndDate(verifyUserDTO.getContractEndDate());
         verificationForm.setUserName(user.getUserName());
-
+        verificationForm.setFullName(user.getFullName());
         verificationForm.setVerified(false);
 
         verificationForm = verificationFormRepository.save(verificationForm);

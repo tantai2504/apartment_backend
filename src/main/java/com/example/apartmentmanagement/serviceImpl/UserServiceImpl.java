@@ -8,6 +8,7 @@ import com.example.apartmentmanagement.entities.VerificationForm;
 import com.example.apartmentmanagement.repository.ApartmentRepository;
 import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.repository.VerificationFormRepository;
+import com.example.apartmentmanagement.service.EmailService;
 import com.example.apartmentmanagement.service.UserService;
 import com.example.apartmentmanagement.util.AESUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private VerificationFormRepository verificationFormRepository;
+
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public void saveUser(User user) {
@@ -137,8 +141,9 @@ public class UserServiceImpl implements UserService {
         verificationForm.setVerified(true);
         verificationFormRepository.save(verificationForm);
 
-        userRepository.save(user);
+        emailService.sendVerificationEmail(user.getEmail(), newAccountDTO.getUsername());
 
+        userRepository.save(user);
 
         List<ApartmentDTO> apartmentDTOList = user.getApartments().stream()
                 .map(apartment1 -> new ApartmentDTO(

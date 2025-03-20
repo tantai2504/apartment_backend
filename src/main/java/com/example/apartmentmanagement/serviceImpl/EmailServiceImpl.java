@@ -18,4 +18,14 @@ public class EmailServiceImpl implements EmailService {
         message.setText("Your OTP code is: " + otp);
         mailSender.send(message);
     }
+
+    @Override
+    public void sendVerificationEmail(String to, String userName) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(to);
+        message.setSubject("Thông báo duyệt cư dân");
+        message.setText("Xin chúc mừng " + userName + " đã trở thành cư dân của căn hộ.\n\n" +
+                "Vui lòng liên hệ ban quản lý nếu có bất kỳ thắc mắc nào.");
+        mailSender.send(message);
+    }
 }

@@ -16,4 +16,6 @@ public interface PostService {
     PostDTO updatePost(Long id, PostRequestDTO postRequestDTO, List<MultipartFile> imageFiles);
 
     void deletePost(Long id);
+
+    List<PostDTO> filterPosts(String priceRange, String sortBy);
 }

@@ -1,5 +1,6 @@
 package com.example.apartmentmanagement.dto;
 
+import com.example.apartmentmanagement.entities.Post;
 import com.example.apartmentmanagement.entities.PostImages;
 import com.example.apartmentmanagement.entities.User;
 import jakarta.persistence.CascadeType;
@@ -38,4 +39,7 @@ public class PostDTO {
     private String userName;
 
     private List<String> postImages;
+
+    public PostDTO(Post post) {
+    }
 }

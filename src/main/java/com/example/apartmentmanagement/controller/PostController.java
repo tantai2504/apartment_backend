@@ -106,4 +106,11 @@ public class PostController {
         response.put("status", HttpStatus.NO_CONTENT.value());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
     }
+
+    @GetMapping("/filter")
+    public ResponseEntity<Object> filterPosts(@RequestParam(required = false) String priceRange,
+                                              @RequestParam(required = false) String sortBy) {
+        List<PostDTO> filteredPosts = postService.filterPosts(priceRange, sortBy);
+        return ResponseEntity.status(HttpStatus.OK).body(filteredPosts);
+    }
 }

@@ -231,4 +231,33 @@ public class PostServiceImpl implements PostService {
     public void deletePost(Long id) {
         postRepository.deleteById(id);
     }
+    @Override
+    public List<PostDTO> filterPosts(String priceRange, String sortBy) {
+        List<Post> posts;
+
+        switch (priceRange) {
+            case "under_3m":
+                posts = postRepository.findByPriceLessThan(3000000);
+                break;
+            case "under_5m":
+                posts = postRepository.findByPriceLessThan(5000000);
+                break;
+            case "under_10m":
+                posts = postRepository.findByPriceLessThan(10000000);
+                break;
+            default:
+                posts = postRepository.findAll();
+        }
+
+        if ("asc".equals(sortBy)) {
+            posts.sort((a, b) -> Float.compare(a.getPrice(), b.getPrice()));
+        } else if ("desc".equals(sortBy)) {
+            posts.sort((a, b) -> Float.compare(b.getPrice(), a.getPrice()));
+        } else if ("latest".equals(sortBy)) {
+            posts.sort((a, b) -> b.getPostDate().compareTo(a.getPostDate()));
+        }
+
+        return posts.stream().map(PostDTO::new).collect(Collectors.toList());
+    }
+
 }

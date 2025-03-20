@@ -32,6 +32,22 @@ public class ChatController {
     @Autowired
     private UserRepository userRepository;
 
+    @GetMapping("/chat-page")
+    public ResponseEntity<?> getChatPage(HttpSession session) {
+        User user = (User) session.getAttribute("user");
+
+        if (user == null) {
+            return ResponseEntity.status(401).body("Lỗi: Chưa đăng nhập hoặc session đã hết hạn.");
+        }
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("userId", user.getUserId());
+        response.put("userName", user.getUserName());
+
+        return ResponseEntity.ok(response);
+    }
+
+
     // Xử lý gửi tin nhắn qua WebSocket
     @MessageMapping("/chat.send")
     public void sendMessage(@Payload ChatMessageDTO chatMessageDTO, HttpSession session) {

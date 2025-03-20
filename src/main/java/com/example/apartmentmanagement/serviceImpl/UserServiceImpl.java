@@ -57,6 +57,10 @@ public class UserServiceImpl implements UserService {
             dto.setContractEndDate(verificationForm.getContractEndDate());
             dto.setVerified(verificationForm.isVerified());
 
+            User user = userRepository.findByUserName(verificationForm.getUserName());
+
+            dto.setUserRole(user.getRole());
+
             // Chuyển đổi danh sách ảnh
             dto.setImageFiles(
                     verificationForm.getContractImages().stream()
@@ -134,7 +138,12 @@ public class UserServiceImpl implements UserService {
             apartment.setStatus("rented");
         }
 
-        user.setRole(newAccountDTO.getUserRole());
+        if (verificationForm.getVerificationFormType() == 1) {
+            user.setRole("Rentor");
+        } else if (verificationForm.getVerificationFormType() == 2) {
+            user.setRole("Owner");
+        }
+
         user.setVerificationForm(verificationForm);
         user.setApartments(apartments);
 
@@ -412,13 +421,6 @@ public class UserServiceImpl implements UserService {
 
         List<VerificationForm> verificationFormList = verificationFormRepository.findAll();
 
-        String setNewRole = "";
-        if (verifyUserDTO.getVerificationFormType()==1) {
-            setNewRole = "Rentor";
-        } else if (verifyUserDTO.getVerificationFormType()==2) {
-            setNewRole = "Owner";
-        }
-
         VerificationForm verificationForm = new VerificationForm();
         verificationForm.setVerificationFormName(verifyUserDTO.getVerificationFormName());
         verificationForm.setVerificationFormType(verifyUserDTO.getVerificationFormType());
@@ -459,7 +461,7 @@ public class UserServiceImpl implements UserService {
                 verificationForm.getContractStartDate(),
                 verificationForm.getContractEndDate(),
                 contractImages.stream().map(ContractImages::getImageUrl).toList(),
-                setNewRole,
+                user.getRole(),
                 verificationForm.getVerificationFormId(),
                 verificationForm.getVerificationFormType(),
                 verificationForm.getApartmentName(),

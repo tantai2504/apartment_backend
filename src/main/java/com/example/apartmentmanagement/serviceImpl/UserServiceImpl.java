@@ -39,8 +39,31 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<VerifyUserResponseDTO> showAllVerifyUser() {
-        return List.of();
+        return verificationFormRepository.findAll().stream().map(verificationForm -> {
+            VerifyUserResponseDTO dto = new VerifyUserResponseDTO();
+            dto.setVerificationFormId(verificationForm.getVerificationFormId());
+            dto.setVerificationFormName(verificationForm.getVerificationFormName());
+            dto.setVerificationFormType(verificationForm.getVerificationFormType());
+            dto.setApartmentName(verificationForm.getApartmentName());
+            dto.setFullName(verificationForm.getFullName());
+            dto.setUsername(verificationForm.getUserName());
+            dto.setEmail(verificationForm.getEmail());
+            dto.setPhoneNumber(verificationForm.getPhoneNumber());
+            dto.setContractStartDate(verificationForm.getContractStartDate());
+            dto.setContractEndDate(verificationForm.getContractEndDate());
+            dto.setVerified(verificationForm.isVerified());
+
+            // Chuyển đổi danh sách ảnh
+            dto.setImageFiles(
+                    verificationForm.getContractImages().stream()
+                            .map(ContractImages::getImageUrl)
+                            .toList()
+            );
+
+            return dto;
+        }).toList();
     }
+
 
     @Override
     public List<UserDTO> showAllUser() {
@@ -97,7 +120,7 @@ public class UserServiceImpl implements UserService {
         Apartment apartment = apartmentRepository.findById(newAccountDTO.getApartmentId())
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy Apartment với ID này"));
         if (apartment.getHouseholder() == null && newAccountDTO.getRole().equals("Owner")) {
-            apartment.setHouseholder(newAccountDTO.getFullName());
+            apartment.setHouseholder(newAccountDTO.getUserName());
         } else if (apartment.getHouseholder() != null && newAccountDTO.getRole().equals("Owner")) {
             throw new RuntimeException("Đã có người đứng tên chủ căn hộ, không thể thêm chủ sở hữu mới.");
         }
@@ -420,7 +443,12 @@ public class UserServiceImpl implements UserService {
                 verificationForm.getPhoneNumber(),
                 verificationForm.getContractStartDate(),
                 verificationForm.getContractEndDate(),
-                contractImages.stream().map(ContractImages::getImageUrl).toList()
+                contractImages.stream().map(ContractImages::getImageUrl).toList(),
+                verificationForm.getVerificationFormId(),
+                verificationForm.getVerificationFormType(),
+                verificationForm.getApartmentName(),
+                verificationForm.getUserName(),
+                verificationForm.isVerified()
         );
     }
 }

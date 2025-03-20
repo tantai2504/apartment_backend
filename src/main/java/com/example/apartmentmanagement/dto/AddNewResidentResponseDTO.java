@@ -13,8 +13,8 @@ import java.util.List;
 @NoArgsConstructor
 public class AddNewResidentResponseDTO {
     private String userName;
-    private String password;
     private List<ApartmentDTO> apartmentDTOS;
     private String fullName;
     private String role;
+    private boolean status;
 }

@@ -10,7 +10,7 @@ public interface UserService {
 
     List<UserDTO> showAllUser();
 
-    AddNewResidentResponseDTO addUser(AddNewResidentRequestDTO newAccountDTO);
+    AddNewResidentResponseDTO addUser(VerifyUserResponseDTO newAccountDTO);
 
     RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO);
 

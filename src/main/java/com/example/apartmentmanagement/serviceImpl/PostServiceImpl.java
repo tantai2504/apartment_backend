@@ -44,6 +44,7 @@ public class PostServiceImpl implements PostService {
     public List<PostDTO> getPosts() {
         return postRepository.findAll().stream().map(post -> new PostDTO(
                 post.getPostId(),
+                post.getUser().getUserId(),
                 post.getTitle(),
                 post.getContent(),
                 post.isDepositCheck(),
@@ -63,6 +64,7 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy bài đăng với ID: " + id));
         PostDTO dto = new PostDTO(
                 post.getPostId(),
+                post.getUser().getUserId(),
                 post.getTitle(),
                 post.getContent(),
                 post.isDepositCheck(),
@@ -135,6 +137,7 @@ public class PostServiceImpl implements PostService {
 
         PostDTO dto = new PostDTO(
                 post.getPostId(),
+                user.getUserId(),
                 post.getTitle(),
                 post.getContent(),
                 post.isDepositCheck(),
@@ -200,6 +203,7 @@ public class PostServiceImpl implements PostService {
 
         return new PostDTO(
                 post.getPostId(),
+                user.getUserId(),
                 post.getTitle(),
                 post.getContent(),
                 post.isDepositCheck(),

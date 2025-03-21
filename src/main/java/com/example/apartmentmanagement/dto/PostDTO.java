@@ -21,13 +21,15 @@ import java.util.List;
 public class PostDTO {
     private Long postId;
 
+    private Long userId;
+
     private String title;
 
     private String content;
 
     private boolean depositCheck;
 
-    private ApartmentDTO apartmentName;
+    private ApartmentDTO apartment;
 
     private float price;
 

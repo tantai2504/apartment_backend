@@ -5,7 +5,6 @@ import com.example.apartmentmanagement.entities.ChatMessage;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.service.ChatService;
-import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -33,11 +32,11 @@ public class ChatController {
     private UserRepository userRepository;
 
     @GetMapping("/chat-page")
-    public ResponseEntity<?> getChatPage(HttpSession session) {
-        User user = (User) session.getAttribute("user");
+    public ResponseEntity<?> getChatPage(@RequestParam Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
 
         if (user == null) {
-            return ResponseEntity.status(401).body("Lỗi: Chưa đăng nhập hoặc session đã hết hạn.");
+            return ResponseEntity.status(404).body("Lỗi: Không tìm thấy người dùng.");
         }
 
         Map<String, Object> response = new HashMap<>();
@@ -47,11 +46,13 @@ public class ChatController {
         return ResponseEntity.ok(response);
     }
 
-
-    // Xử lý gửi tin nhắn qua WebSocket
+    // Xử lý gửi tin nhắn qua WebSocket - Đã sửa
     @MessageMapping("/chat.send")
-    public void sendMessage(@Payload ChatMessageDTO chatMessageDTO, HttpSession session) {
-        User sender = (User) session.getAttribute("user");
+    public void sendMessage(@Payload ChatMessageDTO chatMessageDTO) {
+        // Sử dụng senderId từ chatMessageDTO thay vì từ HttpSession
+        Long senderId = chatMessageDTO.getSenderId();
+        User sender = userRepository.findById(senderId).orElse(null);
+
         if (sender == null) return;
 
         ChatMessage savedMessage = chatService.saveMessage(chatMessageDTO, sender);
@@ -76,10 +77,10 @@ public class ChatController {
 
     // API lấy lịch sử tin nhắn giữa 2 người
     @GetMapping("/history/{userId}")
-    public ResponseEntity<?> getChatHistory(@PathVariable Long userId, HttpSession session) {
-        User currentUser = (User) session.getAttribute("user");
+    public ResponseEntity<?> getChatHistory(@PathVariable Long userId, @RequestParam Long currentUserId) {
+        User currentUser = userRepository.findById(currentUserId).orElse(null);
         if (currentUser == null) {
-            return ResponseEntity.status(401).body("Chưa đăng nhập");
+            return ResponseEntity.status(404).body("Không tìm thấy người dùng");
         }
 
         try {
@@ -103,10 +104,10 @@ public class ChatController {
 
     // API lấy danh sách người dùng đã chat với người dùng hiện tại
     @GetMapping("/contacts")
-    public ResponseEntity<?> getChatContacts(HttpSession session) {
-        User currentUser = (User) session.getAttribute("user");
+    public ResponseEntity<?> getChatContacts(@RequestParam Long currentUserId) {
+        User currentUser = userRepository.findById(currentUserId).orElse(null);
         if (currentUser == null) {
-            return ResponseEntity.status(401).body("Chưa đăng nhập");
+            return ResponseEntity.status(404).body("Không tìm thấy người dùng");
         }
 
         try {
@@ -133,10 +134,10 @@ public class ChatController {
 
     // API đánh dấu tin nhắn là đã đọc
     @PostMapping("/read/{userId}")
-    public ResponseEntity<?> markMessagesAsRead(@PathVariable Long userId, HttpSession session) {
-        User currentUser = (User) session.getAttribute("user");
+    public ResponseEntity<?> markMessagesAsRead(@PathVariable Long userId, @RequestParam Long currentUserId) {
+        User currentUser = userRepository.findById(currentUserId).orElse(null);
         if (currentUser == null) {
-            return ResponseEntity.status(401).body("Chưa đăng nhập");
+            return ResponseEntity.status(404).body("Không tìm thấy người dùng");
         }
 
         try {
@@ -151,7 +152,7 @@ public class ChatController {
         }
     }
 
-    // Helper method để chuyển đổi Entity sang DTO
+    // Helper method để chuyển đổi Entity sang DTO - Đã sửa để chuyển timestamp sang String
     private ChatMessageDTO convertToDTO(ChatMessage message) {
         ChatMessageDTO dto = new ChatMessageDTO();
         dto.setId(message.getId());
@@ -160,7 +161,7 @@ public class ChatController {
         dto.setReceiverId(message.getReceiver().getUserId());
         dto.setReceiverName(message.getReceiver().getFullName());
         dto.setContent(message.getContent());
-        dto.setTimestamp(message.getTimestamp());
+        dto.setTimestamp(message.getTimestamp().toString()); // Chuyển đổi sang String
         dto.setRead(message.isRead());
         return dto;
     }

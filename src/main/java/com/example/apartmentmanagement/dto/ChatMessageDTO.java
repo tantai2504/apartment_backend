@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,6 +14,6 @@ public class ChatMessageDTO {
     private Long receiverId;
     private String receiverName;
     private String content;
-    private LocalDateTime timestamp;
+    private String timestamp; // Thay đổi từ LocalDateTime sang String
     private boolean isRead;
 }

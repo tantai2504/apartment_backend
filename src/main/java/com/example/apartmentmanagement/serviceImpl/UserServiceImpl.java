@@ -112,32 +112,34 @@ public class UserServiceImpl implements UserService {
         }).toList();
     }
 
-
     @Override
     public AddNewResidentResponseDTO addUser(VerifyUserResponseDTO newAccountDTO) {
         VerificationForm verificationForm = verificationFormRepository.findVerificationFormByUserNameContainingIgnoreCase(newAccountDTO.getUsername());
-        List<User> users = userRepository.findAll();
-        for (User user : users) {
-            if (!user.getUserName().equals(newAccountDTO.getUsername())) {
-                throw new RuntimeException("Chưa có user này trong hệ thống");
-            }
+        if (verificationForm == null) {
+            throw new RuntimeException("Không tìm thấy form xác minh");
         }
-        User user = userRepository.findByUserName(newAccountDTO.getUsername());
 
-        List<Apartment> apartments = new ArrayList<>();
-        Apartment apartment = apartmentRepository.findApartmentByApartmentName(newAccountDTO.getApartmentName());
-        if (apartment.getHouseholder() == null && newAccountDTO.getUserRole().equals("Owner")) {
-            apartment.setHouseholder(newAccountDTO.getUserRole());
-        } else if (apartment.getHouseholder() != null && newAccountDTO.getUserRole().equals("Owner")) {
-            throw new RuntimeException("Đã có người đứng tên chủ căn hộ, không thể thêm chủ sở hữu mới.");
+        User user = userRepository.findByUserName(newAccountDTO.getUsername());
+        if (user == null) {
+            throw new RuntimeException("Chưa có user này trong hệ thống");
         }
-        apartments.add(apartment);
+
+        Apartment apartment = apartmentRepository.findApartmentByApartmentName(newAccountDTO.getApartmentName());
+        if (apartment == null) {
+            throw new RuntimeException("Không tìm thấy căn hộ");
+        }
+
+        if (apartment.getHouseholder() == null && "Owner".equals(newAccountDTO.getUserRole())) {
+            apartment.setHouseholder(newAccountDTO.getUsername());
+        } else if (apartment.getHouseholder() != null && "Owner".equals(newAccountDTO.getUserRole())) {
+            throw new RuntimeException("Đã có chủ hộ, không thể thêm chủ sở hữu mới.");
+        }
 
         apartment.setTotalNumber(apartment.getTotalNumber() + 1);
         if (apartment.getTotalNumber() > 0) {
             apartment.setStatus("rented");
         }
-
+        apartmentRepository.save(apartment);
         if (verificationForm.getVerificationFormType() == 1) {
             user.setRole("Rentor");
         } else if (verificationForm.getVerificationFormType() == 2) {
@@ -145,39 +147,46 @@ public class UserServiceImpl implements UserService {
         }
 
         user.setVerificationForm(verificationForm);
-        user.setApartments(apartments);
+
+        userRepository.save(user);
 
         verificationForm.setVerified(true);
         verificationFormRepository.save(verificationForm);
 
+        Long userId = user.getUserId();
+        Long apartmentId = apartment.getApartmentId();
+
+        System.out.println("User ID: " + user.getUserId());
+        System.out.println("Apartment ID: " + apartmentId);
+
+        userRepository.addUserToApartment(userId, apartmentId);
+
         emailService.sendVerificationEmail(user.getEmail(), newAccountDTO.getUsername());
 
-        userRepository.save(user);
-
+        // Chuẩn bị dữ liệu phản hồi
         List<ApartmentDTO> apartmentDTOList = user.getApartments().stream()
                 .map(apartment1 -> new ApartmentDTO(
-                        apartment.getApartmentId(),
-                        apartment.getApartmentName(),
-                        apartment.getHouseholder(),
-                        apartment.getTotalNumber(),
-                        apartment.getStatus(),
-                        apartment.getAptImgUrl(),
-                        apartment.getNumberOfBedrooms(),
-                        apartment.getNumberOfBathrooms(),
-                        apartment.getNote()
+                        apartment1.getApartmentId(),
+                        apartment1.getApartmentName(),
+                        apartment1.getHouseholder(),
+                        apartment1.getTotalNumber(),
+                        apartment1.getStatus(),
+                        apartment1.getAptImgUrl(),
+                        apartment1.getNumberOfBedrooms(),
+                        apartment1.getNumberOfBathrooms(),
+                        apartment1.getNote()
                 ))
                 .toList();
 
-        AddNewResidentResponseDTO responseDTO = new AddNewResidentResponseDTO(
+        return new AddNewResidentResponseDTO(
                 user.getUserName(),
                 apartmentDTOList,
                 user.getFullName(),
                 user.getRole(),
                 true
         );
-
-        return responseDTO;
     }
+
 
     @Override
     public RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO) {

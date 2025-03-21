@@ -67,7 +67,6 @@ public class User {
     )
     private List<Apartment> apartments;
 
-
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Notification> notifications;
 

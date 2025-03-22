@@ -17,5 +17,5 @@ public interface PostService {
 
     void deletePost(Long id);
 
-    List<PostResponseDTO> filterPosts(String priceRange, String sortBy);
+    List<PostResponseDTO> filterPosts(String priceRange, String areaRange, String bedrooms, String sortBy);
 }

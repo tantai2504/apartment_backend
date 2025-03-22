@@ -107,9 +107,24 @@ public class PostController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<Object> filterPosts(@RequestParam(required = false) String priceRange,
-                                              @RequestParam(required = false) String sortBy) {
-        List<PostResponseDTO> filteredPosts = postService.filterPosts(priceRange, sortBy);
-        return ResponseEntity.status(HttpStatus.OK).body(filteredPosts);
+    public ResponseEntity<Object> filterPosts(
+            @RequestParam(required = false) String priceRange,
+            @RequestParam(required = false) String areaRange,
+            @RequestParam(required = false) String bedrooms,
+            @RequestParam(required = false) String sortBy) {
+
+        List<PostResponseDTO> filteredPosts = postService.filterPosts(priceRange, areaRange, bedrooms, sortBy);
+        Map<String, Object> response = new HashMap<>();
+
+        if (filteredPosts.isEmpty()) {
+            response.put("message", "Không có bài đăng nào phù hợp");
+            response.put("status", HttpStatus.OK.value());
+        } else {
+            response.put("status", HttpStatus.OK.value());
+            response.put("data", filteredPosts);
+        }
+
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
 }

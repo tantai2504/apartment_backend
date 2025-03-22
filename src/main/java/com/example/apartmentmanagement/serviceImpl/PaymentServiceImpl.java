@@ -1,7 +1,9 @@
 package com.example.apartmentmanagement.serviceImpl;
 
 import com.example.apartmentmanagement.dto.PaymentHistoryResponseDTO;
+import com.example.apartmentmanagement.entities.Bill;
 import com.example.apartmentmanagement.entities.Payment;
+import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.repository.BillRepository;
 import com.example.apartmentmanagement.repository.PaymentRepository;
 import com.example.apartmentmanagement.repository.UserRepository;
@@ -11,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PaymentServiceImpl implements PaymentService {
@@ -27,12 +30,18 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public List<PaymentHistoryResponseDTO> getPaymentHistory(Long userId, int month, int year) {
 
-        List<PaymentHistoryResponseDTO> paymentHistoryResponseDTOList = new ArrayList<>();
+        List<Payment> payments = paymentRepository.findAll();
 
-        PaymentHistoryResponseDTO paymentHistoryResponseDTO = new PaymentHistoryResponseDTO();
-
-
-
-        return paymentHistoryResponseDTOList;
+        return payments.stream()
+                .filter(payment -> payment.getPaymentDate().getMonthValue() == month && payment.getPaymentDate().getYear() == year)
+                .map(payment -> new PaymentHistoryResponseDTO(
+                        payment.getPaymentId(),
+                        payment.isPaymentCheck(),
+                        payment.getPaymentDate(),
+                        payment.getPaymentInfo(),
+                        payment.getUser().getUserId(),
+                        payment.getBill().getBillId()
+                ))
+                .collect(Collectors.toList());
     }
 }

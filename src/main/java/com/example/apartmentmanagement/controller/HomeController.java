@@ -46,7 +46,7 @@ public class HomeController {
             User user = userService.getUserByEmailOrUserName(usernameOrEmail);
             if (user == null || !password.equals(AESUtil.decrypt(user.getPassword()))) {
                 response.put("status", HttpStatus.UNAUTHORIZED.value());
-                response.put("message", "Đăng nhập thất bại");
+                response.put("message", "Đăng nhập thất bại, sai tên tài khoản hoặc mật khẩu");
                 response.put("data", null);
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
             }

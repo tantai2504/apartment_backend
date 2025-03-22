@@ -24,7 +24,6 @@ public class PaymentController {
   public PaymentController(PayOS payOS) {
     super();
     this.payOS = payOS;
-
   }
 
   @Autowired

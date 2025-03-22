@@ -12,6 +12,8 @@ import vn.payos.PayOS;
 import vn.payos.type.Webhook;
 import vn.payos.type.WebhookData;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/payment")
 public class PaymentController {
@@ -28,20 +30,21 @@ public class PaymentController {
 
   @PostMapping(path = "/payos_transfer_handler")
   public ObjectNode payosTransferHandler(@RequestBody ObjectNode body)
-      throws JsonProcessingException, IllegalArgumentException {
+          throws JsonProcessingException, IllegalArgumentException {
 
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectNode response = objectMapper.createObjectNode();
     Webhook webhookBody = objectMapper.treeToValue(body, Webhook.class);
 
     try {
-      // Init Response
+      // Xác minh dữ liệu từ PayOS
+      WebhookData data = payOS.verifyPaymentWebhookData(webhookBody);
+
+      // Sau khi xử lý thành công, trả về phản hồi OK
       response.put("error", 0);
       response.put("message", "Webhook delivered");
       response.set("data", null);
 
-      WebhookData data = payOS.verifyPaymentWebhookData(webhookBody);
-      System.out.println(data);
       return response;
     } catch (Exception e) {
       e.printStackTrace();
@@ -51,16 +54,16 @@ public class PaymentController {
       return response;
     }
   }
+
   @PostMapping("/success")
-  public ResponseEntity<Object> paymentSuccess(@RequestParam Long billId, @RequestParam String paymentInfo) {
+  public ResponseEntity<Object> paymentSuccess(@RequestBody Map<String, String> payload) {
     try {
-      System.out.println("billId: " + billId);
-      System.out.println("paymentInfo: " + paymentInfo);
-      billService.processPaymentSuccess(billId, paymentInfo);
+      Long billId = Long.parseLong(payload.get("billId"));
+      String description = payload.get("description");
+      billService.processPaymentSuccess(billId, description);
       return ResponseEntity.ok("Thanh toán thành công");
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
     }
   }
-
 }

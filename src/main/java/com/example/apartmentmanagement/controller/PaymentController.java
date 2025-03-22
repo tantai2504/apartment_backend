@@ -1,6 +1,8 @@
 package com.example.apartmentmanagement.controller;
 
+import com.example.apartmentmanagement.dto.PaymentHistoryResponseDTO;
 import com.example.apartmentmanagement.service.BillService;
+import com.example.apartmentmanagement.service.PaymentService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -12,7 +14,7 @@ import vn.payos.PayOS;
 import vn.payos.type.Webhook;
 import vn.payos.type.WebhookData;
 
-import java.util.Map;
+import java.util.*;
 
 @RestController
 @RequestMapping("/payment")
@@ -24,6 +26,9 @@ public class PaymentController {
     this.payOS = payOS;
 
   }
+
+  @Autowired
+  private PaymentService paymentService;
 
   @Autowired
   private BillService billService;
@@ -64,6 +69,22 @@ public class PaymentController {
       return ResponseEntity.ok("Thanh toán thành công");
     } catch (Exception e) {
       return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+    }
+  }
+
+  @GetMapping("/history/{userId}")
+  public ResponseEntity<Object> paymentHistory(@RequestParam int month, @RequestParam int year,
+                                                   @PathVariable Long userId) {
+    Map<String, Object> response = new HashMap<>();
+    List<PaymentHistoryResponseDTO> paymentHistoryResponseDTOS = paymentService.getPaymentHistory(userId, month, year);
+    if (!paymentHistoryResponseDTOS.isEmpty()) {
+      response.put("data", paymentHistoryResponseDTOS);
+      response.put("status", HttpStatus.OK.value());
+      return ResponseEntity.ok(response);
+    } else {
+      response.put("status", HttpStatus.NOT_FOUND.value());
+      response.put("message", "Không có dữ liệu");
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
     }
   }
 }

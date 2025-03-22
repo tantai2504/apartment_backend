@@ -1,6 +1,6 @@
 package com.example.apartmentmanagement.controller;
 
-import com.example.apartmentmanagement.dto.BillDTO;
+import com.example.apartmentmanagement.dto.BillResponseDTO;
 import com.example.apartmentmanagement.dto.BillRequestDTO;
 import com.example.apartmentmanagement.entities.Bill;
 import com.example.apartmentmanagement.entities.User;
@@ -12,7 +12,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,14 +34,14 @@ public class BillController {
     @GetMapping("/getAll/{userId}")
     public ResponseEntity<Object> getBill(@RequestParam int month, @RequestParam int year,
                                           @PathVariable Long userId) {
-        List<BillDTO> billDTOS = billService.getAllBillsWithinSpecTime(userId, month, year);
+        List<BillResponseDTO> billResponseDTOS = billService.getAllBillsWithinSpecTime(userId, month, year);
         Map<String, Object> response = new HashMap<>();
-        if (billDTOS.isEmpty()) {
+        if (billResponseDTOS.isEmpty()) {
             response.put("message", "Chưa thanh toán hoá đơn nào");
             response.put("status", HttpStatus.NOT_FOUND.value());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
-        response.put("data", billDTOS);
+        response.put("data", billResponseDTOS);
         response.put("status", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }
@@ -59,14 +58,14 @@ public class BillController {
     public ResponseEntity<Object> getBillList(@RequestParam int month, @RequestParam int year, HttpSession session) {
         Object sessionUser = session.getAttribute("user");
         User user = (User) sessionUser;
-        List<BillDTO> billDTOS = billService.viewBillList(month, year, user.getUserId());
+        List<BillResponseDTO> billResponseDTOS = billService.viewBillList(month, year, user.getUserId());
         Map<String, Object> response = new HashMap<>();
-        if (billDTOS.isEmpty()) {
+        if (billResponseDTOS.isEmpty()) {
             response.put("message", "Chưa thanh toán hoá đơn nào");
             response.put("status", HttpStatus.NOT_FOUND.value());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
-        response.put("data", billDTOS);
+        response.put("data", billResponseDTOS);
         response.put("status", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }
@@ -99,15 +98,15 @@ public class BillController {
 
     @GetMapping("/get_bill_info/{billId}")
     public ResponseEntity<Object> getBillInfo(@RequestParam int month, @RequestParam int year, @PathVariable Long billId) {
-        BillDTO billDTO = billService.getBillById(billId);
+        BillResponseDTO billResponseDTO = billService.getBillById(billId);
         Map<String, Object> response = new HashMap<>();
-        if (billDTO == null) {
+        if (billResponseDTO == null) {
             response.put("status", HttpStatus.NOT_FOUND.value());
             response.put("message", "Không tìm thấy hoá đơn này");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         } else {
             response.put("status", HttpStatus.OK.value());
-            response.put("data", billDTO);
+            response.put("data", billResponseDTO);
             return ResponseEntity.ok(response);
         }
     }

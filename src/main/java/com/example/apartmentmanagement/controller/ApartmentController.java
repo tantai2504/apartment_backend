@@ -1,15 +1,12 @@
 package com.example.apartmentmanagement.controller;
 
-import com.example.apartmentmanagement.dto.ApartmentDTO;
+import com.example.apartmentmanagement.dto.ApartmentResponseDTO;
 import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.service.ApartmentService;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,7 +24,7 @@ public class ApartmentController {
      */
     @GetMapping("/getAll")
     public ResponseEntity<Object> showAllApartment(){
-        List<ApartmentDTO> apartments = apartmentService.showApartment();
+        List<ApartmentResponseDTO> apartments = apartmentService.showApartment();
         Map<String, Object> response = new HashMap<>();
         if (apartments.isEmpty()) {
             response.put("message", "Không có căn hộ nào");
@@ -47,7 +44,7 @@ public class ApartmentController {
      */
     @GetMapping("/find")
     public ResponseEntity<Object> findApartmentByName(@RequestParam String name) {
-        List<ApartmentDTO> apartment = apartmentService.getApartmentByName(name);
+        List<ApartmentResponseDTO> apartment = apartmentService.getApartmentByName(name);
         Map<String, Object> response = new HashMap<>();
         if (apartment.isEmpty()) {
             response.put("message", "Không tìm thấy căn hộ này");
@@ -61,7 +58,7 @@ public class ApartmentController {
 
     @GetMapping("/getAll/unrented")
     public ResponseEntity<Object> showAllUnrentedApartment() {
-        List<ApartmentDTO> apartments = apartmentService.totalUnrentedApartment();
+        List<ApartmentResponseDTO> apartments = apartmentService.totalUnrentedApartment();
         Map<String, Object> response = new HashMap<>();
         if (apartments.isEmpty()) {
             response.put("message", "Tất cả các căn hộ đều đã được cho thuê");
@@ -75,7 +72,7 @@ public class ApartmentController {
 
     @GetMapping("/get_own_apartment/")
     public ResponseEntity<Object> getOwnApartment(@RequestParam Long userId) {
-        List<ApartmentDTO> apartments = apartmentService.totalUnrentedApartment();
+        List<ApartmentResponseDTO> apartments = apartmentService.totalUnrentedApartment();
         Map<String, Object> response = new HashMap<>();
         if (apartments.isEmpty()) {
             response.put("message", "Tất cả các căn hộ đều đã được cho thuê");

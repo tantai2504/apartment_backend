@@ -1,7 +1,7 @@
 package com.example.apartmentmanagement.serviceImpl;
 
-import com.example.apartmentmanagement.dto.ApartmentDTO;
-import com.example.apartmentmanagement.dto.PostDTO;
+import com.example.apartmentmanagement.dto.ApartmentResponseDTO;
+import com.example.apartmentmanagement.dto.PostResponseDTO;
 import com.example.apartmentmanagement.dto.PostRequestDTO;
 import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.Post;
@@ -41,8 +41,8 @@ public class PostServiceImpl implements PostService {
     private ApartmentRepository apartmentRepository;
 
     @Override
-    public List<PostDTO> getPosts() {
-        return postRepository.findAll().stream().map(post -> new PostDTO(
+    public List<PostResponseDTO> getPosts() {
+        return postRepository.findAll().stream().map(post -> new PostResponseDTO(
                 post.getPostId(),
                 post.getUser().getUserId(),
                 post.getTitle(),
@@ -59,10 +59,10 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDTO getPostById(Long id) {
+    public PostResponseDTO getPostById(Long id) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy bài đăng với ID: " + id));
-        PostDTO dto = new PostDTO(
+        PostResponseDTO dto = new PostResponseDTO(
                 post.getPostId(),
                 post.getUser().getUserId(),
                 post.getTitle(),
@@ -79,7 +79,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDTO createPost(PostRequestDTO postDTO, List<MultipartFile> imageFiles) {
+    public PostResponseDTO createPost(PostRequestDTO postDTO, List<MultipartFile> imageFiles) {
         Post post = new Post();
 
         System.out.println("apartment: " + postDTO.getApartmentName());
@@ -135,7 +135,7 @@ public class PostServiceImpl implements PostService {
         postRepository.save(post);
         postImagesRepository.saveAll(postImagesList);
 
-        PostDTO dto = new PostDTO(
+        PostResponseDTO dto = new PostResponseDTO(
                 post.getPostId(),
                 user.getUserId(),
                 post.getTitle(),
@@ -152,7 +152,7 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public PostDTO updatePost(Long id, PostRequestDTO postDTO, List<MultipartFile> imageFiles) {
+    public PostResponseDTO updatePost(Long id, PostRequestDTO postDTO, List<MultipartFile> imageFiles) {
         Post post = postRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy bài đăng với ID: " + id));
 
@@ -201,7 +201,7 @@ public class PostServiceImpl implements PostService {
 
         postRepository.save(post);
 
-        return new PostDTO(
+        return new PostResponseDTO(
                 post.getPostId(),
                 user.getUserId(),
                 post.getTitle(),
@@ -216,9 +216,9 @@ public class PostServiceImpl implements PostService {
         );
     }
 
-    private ApartmentDTO convertToApartmentDTO(Apartment apartment) {
+    private ApartmentResponseDTO convertToApartmentDTO(Apartment apartment) {
         if (apartment == null) return null;
-        return new ApartmentDTO(
+        return new ApartmentResponseDTO(
                 apartment.getApartmentId(),
                 apartment.getApartmentName(),
                 apartment.getHouseholder(),
@@ -227,7 +227,10 @@ public class PostServiceImpl implements PostService {
                 apartment.getAptImgUrl(),
                 apartment.getNumberOfBedrooms(),
                 apartment.getNumberOfBathrooms(),
-                apartment.getNote()
+                apartment.getNote(),
+                apartment.getDirection(),
+                apartment.getFloor(),
+                apartment.getArea()
         );
     }
 

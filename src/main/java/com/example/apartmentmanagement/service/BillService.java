@@ -1,22 +1,21 @@
 package com.example.apartmentmanagement.service;
 
-import com.example.apartmentmanagement.dto.BillDTO;
+import com.example.apartmentmanagement.dto.BillResponseDTO;
 import com.example.apartmentmanagement.dto.BillRequestDTO;
-import com.example.apartmentmanagement.entities.Bill;
 
 import java.util.List;
 
 public interface BillService {
 
-    List<BillDTO> getAllBillsWithinSpecTime(Long userId, int month, int year);
+    List<BillResponseDTO> getAllBillsWithinSpecTime(Long userId, int month, int year);
 
-    BillDTO getBillById(Long id);
+    BillResponseDTO getBillById(Long id);
 
     void processPaymentSuccess(Long billId, String paymentInfo);
 
     BillRequestDTO updateBill(Long id, BillRequestDTO billRequestDTO);
 
-    List<BillDTO> viewBillList(int month, int year, Long userId);
+    List<BillResponseDTO> viewBillList(int month, int year, Long userId);
 
     void deleteBill(Long id);
 

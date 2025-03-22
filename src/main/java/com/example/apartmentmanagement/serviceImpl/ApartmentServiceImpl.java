@@ -1,6 +1,6 @@
 package com.example.apartmentmanagement.serviceImpl;
 
-import com.example.apartmentmanagement.dto.ApartmentDTO;
+import com.example.apartmentmanagement.dto.ApartmentResponseDTO;
 import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.repository.ApartmentRepository;
@@ -8,9 +8,7 @@ import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.service.ApartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -32,8 +30,8 @@ public class ApartmentServiceImpl implements ApartmentService{
     }
 
     @Override
-    public List<ApartmentDTO> showApartment() {
-        return apartmentRepository.findAll().stream().map(apartment -> new ApartmentDTO(
+    public List<ApartmentResponseDTO> showApartment() {
+        return apartmentRepository.findAll().stream().map(apartment -> new ApartmentResponseDTO(
                 apartment.getApartmentId(),
                 apartment.getApartmentName(),
                 apartment.getHouseholder(),
@@ -43,6 +41,9 @@ public class ApartmentServiceImpl implements ApartmentService{
                 apartment.getNumberOfBedrooms(),
                 apartment.getNumberOfBathrooms(),
                 apartment.getNote(),
+                apartment.getDirection(),
+                apartment.getFloor(),
+                apartment.getArea(),
                 apartment.getUsers().stream().map(User::getUserName).toList()
         )).toList();
     }
@@ -54,9 +55,9 @@ public class ApartmentServiceImpl implements ApartmentService{
     }
 
     @Override
-    public List<ApartmentDTO> getApartmentByName(String name) {
+    public List<ApartmentResponseDTO> getApartmentByName(String name) {
         return apartmentRepository.findApartmentByApartmentNameContaining(name).stream()
-                .map(apartment -> new ApartmentDTO(
+                .map(apartment -> new ApartmentResponseDTO(
                         apartment.getApartmentId(),
                         apartment.getApartmentName(),
                         apartment.getHouseholder(),
@@ -66,6 +67,9 @@ public class ApartmentServiceImpl implements ApartmentService{
                         apartment.getNumberOfBedrooms(),
                         apartment.getNumberOfBathrooms(),
                         apartment.getNote(),
+                        apartment.getDirection(),
+                        apartment.getFloor(),
+                        apartment.getArea(),
                         apartment.getUsers().stream().map(User::getUserName).toList()
                 ))
                 .toList();
@@ -73,10 +77,10 @@ public class ApartmentServiceImpl implements ApartmentService{
 
 
     @Override
-    public List<ApartmentDTO> totalUnrentedApartment() {
+    public List<ApartmentResponseDTO> totalUnrentedApartment() {
         return apartmentRepository.findAll().stream().
                 filter(apartment -> apartment.getStatus().equals("unrented")).
-                map(apartment -> new ApartmentDTO(
+                map(apartment -> new ApartmentResponseDTO(
                 apartment.getApartmentId(),
                 apartment.getApartmentName(),
                 apartment.getHouseholder(),
@@ -86,17 +90,20 @@ public class ApartmentServiceImpl implements ApartmentService{
                 apartment.getNumberOfBedrooms(),
                 apartment.getNumberOfBathrooms(),
                 apartment.getNote(),
+                apartment.getDirection(),
+                apartment.getFloor(),
+                apartment.getArea(),
                 apartment.getUsers().stream().map(User::getUserName).toList()
         )).toList();
     }
 
     @Override
-    public List<ApartmentDTO> getOwnApartment(Long userId) {
+    public List<ApartmentResponseDTO> getOwnApartment(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user.getRole().equals("admin")) {
             return apartmentRepository.findAll().stream().
                     filter(apartment -> apartment.getStatus().equals("unrented")).
-                    map(apartment -> new ApartmentDTO(
+                    map(apartment -> new ApartmentResponseDTO(
                             apartment.getApartmentId(),
                             apartment.getApartmentName(),
                             apartment.getHouseholder(),
@@ -106,6 +113,9 @@ public class ApartmentServiceImpl implements ApartmentService{
                             apartment.getNumberOfBedrooms(),
                             apartment.getNumberOfBathrooms(),
                             apartment.getNote(),
+                            apartment.getDirection(),
+                            apartment.getFloor(),
+                            apartment.getArea(),
                             apartment.getUsers().stream().map(User::getUserName).toList()
                     )).toList();
         } else {

@@ -51,6 +51,13 @@ public class Apartment {
 
     private String aptImgUrl;
 
+    @Nationalized
+    private String direction;
+
+    private String floor;
+
+    private String area;
+
     @ManyToMany(mappedBy = "apartments")
     private List<User> users;
 

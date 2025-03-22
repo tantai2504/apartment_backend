@@ -1,6 +1,8 @@
 package com.example.apartmentmanagement.controller;
 
+import com.example.apartmentmanagement.dto.PaymentHistoryResponseDTO;
 import com.example.apartmentmanagement.service.BillService;
+import com.example.apartmentmanagement.service.PaymentService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -12,6 +14,8 @@ import vn.payos.PayOS;
 import vn.payos.type.Webhook;
 import vn.payos.type.WebhookData;
 
+import java.util.*;
+
 @RestController
 @RequestMapping("/payment")
 public class PaymentController {
@@ -20,28 +24,31 @@ public class PaymentController {
   public PaymentController(PayOS payOS) {
     super();
     this.payOS = payOS;
-
   }
+
+  @Autowired
+  private PaymentService paymentService;
 
   @Autowired
   private BillService billService;
 
   @PostMapping(path = "/payos_transfer_handler")
   public ObjectNode payosTransferHandler(@RequestBody ObjectNode body)
-      throws JsonProcessingException, IllegalArgumentException {
+          throws JsonProcessingException, IllegalArgumentException {
 
     ObjectMapper objectMapper = new ObjectMapper();
     ObjectNode response = objectMapper.createObjectNode();
     Webhook webhookBody = objectMapper.treeToValue(body, Webhook.class);
 
     try {
-      // Init Response
+      // Xác minh dữ liệu từ PayOS
+      WebhookData data = payOS.verifyPaymentWebhookData(webhookBody);
+
+      // Sau khi xử lý thành công, trả về phản hồi OK
       response.put("error", 0);
       response.put("message", "Webhook delivered");
       response.set("data", null);
 
-      WebhookData data = payOS.verifyPaymentWebhookData(webhookBody);
-      System.out.println(data);
       return response;
     } catch (Exception e) {
       e.printStackTrace();
@@ -51,16 +58,38 @@ public class PaymentController {
       return response;
     }
   }
+
   @PostMapping("/success")
-  public ResponseEntity<Object> paymentSuccess(@RequestParam Long billId, @RequestParam String paymentInfo) {
+  public ResponseEntity<Object> paymentSuccess(@RequestBody Map<String, String> payload) {
+    Map<String, Object> response = new HashMap<>();
     try {
-      System.out.println("billId: " + billId);
-      System.out.println("paymentInfo: " + paymentInfo);
-      billService.processPaymentSuccess(billId, paymentInfo);
-      return ResponseEntity.ok("Thanh toán thành công");
+      Long billId = Long.parseLong(payload.get("billId"));
+      String description = payload.get("paymentInfo");
+      response.put("status", HttpStatus.OK.value());
+      response.put("message", "Payment successful");
+      response.put("data", payload);
+      billService.processPaymentSuccess(billId, description);
+      return ResponseEntity.ok(response);
     } catch (Exception e) {
-      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+      response.put("message", e.getMessage());
+      response.put("status", HttpStatus.BAD_REQUEST.value());
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
     }
   }
 
+  @GetMapping("/history/{userId}")
+  public ResponseEntity<Object> paymentHistory(@RequestParam int month, @RequestParam int year,
+                                                   @PathVariable Long userId) {
+    Map<String, Object> response = new HashMap<>();
+    List<PaymentHistoryResponseDTO> paymentHistoryResponseDTOS = paymentService.getPaymentHistory(userId, month, year);
+    if (!paymentHistoryResponseDTOS.isEmpty()) {
+      response.put("data", paymentHistoryResponseDTOS);
+      response.put("status", HttpStatus.OK.value());
+      return ResponseEntity.ok(response);
+    } else {
+      response.put("status", HttpStatus.NOT_FOUND.value());
+      response.put("message", "Không có dữ liệu");
+      return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+    }
+  }
 }

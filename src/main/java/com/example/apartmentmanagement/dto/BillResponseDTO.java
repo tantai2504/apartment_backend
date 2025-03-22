@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class BillDTO {
+public class BillResponseDTO {
     private Long billId;
     private String billContent;
     private float electricBill;

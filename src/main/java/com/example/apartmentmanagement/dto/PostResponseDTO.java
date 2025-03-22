@@ -19,8 +19,10 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostDTO {
+public class PostResponseDTO {
     private Long postId;
+
+    private Long userId;
 
     private String title;
 
@@ -28,7 +30,7 @@ public class PostDTO {
 
     private boolean depositCheck;
 
-    private ApartmentDTO apartmentName;
+    private ApartmentResponseDTO apartment;
 
     private float price;
 
@@ -40,6 +42,4 @@ public class PostDTO {
 
     private List<String> postImages;
 
-    public PostDTO(Post post) {
-    }
 }

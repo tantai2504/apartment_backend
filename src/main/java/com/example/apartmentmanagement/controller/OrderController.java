@@ -112,6 +112,7 @@ public class OrderController {
         ObjectNode response = objectMapper.createObjectNode();
         try {
             String str = payOS.confirmWebhook(requestBody.get("webhookUrl"));
+            System.out.println("Webhook received: " + requestBody);
             response.set("data", objectMapper.valueToTree(str));
             response.put("error", 0);
             response.put("message", "ok");
@@ -121,7 +122,9 @@ public class OrderController {
             response.put("error", -1);
             response.put("message", e.getMessage());
             response.set("data", null);
+            response.put("status", "failed"); // Nếu lỗi, đặt status là failed
             return response;
         }
     }
+
 }

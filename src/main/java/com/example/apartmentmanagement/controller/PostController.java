@@ -1,8 +1,7 @@
 package com.example.apartmentmanagement.controller;
 
-import com.example.apartmentmanagement.dto.PostDTO;
+import com.example.apartmentmanagement.dto.PostResponseDTO;
 import com.example.apartmentmanagement.dto.PostRequestDTO;
-import com.example.apartmentmanagement.entities.Post;
 import com.example.apartmentmanagement.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,7 +21,7 @@ public class PostController {
 
     @GetMapping
     public ResponseEntity<Object> getPosts() {
-        List<PostDTO> posts = postService.getPosts();
+        List<PostResponseDTO> posts = postService.getPosts();
         Map<String, Object> response = new HashMap<>();
         if (posts.isEmpty()) {
             response.put("message", "Chưa có post nào");
@@ -39,9 +38,9 @@ public class PostController {
     public ResponseEntity<Object> getPostById(@PathVariable Long postId) {
         Map<String, Object> response = new HashMap<>();
         try {
-            PostDTO postDTO = postService.getPostById(postId);
+            PostResponseDTO postResponseDTO = postService.getPostById(postId);
             response.put("status", HttpStatus.OK.value());
-            response.put("data", postDTO);
+            response.put("data", postResponseDTO);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (RuntimeException e) {
             response.put("message", e.getMessage());
@@ -63,9 +62,9 @@ public class PostController {
         PostRequestDTO postRequestDTO = new PostRequestDTO(title, content, price, depositCheck, apartmentName, postType, userName);
         Map<String, Object> response = new HashMap<>();
         try {
-            PostDTO postDTO = postService.updatePost(postId, postRequestDTO, imageFiles);
+            PostResponseDTO postResponseDTO = postService.updatePost(postId, postRequestDTO, imageFiles);
             response.put("status", HttpStatus.CREATED.value());
-            response.put("data", postDTO);
+            response.put("data", postResponseDTO);
             response.put("message", "Cập nhật thành công");
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
@@ -87,9 +86,9 @@ public class PostController {
         PostRequestDTO postRequestDTO = new PostRequestDTO(title, content, price, depositCheck, apartmentName, postType, userName);
         Map<String, Object> response = new HashMap<>();
         try {
-            PostDTO postDTO = postService.createPost(postRequestDTO, imageFiles);
+            PostResponseDTO postResponseDTO = postService.createPost(postRequestDTO, imageFiles);
             response.put("status", HttpStatus.CREATED.value());
-            response.put("data", postDTO);
+            response.put("data", postResponseDTO);
             response.put("message", "Khởi tạo thành công");
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
@@ -110,7 +109,7 @@ public class PostController {
     @GetMapping("/filter")
     public ResponseEntity<Object> filterPosts(@RequestParam(required = false) String priceRange,
                                               @RequestParam(required = false) String sortBy) {
-        List<PostDTO> filteredPosts = postService.filterPosts(priceRange, sortBy);
+        List<PostResponseDTO> filteredPosts = postService.filterPosts(priceRange, sortBy);
         return ResponseEntity.status(HttpStatus.OK).body(filteredPosts);
     }
 }

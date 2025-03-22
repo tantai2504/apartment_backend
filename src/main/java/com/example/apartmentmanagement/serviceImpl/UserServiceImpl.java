@@ -164,8 +164,8 @@ public class UserServiceImpl implements UserService {
         emailService.sendVerificationEmail(user.getEmail(), newAccountDTO.getUsername());
 
         // Chuẩn bị dữ liệu phản hồi
-        List<ApartmentDTO> apartmentDTOList = user.getApartments().stream()
-                .map(apartment1 -> new ApartmentDTO(
+        List<ApartmentResponseDTO> apartmentResponseDTOList = user.getApartments().stream()
+                .map(apartment1 -> new ApartmentResponseDTO(
                         apartment1.getApartmentId(),
                         apartment1.getApartmentName(),
                         apartment1.getHouseholder(),
@@ -174,13 +174,16 @@ public class UserServiceImpl implements UserService {
                         apartment1.getAptImgUrl(),
                         apartment1.getNumberOfBedrooms(),
                         apartment1.getNumberOfBathrooms(),
-                        apartment1.getNote()
+                        apartment1.getNote(),
+                        apartment1.getDirection(),
+                        apartment1.getFloor(),
+                        apartment1.getArea()
                 ))
                 .toList();
 
         return new AddNewResidentResponseDTO(
                 user.getUserName(),
-                apartmentDTOList,
+                apartmentResponseDTOList,
                 user.getFullName(),
                 user.getRole(),
                 true

@@ -1,11 +1,5 @@
 package com.example.apartmentmanagement.dto;
 
-import com.example.apartmentmanagement.entities.PostImages;
-import com.example.apartmentmanagement.entities.User;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -18,7 +12,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class PostDTO {
+public class PostResponseDTO {
     private Long postId;
 
     private Long userId;
@@ -29,7 +23,7 @@ public class PostDTO {
 
     private boolean depositCheck;
 
-    private ApartmentDTO apartment;
+    private ApartmentResponseDTO apartment;
 
     private float price;
 

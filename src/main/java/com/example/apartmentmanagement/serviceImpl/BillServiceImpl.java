@@ -1,6 +1,6 @@
 package com.example.apartmentmanagement.serviceImpl;
 
-import com.example.apartmentmanagement.dto.BillDTO;
+import com.example.apartmentmanagement.dto.BillResponseDTO;
 import com.example.apartmentmanagement.dto.BillRequestDTO;
 import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.Bill;
@@ -16,10 +16,7 @@ import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.parser.Entity;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,13 +38,13 @@ public class BillServiceImpl implements BillService {
     private PaymentRepository paymentRepository;
 
     @Override
-    public List<BillDTO> getAllBillsWithinSpecTime(Long userId, int month, int year) {
+    public List<BillResponseDTO> getAllBillsWithinSpecTime(Long userId, int month, int year) {
         User user = userRepository.findById(userId).get();
         List<Bill> bills = user.getBills();
 
         return bills.stream()
                 .filter(bill -> bill.getBillDate().getMonthValue() == month && bill.getBillDate().getYear() == year)
-                .map(bill -> new BillDTO(
+                .map(bill -> new BillResponseDTO(
                         bill.getBillId(),
                         bill.getBillContent(),
                         bill.getElectricBill(),
@@ -63,9 +60,9 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public BillDTO getBillById(Long id) {
+    public BillResponseDTO getBillById(Long id) {
         Bill bill = billRepository.findById(id).get();
-        BillDTO billDTO = new BillDTO(
+        BillResponseDTO billResponseDTO = new BillResponseDTO(
                 bill.getBillId(),
                 bill.getBillContent(),
                 bill.getElectricBill(),
@@ -77,7 +74,7 @@ public class BillServiceImpl implements BillService {
                 bill.getUser().getUserName(),
                 bill.getApartment().getApartmentName()
         );
-        return billDTO;
+        return billResponseDTO;
     }
 
     @Override
@@ -113,13 +110,13 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public List<BillDTO> viewBillList(int month, int year, Long userId) {
+    public List<BillResponseDTO> viewBillList(int month, int year, Long userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null || user.getBills() == null) return List.of();
 
         return user.getBills().stream()
                 .filter(bill -> bill.getBillDate().getMonthValue() == month && bill.getBillDate().getYear() == year)
-                .map(bill -> new BillDTO(
+                .map(bill -> new BillResponseDTO(
                         bill.getBillId(),
                         bill.getBillContent(),
                         bill.getElectricBill(),

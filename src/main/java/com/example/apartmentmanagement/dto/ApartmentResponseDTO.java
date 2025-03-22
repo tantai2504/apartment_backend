@@ -1,6 +1,5 @@
 package com.example.apartmentmanagement.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,7 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-public class ApartmentDTO {
+public class ApartmentResponseDTO {
     private Long apartmentId;
     private String apartmentName;
     private String householder;
@@ -20,9 +19,12 @@ public class ApartmentDTO {
     private int numberOfBedrooms;
     private int numberOfBathrooms;
     private String note;
+    private String direction;
+    private String floor;
+    private String area;
     private List<String> users;
 
-    public ApartmentDTO(Long apartmentId, String apartmentName, String householder, int totalNumber, String status, String aptImgUrl, int numberOfBedrooms, int numberOfBathrooms, String note) {
+    public ApartmentResponseDTO(Long apartmentId, String apartmentName, String householder, int totalNumber, String status, String aptImgUrl, int numberOfBedrooms, int numberOfBathrooms, String note, String direction, String floor, String area) {
         this.apartmentId = apartmentId;
         this.apartmentName = apartmentName;
         this.householder = householder;
@@ -32,9 +34,12 @@ public class ApartmentDTO {
         this.numberOfBedrooms = numberOfBedrooms;
         this.numberOfBathrooms = numberOfBathrooms;
         this.note = note;
+        this.direction = direction;
+        this.floor = floor;
+        this.area = area;
     }
 
-    public ApartmentDTO(Long apartmentId, String apartmentName, String householder, int totalNumber, String status, String aptImgUrl, int numberOfBedrooms, int numberOfBathrooms, String note, List<String> users) {
+    public ApartmentResponseDTO(Long apartmentId, String apartmentName, String householder, int totalNumber, String status, String aptImgUrl, int numberOfBedrooms, int numberOfBathrooms, String note, String direction, String floor, String area, List<String> users) {
         this.apartmentId = apartmentId;
         this.apartmentName = apartmentName;
         this.householder = householder;
@@ -44,6 +49,9 @@ public class ApartmentDTO {
         this.numberOfBedrooms = numberOfBedrooms;
         this.numberOfBathrooms = numberOfBathrooms;
         this.note = note;
+        this.direction = direction;
+        this.floor = floor;
+        this.area = area;
         this.users = users;
     }
 }

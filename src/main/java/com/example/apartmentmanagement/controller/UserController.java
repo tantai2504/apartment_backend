@@ -3,6 +3,7 @@ package com.example.apartmentmanagement.controller;
 import com.cloudinary.Cloudinary;
 import com.example.apartmentmanagement.dto.*;
 import com.example.apartmentmanagement.entities.User;
+import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.service.UserService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @Autowired
     private Cloudinary cloudinary;
@@ -63,11 +67,11 @@ public class UserController {
 
     @GetMapping("/find")
     public ResponseEntity<Object> findAll(String username) {
-        List<UserDTO> userDTOS = userService.getUserByFullName(username);
+        List<UserRequestDTO> userRequestDTOS = userService.getUserByFullName(username);
         Map<String, Object> response = new HashMap<>();
-        if (userDTOS != null) {
+        if (userRequestDTOS != null) {
             response.put("status", HttpStatus.OK.value());
-            response.put("data", userDTOS);
+            response.put("data", userRequestDTOS);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } else {
             response.put("status", HttpStatus.NOT_FOUND.value());
@@ -80,11 +84,11 @@ public class UserController {
     public ResponseEntity<Object> getUserInfo(HttpSession session) {
         User user = (User) session.getAttribute("user");
         Long userId = user.getUserId();
-        UserDTO userDto = userService.getUserDTOById(userId);
+        UserRequestDTO userRequestDto = userService.getUserDTOById(userId);
         Map<String, Object> response = new HashMap<>();
-        if (userDto != null) {
+        if (userRequestDto != null) {
             response.put("status", HttpStatus.OK.value());
-            response.put("data", userDto);
+            response.put("data", userRequestDto);
             return ResponseEntity.ok(response);
         } else {
             response.put("status", HttpStatus.NOT_FOUND.value());
@@ -96,7 +100,7 @@ public class UserController {
     @GetMapping("/get/{userId}")
     public ResponseEntity<Object> getUserById(@PathVariable Long userId) {
         Map<String, Object> response = new HashMap<>();
-        UserDTO user = userService.getUserById(userId);
+        UserRequestDTO user = userService.getUserById(userId);
         if (user != null) {
             response.put("status", HttpStatus.OK.value());
             response.put("data", user);
@@ -109,18 +113,18 @@ public class UserController {
     }
 
     @PutMapping("/edit_profile")
-    public ResponseEntity<Object> updateUserBaseProfile(@RequestBody UserDTO userDTO, HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        String result = userService.updateUser(userDTO, user);
+    public ResponseEntity<Object> updateUserBaseProfile(@RequestBody UserRequestDTO userRequestDTO) {
+        User user = userRepository.findById(userRequestDTO.getUserId()).orElse(null);
         Map<String, Object> response = new HashMap<>();
-        if (result.equals("Update thành công")) {
-            response.put("status", HttpStatus.CREATED.value());
-            response.put("data", userDTO);
-            response.put("message", result);
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } else {
+        try {
+            UserResponseDTO result = userService.updateUser(userRequestDTO, user);
+            response.put("status", HttpStatus.OK.value());
+            response.put("data", result);
+            response.put("message", "Cập nhật thông tin thành công");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (RuntimeException e) {
             response.put("status", HttpStatus.BAD_REQUEST.value());
-            response.put("message", "Lỗi khi cập nhật dữ liệu");
+            response.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
@@ -144,7 +148,7 @@ public class UserController {
 
     @GetMapping("/user_list")
     public ResponseEntity<Object> getUserList() {
-        List<UserDTO> dtos = userService.showAllUser();
+        List<UserRequestDTO> dtos = userService.showAllUser();
         Map<String, Object> response = new HashMap<>();
         if(dtos != null) {
             response.put("status", HttpStatus.OK.value());

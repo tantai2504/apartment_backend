@@ -13,16 +13,13 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDTO {
-
+public class UserResponseDTO {
     private Long userId;
 
     private String userName;
 
     @Nationalized
     private String fullName;
-
-    private String password;
 
     private String email;
 
@@ -48,20 +45,4 @@ public class UserDTO {
     private List<ApartmentResponseInUserDTO> apartment;
 
     private String role;
-
-    public UserDTO(Long userId, String userName, String fullName, String password, String email, String description, String phone, String userImgUrl, String age, LocalDate birthday, String idNumber, String job, String role) {
-        this.userId = userId;
-        this.userName = userName;
-        this.fullName = fullName;
-        this.password = password;
-        this.email = email;
-        this.description = description;
-        this.phone = phone;
-        this.userImgUrl = userImgUrl;
-        this.age = age;
-        this.birthday = birthday;
-        this.idNumber = idNumber;
-        this.job = job;
-        this.role = role;
-    }
 }

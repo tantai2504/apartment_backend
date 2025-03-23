@@ -1,5 +1,12 @@
 package com.example.apartmentmanagement.dto;
 
+import com.example.apartmentmanagement.entities.Post;
+import com.example.apartmentmanagement.entities.PostImages;
+import com.example.apartmentmanagement.entities.User;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -34,4 +41,5 @@ public class PostResponseDTO {
     private String userName;
 
     private List<String> postImages;
+
 }

@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -238,4 +239,71 @@ public class PostServiceImpl implements PostService {
     public void deletePost(Long id) {
         postRepository.deleteById(id);
     }
+    @Override
+    public List<PostResponseDTO> filterPosts(String priceRange, String areaRange, String bedrooms, String sortBy) {
+        List<Post> posts;
+
+        // Lọc theo giá
+        switch (priceRange) {
+            case "under_3m":
+                posts = postRepository.findByPriceLessThan(3000000);
+                break;
+            case "under_5m":
+                posts = postRepository.findByPriceLessThan(5000000);
+                break;
+            case "under_10m":
+                posts = postRepository.findByPriceLessThan(10000000);
+                break;
+            default:
+                posts = postRepository.findAll();
+        }
+
+        // Lọc theo diện tích căn hộ
+        if (areaRange != null) {
+            switch (areaRange) {
+                case "under_30m2":
+                    posts = posts.stream().filter(p -> p.getApartment().getArea() != null && Float.parseFloat(p.getApartment().getArea()) < 30).collect(Collectors.toList());
+                    break;
+                case "under_50m2":
+                    posts = posts.stream().filter(p -> p.getApartment().getArea() != null && Float.parseFloat(p.getApartment().getArea()) < 50).collect(Collectors.toList());
+                    break;
+                case "under_80m2":
+                    posts = posts.stream().filter(p -> p.getApartment().getArea() != null && Float.parseFloat(p.getApartment().getArea()) < 80).collect(Collectors.toList());
+                    break;
+            }
+        }
+
+        // Lọc theo số phòng ngủ
+        if (bedrooms != null) {
+            int bedroomCount = Integer.parseInt(bedrooms);
+            posts = posts.stream().filter(p -> p.getApartment().getNumberOfBedrooms() == bedroomCount).collect(Collectors.toList());
+        }
+
+        // Sắp xếp kết quả
+        if ("asc".equals(sortBy)) {
+            posts.sort(Comparator.comparing(Post::getPrice));
+        } else if ("desc".equals(sortBy)) {
+            posts.sort((a, b) -> Float.compare(b.getPrice(), a.getPrice()));
+        } else if ("latest".equals(sortBy)) {
+            posts.sort((a, b) -> b.getPostDate().compareTo(a.getPostDate()));
+        } else if ("popular".equals(sortBy)) {
+            posts.sort((a, b) -> Integer.compare(b.getPostImages().size(), a.getPostImages().size()));
+        }
+
+        return posts.stream().map(post -> new PostResponseDTO(
+                post.getPostId(),
+                post.getUser().getUserId(),
+                post.getTitle(),
+                post.getContent(),
+                post.isDepositCheck(),
+                convertToApartmentDTO(post.getApartment()),
+                post.getPrice(),
+                post.getPostType(),
+                post.getPostDate(),
+                post.getUser().getUserName(),
+                post.getPostImages().stream().map(PostImages::getPostImagesUrl).toList()
+        )).collect(Collectors.toList());
+    }
+
+
 }

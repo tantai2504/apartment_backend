@@ -16,6 +16,7 @@ public class PaymentHistoryResponseDTO {
     private boolean paymentStatus;
     private LocalDateTime paymentDate;
     private String paymentInfo;
+    private String paymentType;
     private Long userId;
     private Long billId;
 }

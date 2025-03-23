@@ -39,6 +39,7 @@ public class PaymentServiceImpl implements PaymentService {
                         payment.isPaymentCheck(),
                         payment.getPaymentDate(),
                         payment.getPaymentInfo(),
+                        payment.getPaymentType(),
                         payment.getUser().getUserId(),
                         payment.getBill().getBillId()
                 ))

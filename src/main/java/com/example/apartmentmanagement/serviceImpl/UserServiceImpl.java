@@ -227,9 +227,9 @@ public class UserServiceImpl implements UserService {
 
         return new VerifyRegisterRequestDTO(
                 verifyRegisterRequestDTO.getUserName(),
-                verifyRegisterRequestDTO.getEmail(),
                 AESUtil.encrypt(verifyRegisterRequestDTO.getPassword()),
                 AESUtil.encrypt(verifyRegisterRequestDTO.getRe_password()),
+                verifyRegisterRequestDTO.getEmail(),
                 verifyRegisterRequestDTO.getPhone()
         );
     }

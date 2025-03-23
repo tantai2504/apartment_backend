@@ -31,7 +31,6 @@ public class BillController {
      * @param year
      * @return
      */
-
     @GetMapping("/getAll/{userId}")
     public ResponseEntity<Object> getBill(@RequestParam int month, @RequestParam int year,
                                           @PathVariable Long userId) {

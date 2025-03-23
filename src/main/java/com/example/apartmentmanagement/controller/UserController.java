@@ -5,6 +5,7 @@ import com.example.apartmentmanagement.dto.*;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.service.UserService;
+import com.example.apartmentmanagement.serviceImpl.ImageUploadService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -27,7 +28,7 @@ public class UserController {
     private UserRepository userRepository;
 
     @Autowired
-    private Cloudinary cloudinary;
+    private ImageUploadService imageUploadService;
 
     @PostMapping("/add")
     public ResponseEntity<Object> addUser(@RequestBody VerifyUserResponseDTO verifyUserResponseDTO) {
@@ -129,21 +130,14 @@ public class UserController {
         }
     }
 
-    @PutMapping("/update_image")
-    public ResponseEntity<Object> updateImage(@RequestPart("file") MultipartFile file, HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        boolean result = userService.updateImage(user, file);
+    @PostMapping("/update_image")
+    public ResponseEntity<Object> updateImage(@RequestPart("file") MultipartFile file) {
+        String result = imageUploadService.uploadImage(file);
         Map<String, Object> response = new HashMap<>();
-        if (result) {
-            response.put("status", HttpStatus.CREATED.value());
-            response.put("data", user.getUserImgUrl());
-            response.put("message", "Update ảnh thành công");
-            return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } else {
-            response.put("status", HttpStatus.BAD_REQUEST.value());
-            response.put("message", "Update ảnh thất bại");
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-        }
+        response.put("status", HttpStatus.CREATED.value());
+        response.put("data", result);
+        response.put("message", "Khởi tạo url thành công");
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
     @GetMapping("/user_list")

@@ -93,6 +93,7 @@ public class BillServiceImpl implements BillService {
         payment.setPaymentDate(LocalDateTime.now());
         payment.setUser(bill.getUser());
         payment.setBill(bill);
+        payment.setPaymentType("bill");
         paymentRepository.save(payment);
 
         bill.setStatus("paid");

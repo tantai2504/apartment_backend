@@ -36,10 +36,15 @@ public class Payment {
 
     private LocalDateTime paymentDate;
 
+    private String paymentType;
+
     @ManyToOne
     @JoinColumn(name = "user_Id", nullable = false)
     private User user;
 
     @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL)
     private Bill bill;
+
+    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL)
+    private Deposit deposit;
 }

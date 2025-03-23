@@ -12,7 +12,7 @@ public interface UserService {
 
     AddNewResidentResponseDTO addUser(VerifyUserResponseDTO newAccountDTO);
 
-    RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO);
+    RegisterResponseDTO register(VerifyOTPRequestDTO registerRequestDTO);
 
     VerifyRegisterRequestDTO verifyRegister(RegisterRequestDTO verifyRegisterRequestDTO);
 

@@ -192,7 +192,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public RegisterResponseDTO register(RegisterRequestDTO registerRequestDTO) {
+    public RegisterResponseDTO register(VerifyOTPRequestDTO registerRequestDTO) {
         User user = new User();
         user.setUserName(registerRequestDTO.getUserName());
         user.setEmail(registerRequestDTO.getEmail());
@@ -228,8 +228,8 @@ public class UserServiceImpl implements UserService {
         return new VerifyRegisterRequestDTO(
                 verifyRegisterRequestDTO.getUserName(),
                 verifyRegisterRequestDTO.getEmail(),
-                verifyRegisterRequestDTO.getPassword(),
-                verifyRegisterRequestDTO.getRe_password(),
+                AESUtil.encrypt(verifyRegisterRequestDTO.getPassword()),
+                AESUtil.encrypt(verifyRegisterRequestDTO.getRe_password()),
                 verifyRegisterRequestDTO.getPhone()
         );
     }

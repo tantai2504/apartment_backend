@@ -109,6 +109,7 @@ public class HomeController {
             emailService.sendOtpEmail(request.getEmail(), otp);
             response.put("status", HttpStatus.OK.value());
             response.put("message", "Đã gửi otp");
+            response.put("data", verifyRegisterRequestDTO);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (RuntimeException e) {
             response.put("status", HttpStatus.BAD_REQUEST.value());
@@ -118,7 +119,7 @@ public class HomeController {
     }
 
     @PostMapping("/verify")
-    public ResponseEntity<Object> verifyOtp(@RequestBody RegisterRequestDTO request) {
+    public ResponseEntity<Object> verifyOtp(@RequestBody VerifyOTPRequestDTO request) {
         String email = request.getEmail();
         String otp = request.getOtp();
         if (otpService.validateOtp(email, otp)) {

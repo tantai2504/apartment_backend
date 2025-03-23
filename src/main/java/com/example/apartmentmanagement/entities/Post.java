@@ -42,6 +42,11 @@ public class Post {
 
     private float price;
 
+    /**
+     * depositUserId: id của nguòi đặt cọc
+     */
+    private Long depositUserId;
+
     @ManyToOne
     @JoinColumn(name = "user_Id", nullable = false)
     private User user;

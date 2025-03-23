@@ -361,6 +361,9 @@ public class UserServiceImpl implements UserService {
         if (updateUserRequestDTO.getIdNumber() != null) {
             checkUser.setIdNumber(updateUserRequestDTO.getIdNumber());
         }
+        if (updateUserRequestDTO.getUserImgUrl() != null) {
+            checkUser.setUserImgUrl(updateUserRequestDTO.getUserImgUrl());
+        }
 
         User updatedUser = userRepository.save(checkUser);
 

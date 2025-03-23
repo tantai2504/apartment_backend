@@ -77,6 +77,24 @@ public class PaymentController {
     }
   }
 
+  @PostMapping("/deposit_success")
+  public ResponseEntity<Object> depositSuccess(@RequestBody Map<String, String> payload) {
+    Map<String, Object> response = new HashMap<>();
+    try {
+      Long billId = Long.parseLong(payload.get("billId"));
+      String description = payload.get("paymentInfo");
+      response.put("status", HttpStatus.OK.value());
+      response.put("message", "Payment successful");
+      response.put("data", payload);
+      billService.processPaymentSuccess(billId, description);
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      response.put("message", e.getMessage());
+      response.put("status", HttpStatus.BAD_REQUEST.value());
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+  }
+
   @GetMapping("/history/{userId}")
   public ResponseEntity<Object> paymentHistory(@RequestParam int month, @RequestParam int year,
                                                    @PathVariable Long userId) {

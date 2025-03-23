@@ -23,6 +23,8 @@ public class Deposit {
     @JoinColumn(name = "user_Id")
     private User user;
 
+    private String status;
+
     @OneToOne
     @JoinColumn(name = "post_id", referencedColumnName = "postId")
     private Post post;

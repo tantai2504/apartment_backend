@@ -74,9 +74,9 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public List<UserDTO> showAllUser() {
+    public List<UserRequestDTO> showAllUser() {
         return userRepository.findAll().stream().map(user -> {
-            UserDTO dto = new UserDTO();
+            UserRequestDTO dto = new UserRequestDTO();
             dto.setUserName(user.getUserName());
             dto.setFullName(user.getFullName());
             dto.setPassword(null);
@@ -235,7 +235,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDTO getUserById(Long id) {
+    public UserRequestDTO getUserById(Long id) {
         User user = userRepository.findById(id).orElse(null);
         if (user == null) {
             return null;
@@ -257,7 +257,7 @@ public class UserServiceImpl implements UserService {
                         .toList())
                 .orElse(List.of());
 
-        return new UserDTO(
+        return new UserRequestDTO(
                 user.getUserId(),
                 user.getUserName(),
                 user.getFullName(),
@@ -277,7 +277,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public UserDTO getUserDTOById(Long id) {
+    public UserRequestDTO getUserDTOById(Long id) {
         User user = userRepository.findById(id).orElse(null);
         if (user == null) {
             return null; // Tránh lỗi NullPointerException
@@ -297,7 +297,7 @@ public class UserServiceImpl implements UserService {
                 ))
                 .toList();
 
-        return new UserDTO(
+        return new UserRequestDTO(
                 user.getUserId(),
                 user.getUserName(),
                 user.getFullName(),
@@ -331,41 +331,74 @@ public class UserServiceImpl implements UserService {
     /**
      * ServiceImpl: Cap nhat thong tin nguoi dung
      *
-     * @param updateUserDTO
+     * @param updateUserRequestDTO
      * @param checkUser
      * @return
      */
     @Override
-    public String updateUser(UserDTO updateUserDTO, User checkUser) {
-        if (updateUserDTO.getFullName() != null) {
-            checkUser.setFullName(updateUserDTO.getFullName());
+    public UserResponseDTO updateUser(UserRequestDTO updateUserRequestDTO, User checkUser) {
+        if (updateUserRequestDTO.getFullName() != null) {
+            checkUser.setFullName(updateUserRequestDTO.getFullName());
         }
-        if (updateUserDTO.getEmail() != null) {
-            checkUser.setEmail(updateUserDTO.getEmail());
+        if (updateUserRequestDTO.getEmail() != null) {
+            checkUser.setEmail(updateUserRequestDTO.getEmail());
         }
-        if (updateUserDTO.getPhone() != null) {
-            checkUser.setPhone(updateUserDTO.getPhone());
+        if (updateUserRequestDTO.getPhone() != null) {
+            checkUser.setPhone(updateUserRequestDTO.getPhone());
         }
-        if (updateUserDTO.getDescription() != null) {
-            checkUser.setDescription(updateUserDTO.getDescription());
+        if (updateUserRequestDTO.getDescription() != null) {
+            checkUser.setDescription(updateUserRequestDTO.getDescription());
         }
-        if (updateUserDTO.getAge() != null) {
-            checkUser.setAge(updateUserDTO.getAge());
+        if (updateUserRequestDTO.getAge() != null) {
+            checkUser.setAge(updateUserRequestDTO.getAge());
         }
-        if (updateUserDTO.getBirthday() != null) {
-            checkUser.setBirthday(updateUserDTO.getBirthday());
+        if (updateUserRequestDTO.getBirthday() != null) {
+            checkUser.setBirthday(updateUserRequestDTO.getBirthday());
         }
-        if (updateUserDTO.getJob() != null) {
-            checkUser.setJob(updateUserDTO.getJob());
+        if (updateUserRequestDTO.getJob() != null) {
+            checkUser.setJob(updateUserRequestDTO.getJob());
         }
-        if (updateUserDTO.getIdNumber() != null) {
-            checkUser.setIdNumber(updateUserDTO.getIdNumber());
+        if (updateUserRequestDTO.getIdNumber() != null) {
+            checkUser.setIdNumber(updateUserRequestDTO.getIdNumber());
         }
+
+        User updatedUser = userRepository.save(checkUser);
+
         try {
-            userRepository.save(checkUser);
-            return "done";
+            List<ApartmentResponseInUserDTO> apartmentDTOList = Optional.ofNullable(checkUser.getApartments())
+                    .map(apartments -> apartments.stream()
+                            .map(apartment -> new ApartmentResponseInUserDTO(
+                                    apartment.getApartmentId(),
+                                    apartment.getApartmentName(),
+                                    apartment.getHouseholder(),
+                                    apartment.getTotalNumber(),
+                                    apartment.getStatus(),
+                                    apartment.getAptImgUrl(),
+                                    apartment.getNumberOfBedrooms(),
+                                    apartment.getNumberOfBathrooms(),
+                                    apartment.getNote()
+                            ))
+                            .toList())
+                    .orElse(List.of());
+
+            return new UserResponseDTO(
+                    updatedUser.getUserId(),
+                    updatedUser.getUserName(),
+                    updatedUser.getFullName(),
+                    updatedUser.getEmail(),
+                    updatedUser.getDescription(),
+                    updatedUser.getPhone(),
+                    updatedUser.getUserImgUrl(),
+                    updatedUser.getAge(),
+                    updatedUser.getBirthday(),
+                    updatedUser.getIdNumber(),
+                    updatedUser.getJob(),
+                    apartmentDTOList,
+                    updatedUser.getRole()
+            );
+
         } catch (Exception e) {
-            return "Lỗi khi cập nhật: " + e.getMessage();
+            throw new RuntimeException("Lỗi khi cập nhật người dùng: " + e.getMessage());
         }
     }
 
@@ -376,7 +409,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public List<UserDTO> getUserByFullName(String fullName) {
+    public List<UserRequestDTO> getUserByFullName(String fullName) {
         return userRepository.searchByUserName(fullName).stream().map(user -> {
             List<ApartmentResponseInUserDTO> apartmentDTOList = Optional.ofNullable(user.getApartments())
                     .map(apartments -> apartments.stream()
@@ -394,7 +427,7 @@ public class UserServiceImpl implements UserService {
                             .toList())
                     .orElse(List.of());
 
-            return new UserDTO(
+            return new UserRequestDTO(
                     user.getUserId(),
                     user.getUserName(),
                     user.getFullName(),

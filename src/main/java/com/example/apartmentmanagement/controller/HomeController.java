@@ -87,7 +87,7 @@ public class HomeController {
     @GetMapping("/getUser")
     public ResponseEntity<Object> getUser(@RequestParam(value = "id") Long id) {
         Map<String, Object> response = new HashMap<>();
-        UserDTO user = userService.getUserById(id);
+        UserRequestDTO user = userService.getUserById(id);
         if (user != null) {
             response.put("data", user);
             response.put("status", HttpStatus.OK.value());

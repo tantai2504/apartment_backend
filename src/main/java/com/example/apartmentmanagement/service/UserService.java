@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface UserService {
 
-    List<UserDTO> showAllUser();
+    List<UserRequestDTO> showAllUser();
 
     AddNewResidentResponseDTO addUser(VerifyUserResponseDTO newAccountDTO);
 
@@ -16,17 +16,17 @@ public interface UserService {
 
     VerifyRegisterRequestDTO verifyRegister(RegisterRequestDTO verifyRegisterRequestDTO);
 
-    UserDTO getUserById (Long id);
+    UserRequestDTO getUserById (Long id);
 
-    UserDTO getUserDTOById (Long id);
+    UserRequestDTO getUserDTOById (Long id);
 
     boolean updateImage(User user, MultipartFile imageFile);
 
-    String updateUser(UserDTO userDTO, User user);
+    UserResponseDTO updateUser(UserRequestDTO userRequestDTO, User user);
 
     User getUserByName(String name);
 
-    List<UserDTO> getUserByFullName(String fullName);
+    List<UserRequestDTO> getUserByFullName(String fullName);
 
     String deleteUserById(Long id);
 

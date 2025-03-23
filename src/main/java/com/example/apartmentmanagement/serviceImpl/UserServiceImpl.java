@@ -197,7 +197,7 @@ public class UserServiceImpl implements UserService {
         user.setUserName(registerRequestDTO.getUserName());
         user.setEmail(registerRequestDTO.getEmail());
         user.setPhone(registerRequestDTO.getPhone());
-        user.setPassword(AESUtil.encrypt(registerRequestDTO.getPassword()));
+        user.setPassword(registerRequestDTO.getPassword());
         user.setRole("User");
         userRepository.save(user);
         RegisterResponseDTO responseDTO = new RegisterResponseDTO(

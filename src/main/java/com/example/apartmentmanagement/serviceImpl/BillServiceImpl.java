@@ -104,10 +104,24 @@ public class BillServiceImpl implements BillService {
 
 
     @Override
-    public BillRequestDTO updateBill(Long id, BillRequestDTO billRequestDTO) {
+    public BillResponseDTO updateBill(Long id, BillRequestDTO billRequestDTO) {
         Bill bill = billRepository.findById(id).get();
         bill.setBillContent(billRequestDTO.getBillContent());
-        return null;
+        bill.setOthers(billRequestDTO.getOthers());
+        bill.setBillDate(LocalDateTime.now());
+        billRepository.save(bill);
+        return new BillResponseDTO(
+                bill.getBillId(),
+                bill.getBillContent(),
+                bill.getElectricBill(),
+                bill.getWaterBill(),
+                bill.getOthers(),
+                bill.getTotal(),
+                bill.getBillDate(),
+                bill.getStatus(),
+                bill.getUser().getUserName(),
+                bill.getApartment().getApartmentName()
+        );
     }
 
     @Override

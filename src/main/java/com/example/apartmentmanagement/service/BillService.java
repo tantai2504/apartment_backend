@@ -13,7 +13,7 @@ public interface BillService {
 
     void processPaymentSuccess(Long billId, String paymentInfo);
 
-    BillRequestDTO updateBill(Long id, BillRequestDTO billRequestDTO);
+    BillResponseDTO updateBill(Long id, BillRequestDTO billRequestDTO);
 
     List<BillResponseDTO> viewBillList(int month, int year, Long userId);
 

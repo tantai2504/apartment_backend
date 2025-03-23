@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,6 +35,7 @@ public class PaymentServiceImpl implements PaymentService {
 
         return payments.stream()
                 .filter(payment -> payment.getPaymentDate().getMonthValue() == month && payment.getPaymentDate().getYear() == year)
+                .sorted(Comparator.comparing(Payment::getPaymentDate).reversed())
                 .map(payment -> new PaymentHistoryResponseDTO(
                         payment.getPaymentId(),
                         payment.isPaymentCheck(),

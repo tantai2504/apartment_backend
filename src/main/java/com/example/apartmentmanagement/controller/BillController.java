@@ -5,6 +5,7 @@ import com.example.apartmentmanagement.dto.BillRequestDTO;
 import com.example.apartmentmanagement.entities.Bill;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.repository.BillRepository;
+import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.service.BillService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,8 +22,9 @@ import java.util.Map;
 public class BillController {
     @Autowired
     private BillService billService;
+
     @Autowired
-    private BillRepository billRepository;
+    private UserRepository userRepository;
 
     /**
      * (Staff) Xem danh sach bill cua user bat ky trong khoang thoi gian cu the
@@ -52,13 +54,12 @@ public class BillController {
      *
      * @param month
      * @param year
-     * @param session
+     * @param userId
      * @return
      */
     @GetMapping("/view_bill_list")
-    public ResponseEntity<Object> getBillList(@RequestParam int month, @RequestParam int year, HttpSession session) {
-        Object sessionUser = session.getAttribute("user");
-        User user = (User) sessionUser;
+    public ResponseEntity<Object> getBillList(@RequestParam int month, @RequestParam int year, @RequestParam Long userId) {
+        User user = userRepository.findById(userId).get();
         List<BillResponseDTO> billResponseDTOS = billService.viewBillList(month, year, user.getUserId());
         Map<String, Object> response = new HashMap<>();
         if (billResponseDTOS.isEmpty()) {
@@ -114,33 +115,35 @@ public class BillController {
 
     @PutMapping("/update/{billid}")
     public ResponseEntity<Object> updateBill(@PathVariable Long billid, @RequestBody BillRequestDTO request) {
-        return null;
+        Map<String, Object> response = new HashMap<>();
+        try {
+            BillResponseDTO billResponseDTO = billService.updateBill(billid, request);
+            response.put("status", HttpStatus.CREATED.value());
+            response.put("data", billResponseDTO);
+            response.put("message", "Update bill thành công");
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (RuntimeException e) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
     /**
      * (User) xoá hoá đơn đã thanh toán
      *
      * @param billId
-     * @param session
      * @return
      */
     @DeleteMapping("/delete/{billId}")
-    public ResponseEntity<Object> deleteBill(@PathVariable Long billId, HttpSession session) {
-        User user = (User) session.getAttribute("user");
+    public ResponseEntity<Object> deleteBill(@PathVariable Long billId) {
         Map<String, Object> response = new HashMap<>();
         try {
-            Bill bill = billRepository.findById(billId).get();
-            if (!bill.getUser().getUserId().equals(user.getUserId())) {
-                response.put("message", "Không có quyền xoá hoá đơn này");
-                response.put("status", HttpStatus.FORBIDDEN.value());
-                return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
-            }
             billService.deleteBill(billId);
-            response.put("status", HttpStatus.NO_CONTENT.value());
             return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
         } catch (RuntimeException e) {
             response.put("message", e.getMessage());
-            response.put("status", HttpStatus.NOT_FOUND.value());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 }

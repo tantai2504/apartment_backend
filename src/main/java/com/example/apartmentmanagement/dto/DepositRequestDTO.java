@@ -12,5 +12,4 @@ import lombok.Setter;
 public class DepositRequestDTO {
     private Long depositUserId;
     private Long postId;
-    private String status;
 }

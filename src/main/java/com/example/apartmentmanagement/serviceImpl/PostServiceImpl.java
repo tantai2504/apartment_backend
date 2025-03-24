@@ -48,7 +48,7 @@ public class PostServiceImpl implements PostService {
                 post.getUser().getUserId(),
                 post.getTitle(),
                 post.getContent(),
-                post.isDepositCheck(),
+                post.getDepositCheck(),
                 convertToApartmentDTO(post.getApartment()),
                 post.getPrice(),
                 post.getPostType(),
@@ -68,7 +68,7 @@ public class PostServiceImpl implements PostService {
                 post.getUser().getUserId(),
                 post.getTitle(),
                 post.getContent(),
-                post.isDepositCheck(),
+                post.getDepositCheck(),
                 convertToApartmentDTO(post.getApartment()),
                 post.getPrice(),
                 post.getPostType(),
@@ -111,7 +111,7 @@ public class PostServiceImpl implements PostService {
         post.setPostType(postDTO.getPostType());
         post.setPrice(postDTO.getPrice());
         post.setPostDate(LocalDateTime.now());
-        post.setDepositCheck(postDTO.isDepositCheck());
+        post.setDepositCheck(postDTO.getDepositCheck());
         post.setContent(postDTO.getContent());
         post.setApartment(apartment);
 
@@ -141,7 +141,7 @@ public class PostServiceImpl implements PostService {
                 user.getUserId(),
                 post.getTitle(),
                 post.getContent(),
-                post.isDepositCheck(),
+                post.getDepositCheck(),
                 convertToApartmentDTO(post.getApartment()),
                 post.getPrice(),
                 post.getPostType(),
@@ -177,7 +177,7 @@ public class PostServiceImpl implements PostService {
         post.setPostType(postDTO.getPostType());
         post.setPostDate(LocalDateTime.now());
         post.setPrice(postDTO.getPrice());
-        post.setDepositCheck(postDTO.isDepositCheck());
+        post.setDepositCheck(postDTO.getDepositCheck());
         post.setContent(postDTO.getContent());
 
         User user = userRepository.findByUserNameOrEmail(postDTO.getUserName());
@@ -207,7 +207,7 @@ public class PostServiceImpl implements PostService {
                 user.getUserId(),
                 post.getTitle(),
                 post.getContent(),
-                post.isDepositCheck(),
+                post.getDepositCheck(),
                 convertToApartmentDTO(post.getApartment()),
                 post.getPrice(),
                 post.getPostType(),
@@ -239,6 +239,7 @@ public class PostServiceImpl implements PostService {
     public void deletePost(Long id) {
         postRepository.deleteById(id);
     }
+
     @Override
     public List<PostResponseDTO> filterPosts(String priceRange, String areaRange, String bedrooms, String sortBy) {
         List<Post> posts;
@@ -295,7 +296,7 @@ public class PostServiceImpl implements PostService {
                 post.getUser().getUserId(),
                 post.getTitle(),
                 post.getContent(),
-                post.isDepositCheck(),
+                post.getDepositCheck(),
                 convertToApartmentDTO(post.getApartment()),
                 post.getPrice(),
                 post.getPostType(),

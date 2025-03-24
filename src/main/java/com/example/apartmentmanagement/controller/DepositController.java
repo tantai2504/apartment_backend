@@ -25,13 +25,19 @@ public class DepositController {
     @Autowired
     private UserRepository userRepository;
 
+//    @PostMapping("/flag")
+//    public ResponseEntity<Object> flagDeposit(@RequestBody DepositRequestDTO depositRequestDTO) {
+//
+//    }
+
     @PostMapping("/create")
     public ResponseEntity<Object> makeDeposit(@RequestBody DepositRequestDTO depositRequestDTO) {
         Map<String, Object> response = new HashMap<>();
         try {
-            DepositResponseDTO dto = depositService.createDeposit(depositRequestDTO);
+            DepositResponseDTO dto = depositService.depositFlag(depositRequestDTO);
             response.put("status", HttpStatus.CREATED.value());
-            response.put("message", "Khởi tạo thành công");
+            response.put("message", "Đặt cọc thành công");
+            response.put("data", dto);
             return null;
         } catch (RuntimeException e) {
             response.put("message", e.getMessage());

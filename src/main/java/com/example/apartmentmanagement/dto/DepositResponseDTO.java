@@ -10,6 +10,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DepositResponseDTO {
-    private PostResponseDTO post;
-    private Long depositId;
+    private Long postId;
+    private String status;
+    private Long userId;
 }

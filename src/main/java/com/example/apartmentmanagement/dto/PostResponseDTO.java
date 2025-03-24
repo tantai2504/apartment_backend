@@ -28,7 +28,7 @@ public class PostResponseDTO {
 
     private String content;
 
-    private boolean depositCheck;
+    private String depositCheck;
 
     private ApartmentResponseDTO apartment;
 

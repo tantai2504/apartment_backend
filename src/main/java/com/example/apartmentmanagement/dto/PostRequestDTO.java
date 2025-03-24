@@ -17,7 +17,7 @@ public class PostRequestDTO {
 
     private float price;
 
-    private boolean depositCheck;
+    private String depositCheck;
 
     private String apartmentName;
 

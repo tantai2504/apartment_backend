@@ -33,7 +33,7 @@ public class Post {
     @Nationalized
     private String content;
 
-    private boolean depositCheck;
+    private String depositCheck;
 
     @Nationalized
     private String postType;

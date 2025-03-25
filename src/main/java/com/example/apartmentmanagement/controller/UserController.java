@@ -81,6 +81,29 @@ public class UserController {
         }
     }
 
+    @GetMapping("/search")
+    public ResponseEntity<Object> searchByUsernameOrEmail(@RequestParam String query) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            User user = userService.getUserByEmailOrUserName(query);
+
+            if (user != null) {
+                UserRequestDTO userDto = userService.getUserById(user.getUserId());
+                response.put("status", HttpStatus.OK.value());
+                response.put("data", userDto);
+                return ResponseEntity.ok(response);
+            } else {
+                response.put("status", HttpStatus.NOT_FOUND.value());
+                response.put("message", "Không tìm thấy user với username hoặc email này");
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            }
+        } catch (Exception e) {
+            response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
+            response.put("message", "Lỗi: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
+
     @GetMapping("/user_profile")
     public ResponseEntity<Object> getUserInfo(HttpSession session) {
         User user = (User) session.getAttribute("user");

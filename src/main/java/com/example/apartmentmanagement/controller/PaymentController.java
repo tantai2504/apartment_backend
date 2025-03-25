@@ -1,7 +1,10 @@
 package com.example.apartmentmanagement.controller;
 
+import com.example.apartmentmanagement.dto.DepositRequestDTO;
+import com.example.apartmentmanagement.dto.DepositResponseDTO;
 import com.example.apartmentmanagement.dto.PaymentHistoryResponseDTO;
 import com.example.apartmentmanagement.service.BillService;
+import com.example.apartmentmanagement.service.DepositService;
 import com.example.apartmentmanagement.service.PaymentService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -28,6 +31,9 @@ public class PaymentController {
 
   @Autowired
   private PaymentService paymentService;
+
+  @Autowired
+  private DepositService depositService;
 
   @Autowired
   private BillService billService;
@@ -78,15 +84,13 @@ public class PaymentController {
   }
 
   @PostMapping("/deposit_success")
-  public ResponseEntity<Object> depositSuccess(@RequestBody Map<String, String> payload) {
+  public ResponseEntity<Object> depositSuccess(@RequestBody DepositRequestDTO depositRequestDTO) {
     Map<String, Object> response = new HashMap<>();
     try {
-      Long billId = Long.parseLong(payload.get("billId"));
-      String description = payload.get("paymentInfo");
+      DepositResponseDTO dto = depositService.processPaymentSuccess(depositRequestDTO);
       response.put("status", HttpStatus.OK.value());
       response.put("message", "Payment successful");
-      response.put("data", payload);
-      billService.processPaymentSuccess(billId, description);
+      response.put("data", dto);
       return ResponseEntity.ok(response);
     } catch (Exception e) {
       response.put("message", e.getMessage());

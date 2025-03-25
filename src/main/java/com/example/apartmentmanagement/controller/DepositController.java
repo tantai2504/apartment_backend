@@ -25,20 +25,31 @@ public class DepositController {
     @Autowired
     private UserRepository userRepository;
 
-//    @PostMapping("/flag")
-//    public ResponseEntity<Object> flagDeposit(@RequestBody DepositRequestDTO depositRequestDTO) {
-//
-//    }
-
     @PostMapping("/create")
     public ResponseEntity<Object> makeDeposit(@RequestBody DepositRequestDTO depositRequestDTO) {
         Map<String, Object> response = new HashMap<>();
         try {
             DepositResponseDTO dto = depositService.depositFlag(depositRequestDTO);
             response.put("status", HttpStatus.CREATED.value());
-            response.put("message", "Đặt cọc thành công");
+            response.put("message", "Tiến hành chuyển tiền");
             response.put("data", dto);
-            return null;
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            response.put("message", e.getMessage());
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @PostMapping("/cancel")
+    public ResponseEntity<Object> cancelDeposit(@RequestBody DepositRequestDTO depositRequestDTO) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            DepositResponseDTO dto = depositService.cancel(depositRequestDTO);
+            response.put("status", HttpStatus.CREATED.value());
+            response.put("message", "Huỷ cọc");
+            response.put("data", dto);
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             response.put("message", e.getMessage());
             response.put("status", HttpStatus.BAD_REQUEST.value());

@@ -22,12 +22,6 @@ public class PaymentServiceImpl implements PaymentService {
     @Autowired
     private PaymentRepository paymentRepository;
 
-    @Autowired
-    private BillRepository billRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
     @Override
     public List<PaymentHistoryResponseDTO> getPaymentHistory(Long userId, int month, int year) {
 

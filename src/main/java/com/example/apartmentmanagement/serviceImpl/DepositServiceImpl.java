@@ -88,13 +88,17 @@ public class DepositServiceImpl implements DepositService {
     @Override
     public DepositResponseDTO cancel(DepositRequestDTO depositRequestDTO) {
         Post post = postRepository.findById(depositRequestDTO.getPostId()).get();
-        post.setDepositUserId(null);
-        post.setDepositCheck("none");
-        postRepository.save(post);
-        return new DepositResponseDTO(
-                post.getPostId(),
-                post.getDepositCheck(),
-                post.getDepositUserId()
-        );
+        if (post.getDepositCheck().equals("ongoing") && post.getDepositUserId() != null) {
+            post.setDepositUserId(null);
+            post.setDepositCheck("none");
+            postRepository.save(post);
+            return new DepositResponseDTO(
+                    post.getPostId(),
+                    post.getDepositCheck(),
+                    post.getDepositUserId()
+            );
+        } else {
+            throw new RuntimeException("Không thể hoàn lại thanh toán");
+        }
     }
 }

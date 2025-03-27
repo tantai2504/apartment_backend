@@ -130,7 +130,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (apartment.getHouseholder() == null && "Owner".equals(newAccountDTO.getUserRole())) {
-            apartment.setHouseholder(newAccountDTO.getUsername());
+            apartment.setHouseholder(user.getUserName());
         } else if (apartment.getHouseholder() != null && "Owner".equals(newAccountDTO.getUserRole())) {
             throw new RuntimeException("Đã có chủ hộ, không thể thêm chủ sở hữu mới.");
         }

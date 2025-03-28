@@ -30,9 +30,6 @@ public class BillServiceImpl implements BillService {
     private BillRepository billRepository;
 
     @Autowired
-    private ApartmentRepository apartmentRepository;
-
-    @Autowired
     private NotificationService notificationService;
     @Autowired
     private PaymentRepository paymentRepository;
@@ -190,7 +187,6 @@ public class BillServiceImpl implements BillService {
         billRepository.save(newBill);
         return "success";
     }
-
     private float calculateElectricBill(int consumption) {
         float total = 0;
         int remaining = consumption;
@@ -207,7 +203,12 @@ public class BillServiceImpl implements BillService {
                 return total;
             }
         }
-        total += remaining * rates[rates.length - 1];
+
+        // Nếu còn điện năng tiêu thụ vượt bậc cuối cùng
+        if (remaining > 0) {
+            total += remaining * rates[rates.length - 1];
+        }
+
         return total;
     }
 
@@ -215,8 +216,8 @@ public class BillServiceImpl implements BillService {
         float total = 0;
         int remaining = consumption;
 
-        int[] thresholds = {10, 10, 10}; // Bậc 1: 10m³, Bậc 2: 10m³, Bậc 3: 10m³
-        float[] rates = {5.973F, 7.052F, 8.669F, 15.929F}; // Giá từng bậc
+        int[] thresholds = {10, 10, 10};
+        float[] rates = {5.973F, 7.052F, 8.669F, 15.929F};
 
         for (int i = 0; i < thresholds.length; i++) {
             if (remaining > thresholds[i]) {
@@ -227,7 +228,11 @@ public class BillServiceImpl implements BillService {
                 return total;
             }
         }
-        total += remaining * rates[rates.length - 1];
+
+        if (remaining > 0) {
+            total += remaining * rates[rates.length - 1];
+        }
+
         return total;
     }
 

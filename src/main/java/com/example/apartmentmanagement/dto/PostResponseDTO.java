@@ -42,4 +42,6 @@ public class PostResponseDTO {
 
     private List<String> postImages;
 
+    private Long depositUserId;
+
 }

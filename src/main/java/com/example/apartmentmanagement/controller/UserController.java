@@ -204,7 +204,7 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException e) {
             response.put("status", HttpStatus.BAD_REQUEST.value());
-            response.put("message", "Lỗi");
+            response.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }

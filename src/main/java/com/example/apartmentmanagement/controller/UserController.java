@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,7 @@ public class UserController {
     public ResponseEntity<Object> listResident() {
         Map<String, Object> response = new HashMap<>();
         List<VerifyUserResponseDTO> residentList = userService.showAllVerifyUser();
+
         if (!residentList.isEmpty()) {
             response.put("status", HttpStatus.OK.value());
             response.put("data", residentList);
@@ -185,17 +187,29 @@ public class UserController {
     }
 
     @PostMapping("/verify_user")
-    public ResponseEntity<Object> verifyUser(@RequestParam("verificationFormName") String verificationFormName,
-                                             @RequestParam("verificationFormType") int verificationFormType,
-                                             @RequestParam("email") String email,
-                                             @RequestParam("phoneNumber") String phoneNumber,
-                                             @RequestParam("apartmentName") String apartmentName,
-                                             @RequestParam("contractStartDate") LocalDateTime contractStartDate,
-                                             @RequestParam("contractEndDate") LocalDateTime contractEndDate,
-                                             @RequestPart("imageFile") List<MultipartFile> imageFiles){
+    public ResponseEntity<Object> verifyUser(
+            @RequestParam("verificationFormName") String verificationFormName,
+            @RequestParam("verificationFormType") int verificationFormType,
+            @RequestParam("email") String email,
+            @RequestParam("phoneNumber") String phoneNumber,
+            @RequestParam("apartmentName") String apartmentName,
+            @RequestParam("contractStartDate") String contractStartDateStr,
+            @RequestParam(value = "contractEndDate", required = false) String contractEndDateStr,
+            @RequestPart("imageFile") List<MultipartFile> imageFiles) {
+
+        // Chuyển đổi String sang LocalDateTime cho ngày bắt đầu
+        LocalDateTime contractStartDate = LocalDateTime.parse(contractStartDateStr, DateTimeFormatter.ISO_DATE_TIME);
+
+        // Xử lý ngày kết thúc (có thể null cho chủ hộ)
+        LocalDateTime contractEndDate = null;
+        if (verificationFormType != 2 && contractEndDateStr != null && !contractEndDateStr.isEmpty()) {
+            contractEndDate = LocalDateTime.parse(contractEndDateStr, DateTimeFormatter.ISO_DATE_TIME);
+        }
+
         Map<String, Object> response = new HashMap<>();
         VerifyUserRequestDTO verifyUserDTO = new VerifyUserRequestDTO(
-                verificationFormName, verificationFormType, apartmentName, email, phoneNumber, contractStartDate, contractEndDate);
+                verificationFormName, verificationFormType, apartmentName, email, phoneNumber,
+                contractStartDate, contractEndDate); // contractEndDate có thể là null
         try {
             VerifyUserResponseDTO result = userService.verifyUser(verifyUserDTO, imageFiles);
             response.put("status", HttpStatus.CREATED.value());

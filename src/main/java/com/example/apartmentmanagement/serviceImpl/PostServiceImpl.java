@@ -54,7 +54,8 @@ public class PostServiceImpl implements PostService {
                 post.getPostType(),
                 post.getPostDate(),
                 post.getUser().getUserName(),
-                post.getPostImages().stream().map(PostImages::getPostImagesUrl).toList()
+                post.getPostImages().stream().map(PostImages::getPostImagesUrl).toList(),
+                post.getDepositUserId()
                 ))
         .collect(Collectors.toList());
     }
@@ -74,7 +75,8 @@ public class PostServiceImpl implements PostService {
                 post.getPostType(),
                 post.getPostDate(),
                 post.getUser().getUserName(),
-                post.getPostImages().stream().map(PostImages::getPostImagesUrl).toList()
+                post.getPostImages().stream().map(PostImages::getPostImagesUrl).toList(),
+                post.getDepositUserId()
         );
         return dto;
     }
@@ -147,7 +149,8 @@ public class PostServiceImpl implements PostService {
                 post.getPostType(),
                 post.getPostDate(),
                 post.getUser().getUserName(),
-                post.getPostImages().stream().map(PostImages::getPostImagesUrl).toList()
+                post.getPostImages().stream().map(PostImages::getPostImagesUrl).toList(),
+                post.getDepositUserId()
         );
         return dto;
     }
@@ -213,7 +216,8 @@ public class PostServiceImpl implements PostService {
                 post.getPostType(),
                 post.getPostDate(),
                 post.getUser().getUserName(),
-                post.getPostImages().stream().map(PostImages::getPostImagesUrl).toList()
+                post.getPostImages().stream().map(PostImages::getPostImagesUrl).toList(),
+                post.getDepositUserId()
         );
     }
 
@@ -302,7 +306,8 @@ public class PostServiceImpl implements PostService {
                 post.getPostType(),
                 post.getPostDate(),
                 post.getUser().getUserName(),
-                post.getPostImages().stream().map(PostImages::getPostImagesUrl).toList()
+                post.getPostImages().stream().map(PostImages::getPostImagesUrl).toList(),
+                post.getDepositUserId()
         )).collect(Collectors.toList());
     }
 

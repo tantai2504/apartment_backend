@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserResponseDTO {
+public class    UserResponseDTO {
     private Long userId;
 
     private String userName;

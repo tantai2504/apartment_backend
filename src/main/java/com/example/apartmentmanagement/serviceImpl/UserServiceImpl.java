@@ -464,7 +464,6 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public VerifyUserResponseDTO verifyUser(VerifyUserRequestDTO verifyUserDTO, List<MultipartFile> imageFiles) {
-
         User user = getUserByEmailOrUserName(verifyUserDTO.getEmail());
 
         List<VerificationForm> verificationFormList = verificationFormRepository.findAll();

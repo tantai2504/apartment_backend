@@ -32,6 +32,7 @@ public class Consumption {
     private float electricConsumption;
 
     @ManyToOne
-    @JoinColumn(name = "user_Id", nullable = false)
-    private User user;
+    @JoinColumn(name = "apartment_id", nullable = false)
+    private Apartment apartment;
+
 }

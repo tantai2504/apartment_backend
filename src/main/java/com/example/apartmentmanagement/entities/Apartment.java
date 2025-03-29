@@ -65,5 +65,8 @@ public class Apartment {
     private List<Bill> bills;
 
     @OneToMany(mappedBy = "apartment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Consumption> consumptions;
+
+    @OneToMany(mappedBy = "apartment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts;
 }

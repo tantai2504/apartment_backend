@@ -13,11 +13,15 @@ import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.service.DepositService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import vn.payos.PayOS;
 
 import java.time.LocalDateTime;
 
 @Service
 public class DepositServiceImpl implements DepositService {
+
+    @Autowired
+    private PayOS payOS;
 
     @Autowired
     private DepositRepository depositRepository;
@@ -74,6 +78,7 @@ public class DepositServiceImpl implements DepositService {
         if (post.getDepositUserId() == null) {
             post.setDepositUserId(depositRequestDTO.getDepositUserId());
             post.setDepositCheck("ongoing");
+            post.setDepositPrice(depositRequestDTO.getDepositPrice());
             postRepository.save(post);
         } else if (post.getDepositUserId() != null && post.getDepositCheck().equals("ongoing")) {
             throw new RuntimeException("Đang có người thực hiện quá trình đặt cọc");

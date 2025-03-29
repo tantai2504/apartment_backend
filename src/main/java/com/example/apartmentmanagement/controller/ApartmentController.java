@@ -70,9 +70,9 @@ public class ApartmentController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/get_own_apartment/")
+    @GetMapping("/get_own_apartment")
     public ResponseEntity<Object> getOwnApartment(@RequestParam Long userId) {
-        List<ApartmentResponseDTO> apartments = apartmentService.totalUnrentedApartment();
+        List<ApartmentResponseDTO> apartments = apartmentService.getOwnApartment(userId);
         Map<String, Object> response = new HashMap<>();
         if (apartments.isEmpty()) {
             response.put("message", "Tất cả các căn hộ đều đã được cho thuê");

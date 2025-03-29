@@ -40,10 +40,9 @@ public class Post {
 
     private LocalDateTime postDate;
 
-    private float price;
+    private Float price = 0.0f;
 
-    private float depositPrice;
-
+    private Float depositPrice = 0.0f;
     /**
      * depositUserId: id của nguòi đặt cọc
      */

@@ -51,6 +51,7 @@ public class PostServiceImpl implements PostService {
                 post.getDepositCheck(),
                 convertToApartmentDTO(post.getApartment()),
                 post.getPrice(),
+                post.getDepositPrice(),
                 post.getPostType(),
                 post.getPostDate(),
                 post.getUser().getUserName(),
@@ -72,6 +73,7 @@ public class PostServiceImpl implements PostService {
                 post.getDepositCheck(),
                 convertToApartmentDTO(post.getApartment()),
                 post.getPrice(),
+                post.getDepositPrice(),
                 post.getPostType(),
                 post.getPostDate(),
                 post.getUser().getUserName(),
@@ -116,6 +118,7 @@ public class PostServiceImpl implements PostService {
         post.setDepositCheck(postDTO.getDepositCheck());
         post.setContent(postDTO.getContent());
         post.setApartment(apartment);
+        post.setDepositPrice(postDTO.getDepositPrice());
 
         User user = userRepository.findByUserNameOrEmail(postDTO.getUserName());
         if (user == null) {
@@ -146,6 +149,7 @@ public class PostServiceImpl implements PostService {
                 post.getDepositCheck(),
                 convertToApartmentDTO(post.getApartment()),
                 post.getPrice(),
+                post.getDepositPrice(),
                 post.getPostType(),
                 post.getPostDate(),
                 post.getUser().getUserName(),
@@ -182,6 +186,7 @@ public class PostServiceImpl implements PostService {
         post.setPrice(postDTO.getPrice());
         post.setDepositCheck(postDTO.getDepositCheck());
         post.setContent(postDTO.getContent());
+        post.setDepositPrice(postDTO.getDepositPrice());
 
         User user = userRepository.findByUserNameOrEmail(postDTO.getUserName());
         if (user == null) {
@@ -213,6 +218,7 @@ public class PostServiceImpl implements PostService {
                 post.getDepositCheck(),
                 convertToApartmentDTO(post.getApartment()),
                 post.getPrice(),
+                post.getDepositPrice(),
                 post.getPostType(),
                 post.getPostDate(),
                 post.getUser().getUserName(),
@@ -303,6 +309,7 @@ public class PostServiceImpl implements PostService {
                 post.getDepositCheck(),
                 convertToApartmentDTO(post.getApartment()),
                 post.getPrice(),
+                post.getDepositPrice(),
                 post.getPostType(),
                 post.getPostDate(),
                 post.getUser().getUserName(),

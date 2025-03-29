@@ -32,7 +32,8 @@ public class ConsumptionServiceImpl implements ConsumptionService {
                 consumption.getConsumptionId(),
                 consumption.getConsumptionDate(),
                 consumption.getWaterConsumption(),
-                consumption.getElectricConsumption()
+                consumption.getElectricConsumption(),
+                consumption.getUser().getUserName()
         )).collect(Collectors.toList());
     }
 
@@ -45,7 +46,7 @@ public class ConsumptionServiceImpl implements ConsumptionService {
                         consumption.getConsumptionDate(),
                         consumption.getWaterConsumption(),
                         consumption.getElectricConsumption(),
-                        convertToUserResponseDTO(consumption.getUser())
+                        consumption.getUser().getUserName()
                 )).collect(Collectors.toList());
     }
 

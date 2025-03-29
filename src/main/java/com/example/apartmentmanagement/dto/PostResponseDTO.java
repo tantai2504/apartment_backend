@@ -34,6 +34,8 @@ public class PostResponseDTO {
 
     private float price;
 
+    private float depositPrice;
+
     private String postType;
 
     private LocalDateTime postDate;

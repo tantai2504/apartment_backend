@@ -54,12 +54,13 @@ public class PostController {
                                              @RequestParam ("title") String title,
                                              @RequestParam ("content") String content,
                                              @RequestParam ("price") float price,
+                                             @RequestParam ("depositPrice") float depositPrice,
                                              @RequestParam ("depositCheck") String depositCheck,
                                              @RequestParam ("apartmentName") String apartmentName,
                                              @RequestParam ("postType") String postType,
                                              @RequestParam ("userName") String userName,
                                              @RequestPart("imageFile") List<MultipartFile> imageFiles) {
-        PostRequestDTO postRequestDTO = new PostRequestDTO(title, content, price, depositCheck, apartmentName, postType, userName);
+        PostRequestDTO postRequestDTO = new PostRequestDTO(title, content, price, depositCheck, depositPrice, apartmentName, postType, userName);
         Map<String, Object> response = new HashMap<>();
         try {
             PostResponseDTO postResponseDTO = postService.updatePost(postId, postRequestDTO, imageFiles);
@@ -82,8 +83,9 @@ public class PostController {
                                           @RequestParam ("apartmentName") String apartmentName,
                                           @RequestParam ("postType") String postType,
                                           @RequestParam ("userName") String userName,
+                                          @RequestParam ("depositPrice") float depositPrice,
                                           @RequestPart("imageFile") List<MultipartFile> imageFiles) {
-        PostRequestDTO postRequestDTO = new PostRequestDTO(title, content, price, depositCheck, apartmentName, postType, userName);
+        PostRequestDTO postRequestDTO = new PostRequestDTO(title, content, price, depositCheck, depositPrice, apartmentName, postType, userName);
         Map<String, Object> response = new HashMap<>();
         try {
             PostResponseDTO postResponseDTO = postService.createPost(postRequestDTO, imageFiles);

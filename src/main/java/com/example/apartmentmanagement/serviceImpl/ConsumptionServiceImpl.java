@@ -26,15 +26,8 @@ public class ConsumptionServiceImpl implements ConsumptionService {
     @Override
     public List<ConsumptionResponseDTO> getAllConsumptionsByUser(int month, int year, Long userId) {
         User user = userRepository.findById(userId).get();
-        List<Consumption> consumptions = user.getConsumptions();
-        return consumptions.stream().filter(consumption -> consumption.getConsumptionDate().getMonthValue() == month && consumption.getConsumptionDate().getYear() == year)
-                .map(consumption -> new ConsumptionResponseDTO(
-                consumption.getConsumptionId(),
-                consumption.getConsumptionDate(),
-                consumption.getWaterConsumption(),
-                consumption.getElectricConsumption(),
-                consumption.getUser().getUserName()
-        )).collect(Collectors.toList());
+
+        return null;
     }
 
     @Override
@@ -46,7 +39,7 @@ public class ConsumptionServiceImpl implements ConsumptionService {
                         consumption.getConsumptionDate(),
                         consumption.getWaterConsumption(),
                         consumption.getElectricConsumption(),
-                        consumption.getUser().getUserName()
+                        null
                 )).collect(Collectors.toList());
     }
 

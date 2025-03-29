@@ -42,6 +42,8 @@ public class Post {
 
     private float price;
 
+    private float depositPrice;
+
     /**
      * depositUserId: id của nguòi đặt cọc
      */

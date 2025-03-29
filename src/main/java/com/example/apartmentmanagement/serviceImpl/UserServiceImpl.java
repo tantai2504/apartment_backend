@@ -129,21 +129,23 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Không tìm thấy căn hộ");
         }
 
-        if (apartment.getHouseholder() == null && "Owner".equals(newAccountDTO.getUserRole())) {
-            apartment.setHouseholder(user.getUserName());
-        } else if (apartment.getHouseholder() != null && "Owner".equals(newAccountDTO.getUserRole())) {
-            throw new RuntimeException("Đã có chủ hộ, không thể thêm chủ sở hữu mới.");
-        }
-
         apartment.setTotalNumber(apartment.getTotalNumber() + 1);
         if (apartment.getTotalNumber() > 0) {
             apartment.setStatus("rented");
         }
         apartmentRepository.save(apartment);
+
         if (verificationForm.getVerificationFormType() == 1) {
             user.setRole("Rentor");
-        } else if (verificationForm.getVerificationFormType() == 2) {
-            user.setRole("Owner");
+        }
+
+        if (verificationForm.getVerificationFormType() == 2) {
+            if (apartment.getHouseholder() == null) {
+                user.setRole("Owner");
+                apartment.setHouseholder(user.getUserName());
+            } else {
+                throw new RuntimeException("Căn hộ này đã có chủ sở hữu");
+            }
         }
 
         user.setVerificationForm(verificationForm);

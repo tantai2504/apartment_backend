@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class ApartmentServiceImpl implements ApartmentService{
@@ -100,26 +101,22 @@ public class ApartmentServiceImpl implements ApartmentService{
     @Override
     public List<ApartmentResponseDTO> getOwnApartment(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
-        if (user.getRole().equals("admin")) {
-            return apartmentRepository.findAll().stream().
-                    filter(apartment -> apartment.getStatus().equals("unrented")).
-                    map(apartment -> new ApartmentResponseDTO(
-                            apartment.getApartmentId(),
-                            apartment.getApartmentName(),
-                            apartment.getHouseholder(),
-                            apartment.getTotalNumber(),
-                            apartment.getStatus(),
-                            apartment.getAptImgUrl(),
-                            apartment.getNumberOfBedrooms(),
-                            apartment.getNumberOfBathrooms(),
-                            apartment.getNote(),
-                            apartment.getDirection(),
-                            apartment.getFloor(),
-                            apartment.getArea(),
-                            apartment.getUsers().stream().map(User::getUserName).toList()
-                    )).toList();
-        } else {
-            return null;
-        }
+        return user.getApartments().stream()
+                .map(apartment -> new ApartmentResponseDTO(
+                        apartment.getApartmentId(),
+                        apartment.getApartmentName(),
+                        apartment.getHouseholder(),
+                        apartment.getTotalNumber(),
+                        apartment.getStatus(),
+                        apartment.getAptImgUrl(),
+                        apartment.getNumberOfBedrooms(),
+                        apartment.getNumberOfBathrooms(),
+                        apartment.getNote(),
+                        apartment.getDirection(),
+                        apartment.getFloor(),
+                        apartment.getArea(),
+                        apartment.getUsers().stream().map(User::getUserName).toList()
+                ))
+                .collect(Collectors.toList());
     }
 }

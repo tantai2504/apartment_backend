@@ -56,8 +56,8 @@ public class BillController {
      * @param userId
      * @return
      */
-    @GetMapping("/view_bill_list")
-    public ResponseEntity<Object> getBillList(@RequestParam int month, @RequestParam int year, @RequestParam Long userId) {
+    @GetMapping("/view_bill_list/{userId}")
+    public ResponseEntity<Object> getBillList(@RequestParam int month, @RequestParam int year, @PathVariable Long userId) {
         User user = userRepository.findById(userId).get();
         List<BillResponseDTO> billResponseDTOS = billService.viewBillList(month, year, user.getUserId());
         Map<String, Object> response = new HashMap<>();

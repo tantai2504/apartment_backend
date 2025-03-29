@@ -122,7 +122,7 @@ public class OrderController {
             response.put("error", -1);
             response.put("message", e.getMessage());
             response.set("data", null);
-            response.put("status", "failed"); // Nếu lỗi, đặt status là failed
+            response.put("status", "failed");
             return response;
         }
     }

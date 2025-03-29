@@ -339,14 +339,26 @@ public class UserServiceImpl implements UserService {
      */
     @Override
     public UserResponseDTO updateUser(UserRequestDTO updateUserRequestDTO, User checkUser) {
+
+        VerificationForm verificationForm = verificationFormRepository.findById(checkUser.getUserId()).orElse(null);
+
         if (updateUserRequestDTO.getFullName() != null) {
             checkUser.setFullName(updateUserRequestDTO.getFullName());
+            if (verificationForm != null) {
+                verificationForm.setFullName(updateUserRequestDTO.getFullName());
+            }
         }
         if (updateUserRequestDTO.getEmail() != null) {
             checkUser.setEmail(updateUserRequestDTO.getEmail());
+            if (verificationForm != null) {
+                verificationForm.setEmail(updateUserRequestDTO.getEmail());
+            }
         }
         if (updateUserRequestDTO.getPhone() != null) {
             checkUser.setPhone(updateUserRequestDTO.getPhone());
+            if (verificationForm != null) {
+                verificationForm.setPhoneNumber(updateUserRequestDTO.getPhone());
+            }
         }
         if (updateUserRequestDTO.getDescription() != null) {
             checkUser.setDescription(updateUserRequestDTO.getDescription());
@@ -368,6 +380,7 @@ public class UserServiceImpl implements UserService {
         }
 
         User updatedUser = userRepository.save(checkUser);
+        verificationFormRepository.save(verificationForm);
 
         try {
             List<ApartmentResponseInUserDTO> apartmentDTOList = Optional.ofNullable(checkUser.getApartments())
@@ -480,6 +493,7 @@ public class UserServiceImpl implements UserService {
                 throw new RuntimeException("Đã gửi request của user này");
             }
         }
+
         verificationForm.setEmail(verifyUserDTO.getEmail());
         verificationForm.setApartmentName(verifyUserDTO.getApartmentName());
         verificationForm.setPhoneNumber(user.getPhone());

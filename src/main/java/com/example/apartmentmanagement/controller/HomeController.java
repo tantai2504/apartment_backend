@@ -56,7 +56,7 @@ public class HomeController {
 
             Map<String, Object> dto = new HashMap<>();
             dto.put("userId", user.getUserId());
-            dto.put("user", user.getUserName());
+            dto.put("userName", user.getUserName());
             dto.put("password", user.getPassword());
             dto.put("fullName", user.getFullName());
             dto.put("email", user.getEmail());

@@ -72,8 +72,8 @@ public class DepositController {
                     .amount((int) depositRequestDTO.getDepositPrice())
                     .description("Đặt cọc căn hộ")
                     .item(item)
-                    .returnUrl("http://localhost:3000/deposit/success")
-                    .cancelUrl("http://localhost:3000/deposit/cancel")
+                    .returnUrl(depositRequestDTO.getSuccessUrl())
+                    .cancelUrl(depositRequestDTO.getCancelUrl())
                     .build();
 
             // Tạo link thanh toán
@@ -82,7 +82,7 @@ public class DepositController {
             // Chuẩn bị response
             Map<String, Object> response = new HashMap<>();
             response.put("error", 0);
-            response.put("message", dto);
+            response.put("message", "Bắt đầu quá trình đặt cọc");
             response.put("data", createPaymentResponseData(checkoutData));
 
             return ResponseEntity.ok(response);

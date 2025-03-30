@@ -25,19 +25,32 @@ public class ConsumptionController {
     @GetMapping("/getAll/{userId}")
     public ResponseEntity<Object> viewConsumption(@RequestParam int month, @RequestParam int year,
                                           @PathVariable Long userId) {
-        List<ConsumptionResponseDTO> consumptions = consumptionService.getAllConsumptionsByUser(month, year, userId);
         Map<String, Object> response = new HashMap<>();
-        response.put("data", consumptions);
-        response.put("status", HttpStatus.OK.value());
-        return ResponseEntity.ok(response);
+        try {
+            List<ConsumptionResponseDTO> consumptions = consumptionService.getAllConsumptionsByUser(month, year, userId);
+            response.put("status", HttpStatus.CREATED.value());
+            response.put("data", consumptions);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (RuntimeException e) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
 
     @GetMapping("/viewAll")
     public ResponseEntity<Object> viewAllConsumption(@RequestParam int month, @RequestParam int year) {
-        List<ConsumptionResponseDTO> consumptions = consumptionService.viewAllConsumption(month, year);
+
         Map<String, Object> response = new HashMap<>();
-        response.put("data", consumptions);
-        response.put("status", HttpStatus.OK.value());
-        return ResponseEntity.ok(response);
+        try {
+            List<ConsumptionResponseDTO> consumptions = consumptionService.viewAllConsumption(month, year);
+            response.put("status", HttpStatus.CREATED.value());
+            response.put("data", consumptions);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (RuntimeException e) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
 }

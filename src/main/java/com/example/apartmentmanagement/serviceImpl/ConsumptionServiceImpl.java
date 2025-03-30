@@ -4,14 +4,17 @@ import com.example.apartmentmanagement.dto.ApartmentResponseInUserDTO;
 import com.example.apartmentmanagement.dto.ConsumptionResponseDTO;
 import com.example.apartmentmanagement.dto.UserRequestDTO;
 import com.example.apartmentmanagement.dto.UserResponseDTO;
+import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.Consumption;
 import com.example.apartmentmanagement.entities.User;
+import com.example.apartmentmanagement.repository.ApartmentRepository;
 import com.example.apartmentmanagement.repository.ConsumptionRepository;
 import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.service.ConsumptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,26 +24,70 @@ public class ConsumptionServiceImpl implements ConsumptionService {
     private ConsumptionRepository consumptionRepository;
 
     @Autowired
+    private ApartmentRepository apartmentRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Override
     public List<ConsumptionResponseDTO> getAllConsumptionsByUser(int month, int year, Long userId) {
-        User user = userRepository.findById(userId).get();
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
-        return null;
-    }
+        List<Apartment> apartments = user.getApartments();
+        if (apartments == null || apartments.isEmpty()) {
+            throw new RuntimeException("No apartments found for this user");
+        }
 
-    @Override
-    public List<ConsumptionResponseDTO> viewAllConsumption(int month, int year) {
-        List<Consumption> consumptions = consumptionRepository.findAll();
-        return consumptions.stream().filter(consumption -> consumption.getConsumptionDate().getMonthValue() == month && consumption.getConsumptionDate().getYear() == year)
+        List<Consumption> consumptions = new ArrayList<>();
+        for (Apartment apartment : apartments) {
+            List<Consumption> apartmentConsumptions = consumptionRepository.findByApartment(apartment);
+
+            List<Consumption> filteredConsumptions = apartmentConsumptions.stream()
+                    .filter(consumption ->
+                            consumption.getConsumptionDate().getMonthValue() == month &&
+                                    consumption.getConsumptionDate().getYear() == year)
+                    .collect(Collectors.toList());
+
+            consumptions.addAll(filteredConsumptions);
+        }
+
+        return consumptions.stream()
                 .map(consumption -> new ConsumptionResponseDTO(
                         consumption.getConsumptionId(),
                         consumption.getConsumptionDate(),
                         consumption.getWaterConsumption(),
                         consumption.getElectricConsumption(),
-                        null
-                )).collect(Collectors.toList());
+                        consumption.getApartment().getApartmentName()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ConsumptionResponseDTO> viewAllConsumption(int month, int year) {
+        List<Apartment> apartments = apartmentRepository.findAll();
+        List<Consumption> consumptions = new ArrayList<>();
+        for (Apartment apartment : apartments) {
+            List<Consumption> apartmentConsumptions = consumptionRepository.findByApartment(apartment);
+
+            List<Consumption> filteredConsumptions = apartmentConsumptions.stream()
+                    .filter(consumption ->
+                            consumption.getConsumptionDate().getMonthValue() == month &&
+                                    consumption.getConsumptionDate().getYear() == year)
+                    .collect(Collectors.toList());
+
+            consumptions.addAll(filteredConsumptions);
+        }
+
+        return consumptions.stream()
+                .map(consumption -> new ConsumptionResponseDTO(
+                        consumption.getConsumptionId(),
+                        consumption.getConsumptionDate(),
+                        consumption.getWaterConsumption(),
+                        consumption.getElectricConsumption(),
+                        consumption.getApartment().getApartmentName()
+                ))
+                .collect(Collectors.toList());
     }
 
     private UserResponseDTO convertToUserResponseDTO(User user) {

@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class BillResponseDTO {
     private Long billId;
     private String billContent;
-    private float electricBill;
+    private float monthlyPaid;
     private float waterBill;
     private float others;
     private float total;

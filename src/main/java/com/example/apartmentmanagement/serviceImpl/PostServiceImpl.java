@@ -206,6 +206,8 @@ public class PostServiceImpl implements PostService {
             }).toList();
 
             post.getPostImages().addAll(postImagesList);
+        } else {
+            post.getPostImages().clear();
         }
 
         postRepository.save(post);

@@ -79,13 +79,14 @@ public class BillController {
      */
     @PostMapping("/create")
     public ResponseEntity<Object> createBill(@RequestBody BillRequestDTO request) {
-        String result = billService.addBill(request.getBillContent(),
+        BillResponseDTO result = billService.addBill(request.getBillContent(),
                 request.getUserName(),
-                request.getElectricCons(),
+                request.getManagementFee(),
+                request.getLastMonthWaterCons(),
                 request.getWaterCons(),
                 request.getOthers());
         Map<String, Object> response = new HashMap<>();
-        if (result.equals("success")) {
+        if (result != null) {
             response.put("status", HttpStatus.CREATED.value());
             response.put("data", request);
             response.put("message", "Tạo hoá đơn thành công");
@@ -110,6 +111,11 @@ public class BillController {
             response.put("data", billResponseDTO);
             return ResponseEntity.ok(response);
         }
+    }
+
+    @PostMapping("/monthly_paid")
+    public ResponseEntity<Object> monthlyPaid(@RequestBody BillRequestDTO request) {
+        return null;
     }
 
     @PutMapping("/update/{billid}")

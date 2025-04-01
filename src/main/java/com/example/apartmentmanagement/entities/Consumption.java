@@ -27,9 +27,9 @@ public class Consumption {
 
     private LocalDateTime consumptionDate;
 
-    private float waterConsumption;
+    private int waterConsumption;
 
-    private float electricConsumption;
+    private int lastMonthWaterConsumption;
 
     @ManyToOne
     @JoinColumn(name = "apartment_id", nullable = false)

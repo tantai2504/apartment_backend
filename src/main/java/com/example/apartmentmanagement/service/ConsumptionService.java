@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface ConsumptionService {
     List<ConsumptionResponseDTO> getAllConsumptionsByUser(int month, int year, Long userId);
+    List<ConsumptionResponseDTO> getAll();
     List<ConsumptionResponseDTO> viewAllConsumption(int month, int year);
 }

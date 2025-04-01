@@ -154,7 +154,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public BillResponseDTO addBill(String billContent, String name, float managementFee, int lastMonthCons, int waterCons, float otherCost) {
+    public BillResponseDTO addBill(String billContent, String name, float managementFee, float lastMonthCons, float waterCons, float otherCost) {
         System.out.println("bill content" + billContent);
         User user = userRepository.findByUserName(name);
 
@@ -165,7 +165,7 @@ public class BillServiceImpl implements BillService {
         newBill.setManagementFee(managementFee);
         newBill.setBillContent(billContent);
 
-        float waterCost = (float) calculateWaterBill(lastMonthCons, waterCons);
+        float waterCost = calculateWaterBill(lastMonthCons, waterCons);
         newBill.setWaterBill(waterCost);
         newBill.setOthers(otherCost);
         newBill.setTotal(managementFee + waterCost + otherCost);
@@ -203,10 +203,10 @@ public class BillServiceImpl implements BillService {
         return null;
     }
 
-    public double calculateWaterBill(int lastMonthWaterConsumption, int waterConsumption) {
-        double totalCost = 0;
+    public float calculateWaterBill(float lastMonthWaterConsumption, float waterConsumption) {
+        float totalCost = 0;
 
-        int monthlyWaterPaid = waterConsumption - lastMonthWaterConsumption;
+        float monthlyWaterPaid = waterConsumption - lastMonthWaterConsumption;
 
         if (monthlyWaterPaid <= 10) {
             totalCost = waterConsumption * 10000;

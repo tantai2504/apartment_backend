@@ -56,8 +56,8 @@ public class ConsumptionServiceImpl implements ConsumptionService {
                 .map(consumption -> new ConsumptionResponseDTO(
                         consumption.getConsumptionId(),
                         consumption.getConsumptionDate(),
-                        consumption.getLastMonthWaterConsumption(),
                         consumption.getWaterConsumption(),
+                        consumption.getLastMonthWaterConsumption(),
                         consumption.getApartment().getApartmentName()
                 ))
                 .collect(Collectors.toList());
@@ -80,8 +80,8 @@ public class ConsumptionServiceImpl implements ConsumptionService {
                 .map(consumption -> new ConsumptionResponseDTO(
                         consumption.getConsumptionId(),
                         consumption.getConsumptionDate(),
-                        consumption.getLastMonthWaterConsumption(),
                         consumption.getWaterConsumption(),
+                        consumption.getLastMonthWaterConsumption(),
                         consumption.getApartment().getApartmentName()
                 ))
                 .collect(Collectors.toList());
@@ -107,8 +107,8 @@ public class ConsumptionServiceImpl implements ConsumptionService {
                 .map(consumption -> new ConsumptionResponseDTO(
                         consumption.getConsumptionId(),
                         consumption.getConsumptionDate(),
-                        consumption.getLastMonthWaterConsumption(),
                         consumption.getWaterConsumption(),
+                        consumption.getLastMonthWaterConsumption(),
                         consumption.getApartment().getApartmentName()
                 ))
                 .collect(Collectors.toList());

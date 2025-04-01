@@ -11,11 +11,11 @@ public class BillRequestDTO {
     private String billContent;
     private float monthlyPaid;
     private float managementFee;
-    private int lastMonthWaterCons;
-    private int waterCons;
+    private float lastMonthWaterCons;
+    private float waterCons;
     private float others;
 
-    public BillRequestDTO(String userName, String billContent, float managementFee, int lastMonthWaterCons, int waterCons, float others) {
+    public BillRequestDTO(String userName, String billContent, float managementFee, float lastMonthWaterCons, int waterCons, float others) {
         this.userName = userName;
         this.billContent = billContent;
         this.managementFee = managementFee;

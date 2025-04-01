@@ -12,7 +12,6 @@ import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "consumption")
@@ -25,7 +24,7 @@ public class Consumption {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long consumptionId;
 
-    private LocalDateTime consumptionDate;
+    private LocalDate consumptionDate;
 
     private float waterConsumption;
 

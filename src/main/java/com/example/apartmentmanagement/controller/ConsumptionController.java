@@ -22,7 +22,22 @@ public class ConsumptionController {
     @Autowired
     private ConsumptionService consumptionService;
 
-    @GetMapping("/getAll/{userId}")
+    @GetMapping("/getAll")
+    public ResponseEntity<Object> getAll() {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<ConsumptionResponseDTO> consumptions = consumptionService.getAll();
+            response.put("status", HttpStatus.CREATED.value());
+            response.put("data", consumptions);
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (RuntimeException e) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @GetMapping("/getByMonthYear/{userId}")
     public ResponseEntity<Object> viewConsumption(@RequestParam int month, @RequestParam int year,
                                           @PathVariable Long userId) {
         Map<String, Object> response = new HashMap<>();
@@ -38,7 +53,7 @@ public class ConsumptionController {
         }
     }
 
-    @GetMapping("/viewAll")
+    @GetMapping("/viewByMonthYear")
     public ResponseEntity<Object> viewAllConsumption(@RequestParam int month, @RequestParam int year) {
 
         Map<String, Object> response = new HashMap<>();

@@ -44,7 +44,7 @@ public class BillServiceImpl implements BillService {
                 .map(bill -> new BillResponseDTO(
                         bill.getBillId(),
                         bill.getBillContent(),
-                        bill.getElectricBill(),
+                        bill.getMonthlyPaid(),
                         bill.getWaterBill(),
                         bill.getOthers(),
                         bill.getTotal(),
@@ -62,7 +62,7 @@ public class BillServiceImpl implements BillService {
         BillResponseDTO billResponseDTO = new BillResponseDTO(
                 bill.getBillId(),
                 bill.getBillContent(),
-                bill.getElectricBill(),
+                bill.getMonthlyPaid(),
                 bill.getWaterBill(),
                 bill.getOthers(),
                 bill.getTotal(),
@@ -110,7 +110,7 @@ public class BillServiceImpl implements BillService {
         return new BillResponseDTO(
                 bill.getBillId(),
                 bill.getBillContent(),
-                bill.getElectricBill(),
+                bill.getMonthlyPaid(),
                 bill.getWaterBill(),
                 bill.getOthers(),
                 bill.getTotal(),
@@ -131,7 +131,7 @@ public class BillServiceImpl implements BillService {
                 .map(bill -> new BillResponseDTO(
                         bill.getBillId(),
                         bill.getBillContent(),
-                        bill.getElectricBill(),
+                        bill.getMonthlyPaid(),
                         bill.getWaterBill(),
                         bill.getOthers(),
                         bill.getTotal(),
@@ -154,7 +154,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public String addBill(String billContent, String name, int electricCons, int waterCons, float otherCost) {
+    public BillResponseDTO addBill(String billContent, String name, float managementFee, int lastMonthCons, int waterCons, float otherCost) {
         System.out.println("bill content" + billContent);
         User user = userRepository.findByUserName(name);
 
@@ -162,14 +162,13 @@ public class BillServiceImpl implements BillService {
 
         Bill newBill = new Bill();
 
-        float electricCost = calculateElectricBill(electricCons);
-        newBill.setElectricBill(electricCost);
+        newBill.setManagementFee(managementFee);
         newBill.setBillContent(billContent);
 
-        float waterCost = calculateWaterBill(waterCons);
+        float waterCost = (float) calculateWaterBill(lastMonthCons, waterCons);
         newBill.setWaterBill(waterCost);
         newBill.setOthers(otherCost);
-        newBill.setTotal(electricCost + waterCost + otherCost);
+        newBill.setTotal(managementFee + waterCost + otherCost);
 
         newBill.setBillDate(LocalDateTime.now());
         newBill.setStatus("unpaid");
@@ -185,55 +184,41 @@ public class BillServiceImpl implements BillService {
         notificationService.createNotification(notificationContent, "1", user.getUserId());
 
         billRepository.save(newBill);
-        return "success";
-    }
-    private float calculateElectricBill(int consumption) {
-        float total = 0;
-        int remaining = consumption;
-
-        int[] thresholds = {50, 50, 100, 100, 100};
-        float[] rates = {1.678F, 1.734F, 2.014F, 2.536F, 2.834F, 2.927F};
-
-        for (int i = 0; i < thresholds.length; i++) {
-            if (remaining > thresholds[i]) {
-                total += thresholds[i] * rates[i];
-                remaining -= thresholds[i];
-            } else {
-                total += remaining * rates[i];
-                return total;
-            }
-        }
-
-        // Nếu còn điện năng tiêu thụ vượt bậc cuối cùng
-        if (remaining > 0) {
-            total += remaining * rates[rates.length - 1];
-        }
-
-        return total;
+        return new BillResponseDTO(
+                newBill.getBillId(),
+                newBill.getBillContent(),
+                newBill.getMonthlyPaid(),
+                newBill.getWaterBill(),
+                newBill.getOthers(),
+                newBill.getTotal(),
+                newBill.getBillDate(),
+                newBill.getStatus(),
+                newBill.getUser().getUserName(),
+                newBill.getApartment().getApartmentName()
+        );
     }
 
-    private float calculateWaterBill(int consumption) {
-        float total = 0;
-        int remaining = consumption;
+    @Override
+    public BillResponseDTO sendBillToRenter(String billContent, float waterCons, float monthlyPaid, float managementFee, String userName) {
+        return null;
+    }
 
-        int[] thresholds = {10, 10, 10};
-        float[] rates = {5.973F, 7.052F, 8.669F, 15.929F};
+    public double calculateWaterBill(int lastMonthWaterConsumption, int waterConsumption) {
+        double totalCost = 0;
 
-        for (int i = 0; i < thresholds.length; i++) {
-            if (remaining > thresholds[i]) {
-                total += thresholds[i] * rates[i];
-                remaining -= thresholds[i];
-            } else {
-                total += remaining * rates[i];
-                return total;
-            }
+        int monthlyWaterPaid = waterConsumption - lastMonthWaterConsumption;
+
+        if (monthlyWaterPaid <= 10) {
+            totalCost = waterConsumption * 10000;
+        } else if (monthlyWaterPaid <= 20) {
+            totalCost = (10 * 10000) + (monthlyWaterPaid - 10) * 12000;
+        } else if (monthlyWaterPaid <= 30) {
+            totalCost = (10 * 10000) + (10 * 12000) + (monthlyWaterPaid - 20) * 15000;
+        } else {
+            totalCost = (10 * 10000) + (10 * 12000) + (10 * 15000) + (monthlyWaterPaid - 30) * 18000;
         }
 
-        if (remaining > 0) {
-            total += remaining * rates[rates.length - 1];
-        }
-
-        return total;
+        return totalCost;
     }
 
 }

@@ -56,8 +56,32 @@ public class ConsumptionServiceImpl implements ConsumptionService {
                 .map(consumption -> new ConsumptionResponseDTO(
                         consumption.getConsumptionId(),
                         consumption.getConsumptionDate(),
+                        consumption.getLastMonthWaterConsumption(),
                         consumption.getWaterConsumption(),
-                        consumption.getElectricConsumption(),
+                        consumption.getApartment().getApartmentName()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ConsumptionResponseDTO> getAll() {
+        List<Apartment> apartments = apartmentRepository.findAll();
+        List<Consumption> consumptions = new ArrayList<>();
+        for (Apartment apartment : apartments) {
+            List<Consumption> apartmentConsumptions = consumptionRepository.findByApartment(apartment);
+
+            List<Consumption> filteredConsumptions = apartmentConsumptions.stream()
+                    .collect(Collectors.toList());
+
+            consumptions.addAll(filteredConsumptions);
+        }
+
+        return consumptions.stream()
+                .map(consumption -> new ConsumptionResponseDTO(
+                        consumption.getConsumptionId(),
+                        consumption.getConsumptionDate(),
+                        consumption.getLastMonthWaterConsumption(),
+                        consumption.getWaterConsumption(),
                         consumption.getApartment().getApartmentName()
                 ))
                 .collect(Collectors.toList());
@@ -83,8 +107,8 @@ public class ConsumptionServiceImpl implements ConsumptionService {
                 .map(consumption -> new ConsumptionResponseDTO(
                         consumption.getConsumptionId(),
                         consumption.getConsumptionDate(),
+                        consumption.getLastMonthWaterConsumption(),
                         consumption.getWaterConsumption(),
-                        consumption.getElectricConsumption(),
                         consumption.getApartment().getApartmentName()
                 ))
                 .collect(Collectors.toList());

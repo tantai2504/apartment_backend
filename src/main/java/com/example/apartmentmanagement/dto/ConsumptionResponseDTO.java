@@ -14,16 +14,16 @@ import java.time.LocalDateTime;
 public class ConsumptionResponseDTO {
     private Long id;
     private LocalDateTime consumptionDate;
-    private float waterConsumption;
-    private float electricConsumption;
+    private int lastMonthWaterConsumption;
+    private int waterConsumption;
     private String userName;
     private String apartmentName;
 
-    public ConsumptionResponseDTO(Long id, LocalDateTime consumptionDate, float waterConsumption, float electricConsumption, String userName) {
+    public ConsumptionResponseDTO(Long id, LocalDateTime consumptionDate, int waterConsumption, int lastMonthWaterConsumption, String userName) {
         this.id = id;
         this.consumptionDate = consumptionDate;
+        this.lastMonthWaterConsumption = waterConsumption;
         this.waterConsumption = waterConsumption;
-        this.electricConsumption = electricConsumption;
         this.userName = userName;
     }
 }

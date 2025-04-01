@@ -28,9 +28,14 @@ public class Bill {
     @Nationalized
     private String billContent;
 
-    private float electricBill;
+    // tiền thuê hằng tháng nếu căn hộ được đem cho thuê
+    private float monthlyPaid;
 
+    // tiền nước
     private float waterBill;
+
+    // phí quản lý
+    private float managementFee;
 
     private float others;
 

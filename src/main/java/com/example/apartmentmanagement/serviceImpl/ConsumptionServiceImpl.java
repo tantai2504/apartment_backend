@@ -67,6 +67,10 @@ public class ConsumptionServiceImpl implements ConsumptionService {
     public List<ConsumptionResponseDTO> getAll() {
         List<Consumption> consumptions = consumptionRepository.findAll();
 
+        for (Consumption consumption : consumptions) {
+            System.out.println(consumption.getApartment().getApartmentName());
+        }
+
         return consumptions.stream()
                 .map(consumption -> new ConsumptionResponseDTO(
                         consumption.getConsumptionId(),

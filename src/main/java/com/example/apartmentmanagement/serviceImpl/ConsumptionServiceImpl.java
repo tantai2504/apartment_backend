@@ -65,16 +65,7 @@ public class ConsumptionServiceImpl implements ConsumptionService {
 
     @Override
     public List<ConsumptionResponseDTO> getAll() {
-        List<Apartment> apartments = apartmentRepository.findAll();
-        List<Consumption> consumptions = new ArrayList<>();
-        for (Apartment apartment : apartments) {
-            List<Consumption> apartmentConsumptions = consumptionRepository.findByApartment(apartment);
-
-            List<Consumption> filteredConsumptions = apartmentConsumptions.stream()
-                    .collect(Collectors.toList());
-
-            consumptions.addAll(filteredConsumptions);
-        }
+        List<Consumption> consumptions = consumptionRepository.findAll();
 
         return consumptions.stream()
                 .map(consumption -> new ConsumptionResponseDTO(

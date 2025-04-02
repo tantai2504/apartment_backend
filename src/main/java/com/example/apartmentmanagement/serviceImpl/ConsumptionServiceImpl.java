@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -121,11 +122,23 @@ public class ConsumptionServiceImpl implements ConsumptionService {
     }
 
     @Override
-    public List<ConsumptionResponseDTO> processExcelFile(MultipartFile file) throws IOException {
-        List<ConsumptionResponseDTO> responseDTOs = new ArrayList<>();
+    public List<ConsumptionResponseDTO> processExcelFile(MultipartFile file, Long createdUserId) throws IOException {
+        User verifiedUser = userRepository.findById(createdUserId).orElse(null);
+        if (verifiedUser.getRole().equals("Admin") || verifiedUser.getRole().equals("Staff")) {
 
+        }
+        List<ConsumptionResponseDTO> responseDTOs = new ArrayList<>();
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
             Sheet sheet = workbook.getSheetAt(0);
+
+            String firstSheetName = workbook.getSheetName(0);
+
+            LocalDate currentDate = LocalDate.now();
+            String expectedSheetName = currentDate.format(DateTimeFormatter.ofPattern("yyyy-MM"));
+
+            if (!firstSheetName.equals(expectedSheetName)) {
+                throw new IllegalArgumentException("Tên sheet không khớp với tháng/năm hiện tại");
+            }
 
             for (Row row : sheet) {
                 if (row.getRowNum() == 0) {
@@ -138,6 +151,11 @@ public class ConsumptionServiceImpl implements ConsumptionService {
                 float waterConsumption = (float) row.getCell(3).getNumericCellValue();
 
                 Apartment apartment = apartmentRepository.findApartmentByApartmentName(apartmentName);
+                List<User> users = apartment.getUsers();
+                User owner = users.stream()
+                        .filter(user -> "Owner".equals(user.getRole()))
+                        .findFirst()
+                        .orElse(null);
 
                 Consumption consumption = new Consumption();
                 consumption.setApartment(apartment);
@@ -145,6 +163,7 @@ public class ConsumptionServiceImpl implements ConsumptionService {
                 consumption.setWaterConsumption(waterConsumption);
                 consumption.setLastMonthWaterConsumption(lastMonthWaterConsumption);
                 consumption.setBillCreated(false);
+                consumption.setUploadConsumptionUserId(createdUserId);
                 consumptionRepository.save(consumption);
 
                 ConsumptionResponseDTO responseDTO = new ConsumptionResponseDTO(
@@ -152,6 +171,7 @@ public class ConsumptionServiceImpl implements ConsumptionService {
                         consumptionDate,
                         waterConsumption,
                         lastMonthWaterConsumption,
+                        owner.getUserName(),
                         apartmentName
                 );
                 responseDTOs.add(responseDTO);

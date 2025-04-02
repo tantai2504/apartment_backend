@@ -72,7 +72,7 @@ public class BillController {
     }
 
     /**
-     * (Staff) Tao hoa don cho user
+     * (Staff) Tao hoa don cho owner
      *
      * @param request
      * @return
@@ -99,7 +99,7 @@ public class BillController {
     }
 
     @GetMapping("/get_bill_info/{billId}")
-    public ResponseEntity<Object> getBillInfo(@RequestParam int month, @RequestParam int year, @PathVariable Long billId) {
+    public ResponseEntity<Object> getBillInfo(@PathVariable Long billId) {
         BillResponseDTO billResponseDTO = billService.getBillById(billId);
         Map<String, Object> response = new HashMap<>();
         if (billResponseDTO == null) {

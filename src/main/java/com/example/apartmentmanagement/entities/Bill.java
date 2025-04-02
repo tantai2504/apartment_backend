@@ -43,6 +43,8 @@ public class Bill {
 
     private LocalDateTime billDate;
 
+    private Long createBillUserId;
+
     @Nationalized
     private String status;
 

@@ -6,10 +6,7 @@ import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.Bill;
 import com.example.apartmentmanagement.entities.Payment;
 import com.example.apartmentmanagement.entities.User;
-import com.example.apartmentmanagement.repository.ApartmentRepository;
-import com.example.apartmentmanagement.repository.BillRepository;
-import com.example.apartmentmanagement.repository.PaymentRepository;
-import com.example.apartmentmanagement.repository.UserRepository;
+import com.example.apartmentmanagement.repository.*;
 import com.example.apartmentmanagement.service.BillService;
 import com.example.apartmentmanagement.service.NotificationService;
 import jakarta.persistence.EntityNotFoundException;
@@ -24,6 +21,9 @@ import java.util.stream.Collectors;
 public class BillServiceImpl implements BillService {
 
     @Autowired
+    private ConsumptionRepository consumptionRepository;
+
+    @Autowired
     private UserRepository userRepository;
 
     @Autowired
@@ -31,6 +31,7 @@ public class BillServiceImpl implements BillService {
 
     @Autowired
     private NotificationService notificationService;
+
     @Autowired
     private PaymentRepository paymentRepository;
 
@@ -155,7 +156,7 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public BillResponseDTO addBill(String billContent, String name, float managementFee, float lastMonthCons, float waterCons, float otherCost) {
-        System.out.println("bill content" + billContent);
+
         User user = userRepository.findByUserName(name);
 
         List<Apartment> apartments = user.getApartments();
@@ -199,7 +200,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public BillResponseDTO sendBillToRenter(String billContent, float waterCons, float monthlyPaid, float managementFee, String userName) {
+    public BillResponseDTO sendBillToRenter(BillRequestDTO billRequestDTO) {
         return null;
     }
 

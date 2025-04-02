@@ -2,7 +2,6 @@ package com.example.apartmentmanagement.serviceImpl;
 
 import com.example.apartmentmanagement.dto.ApartmentResponseInUserDTO;
 import com.example.apartmentmanagement.dto.ConsumptionResponseDTO;
-import com.example.apartmentmanagement.dto.UserRequestDTO;
 import com.example.apartmentmanagement.dto.UserResponseDTO;
 import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.Consumption;
@@ -11,11 +10,17 @@ import com.example.apartmentmanagement.repository.ApartmentRepository;
 import com.example.apartmentmanagement.repository.ConsumptionRepository;
 import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.service.ConsumptionService;
+import org.apache.poi.ss.usermodel.*;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -69,6 +74,10 @@ public class ConsumptionServiceImpl implements ConsumptionService {
     public List<ConsumptionResponseDTO> getAll() {
         List<Consumption> consumptions = consumptionRepository.findAll();
 
+        for (Consumption consumption : consumptions) {
+            System.out.println(consumption.getApartment().getApartmentName());
+        }
+
         return consumptions.stream()
                 .map(consumption -> new ConsumptionResponseDTO(
                         consumption.getConsumptionId(),
@@ -109,6 +118,49 @@ public class ConsumptionServiceImpl implements ConsumptionService {
                         consumption.isBillCreated()
                 ))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ConsumptionResponseDTO> processExcelFile(MultipartFile file) throws IOException {
+        List<ConsumptionResponseDTO> responseDTOs = new ArrayList<>();
+
+        try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
+            Sheet sheet = workbook.getSheetAt(0);
+
+            for (Row row : sheet) {
+                if (row.getRowNum() == 0) {
+                    continue;
+                }
+
+                String apartmentName = row.getCell(0).getStringCellValue();
+                LocalDate consumptionDate = row.getCell(1).getLocalDateTimeCellValue().toLocalDate();
+                float lastMonthWaterConsumption = (float) row.getCell(2).getNumericCellValue();
+                float waterConsumption = (float) row.getCell(3).getNumericCellValue();
+
+                Apartment apartment = apartmentRepository.findApartmentByApartmentName(apartmentName);
+
+                Consumption consumption = new Consumption();
+                consumption.setApartment(apartment);
+                consumption.setConsumptionDate(consumptionDate);
+                consumption.setWaterConsumption(waterConsumption);
+                consumption.setLastMonthWaterConsumption(lastMonthWaterConsumption);
+                consumption.setBillCreated(false);
+                consumptionRepository.save(consumption);
+
+                ConsumptionResponseDTO responseDTO = new ConsumptionResponseDTO(
+                        consumption.getConsumptionId(),
+                        consumptionDate,
+                        waterConsumption,
+                        lastMonthWaterConsumption,
+                        apartmentName
+                );
+                responseDTOs.add(responseDTO);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to read Excel file", e);
+        }
+
+        return responseDTOs;
     }
 
     private UserResponseDTO convertToUserResponseDTO(User user) {

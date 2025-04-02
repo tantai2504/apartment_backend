@@ -32,6 +32,8 @@ public class Consumption {
 
     private boolean isBillCreated;
 
+    private Long uploadConsumptionUserId;
+
     @ManyToOne
     @JoinColumn(name = "apartment_id", nullable = false)
     private Apartment apartment;

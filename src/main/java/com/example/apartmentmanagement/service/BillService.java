@@ -21,5 +21,5 @@ public interface BillService {
 
     BillResponseDTO addBill(String billContent, String userName, float managementFee, float lastMonthWaterCons, float waterCons, float otherCost);
 
-    BillResponseDTO sendBillToRenter(String billContent, float waterCons, float monthlyPaid, float managementFee, String userName);
+    BillResponseDTO sendBillToRenter(BillRequestDTO billRequestDTO);
 }

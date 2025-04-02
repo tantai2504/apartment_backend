@@ -10,5 +10,5 @@ public interface ConsumptionService {
     List<ConsumptionResponseDTO> getAllConsumptionsByUser(int month, int year, Long userId);
     List<ConsumptionResponseDTO> getAll();
     List<ConsumptionResponseDTO> viewAllConsumption(int month, int year);
-    List<ConsumptionResponseDTO> processExcelFile(MultipartFile file) throws IOException;
+    List<ConsumptionResponseDTO> processExcelFile(MultipartFile file, Long createdUserId) throws IOException;
 }

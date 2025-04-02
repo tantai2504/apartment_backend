@@ -68,13 +68,18 @@ public class ConsumptionController {
     }
 
     @PostMapping("/upload_file")
-    public ResponseEntity<Object> uploadConsumptionFile(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<Object> uploadConsumptionFile(@RequestParam("file") MultipartFile file,
+                                                        @RequestParam Long createdUserId) {
         Map<String, Object> response = new HashMap<>();
         try {
-            List<ConsumptionResponseDTO> consumptions = consumptionService.processExcelFile(file);
+            List<ConsumptionResponseDTO> consumptions = consumptionService.processExcelFile(file, createdUserId);
             response.put("status", HttpStatus.CREATED.value());
             response.put("data", consumptions);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (IllegalArgumentException e) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         } catch (RuntimeException | IOException e) {
             response.put("status", HttpStatus.BAD_REQUEST.value());
             response.put("message", e.getMessage());

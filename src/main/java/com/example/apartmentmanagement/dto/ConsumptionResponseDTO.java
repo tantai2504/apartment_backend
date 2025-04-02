@@ -20,11 +20,11 @@ public class ConsumptionResponseDTO {
     private String apartmentName;
     private boolean isBillCreated;
 
-    public ConsumptionResponseDTO(Long id, LocalDate consumptionDate, float waterConsumption, float lastMonthWaterConsumption, String userName, String apartmentName) {
+    public ConsumptionResponseDTO(Long id, LocalDate consumptionDate, float lastMonthWaterConsumption, float waterConsumption, String userName, String apartmentName) {
         this.id = id;
         this.consumptionDate = consumptionDate;
-        this.waterConsumption = waterConsumption;
         this.lastMonthWaterConsumption = lastMonthWaterConsumption;
+        this.waterConsumption = waterConsumption;
         this.userName = userName;
         this.apartmentName = apartmentName;
     }

@@ -154,7 +154,10 @@ public class BillServiceImpl implements BillService {
     @Override
     public BillResponseDTO addBill(BillRequestDTO billRequestDTO) {
 
-        Consumption consumption = new Consumption();
+        Consumption consumption = consumptionRepository.findById(billRequestDTO.getConsumptionId()).orElse(null);
+        if (consumption.isBillCreated()) {
+            throw new RuntimeException("Đã tạo hoá đơn cho consumption này");
+        }
 
         User user = userRepository.findByUserName(billRequestDTO.getUserName());
 
@@ -165,7 +168,7 @@ public class BillServiceImpl implements BillService {
         newBill.setManagementFee(billRequestDTO.getManagementFee());
         newBill.setBillContent(billRequestDTO.getBillContent());
 
-        float waterCost = calculateWaterBill(billRequestDTO.getLastMonthWaterCons(), billRequestDTO.getWaterCons());
+        float waterCost = calculateWaterBill(consumption.getLastMonthWaterConsumption(), consumption.getWaterConsumption());
         newBill.setWaterBill(waterCost);
         newBill.setOthers(billRequestDTO.getOthers());
         newBill.setTotal(billRequestDTO.getManagementFee() + waterCost + billRequestDTO.getOthers());
@@ -174,10 +177,14 @@ public class BillServiceImpl implements BillService {
         newBill.setStatus("unpaid");
         newBill.setUser(user);
         newBill.setCreateBillUserId(billRequestDTO.getCreatedUserId());
+        newBill.setConsumption(consumption);
 
         for (Apartment apartment : apartments) {
             newBill.setApartment(apartment);
         }
+
+        consumption.setBillCreated(true);
+        consumptionRepository.save(consumption);
 
         String notificationContent = "Thông báo hóa đơn mới";
 

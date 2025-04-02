@@ -79,16 +79,16 @@ public class BillController {
      */
     @PostMapping("/create")
     public ResponseEntity<Object> createBill(@RequestBody BillRequestDTO request) {
-        BillResponseDTO result = billService.addBill(request);
         Map<String, Object> response = new HashMap<>();
-        if (result != null) {
+        try {
+            BillResponseDTO result = billService.addBill(request);
             response.put("status", HttpStatus.CREATED.value());
             response.put("data", result);
             response.put("message", "Tạo hoá đơn thành công");
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
-        } else {
+        } catch (RuntimeException e) {
             response.put("status", HttpStatus.BAD_REQUEST.value());
-            response.put("message", "Khởi tạo thất bại");
+            response.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }

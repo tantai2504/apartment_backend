@@ -56,6 +56,10 @@ public class Bill {
     @JoinColumn(name = "user_Id", nullable = false)
     private User user;
 
+    @OneToOne
+    @JoinColumn(name = "consumption_id", referencedColumnName = "consumptionId", nullable = false)
+    private Consumption consumption;
+
     @ManyToOne
     @JoinColumn(name = "apartment_id", nullable = false)
     private Apartment apartment;

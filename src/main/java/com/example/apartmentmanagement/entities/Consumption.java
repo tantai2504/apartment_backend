@@ -34,6 +34,9 @@ public class Consumption {
 
     private Long uploadConsumptionUserId;
 
+    @OneToOne(mappedBy = "consumption", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Bill bill;
+
     @ManyToOne
     @JoinColumn(name = "apartment_id", nullable = false)
     private Apartment apartment;

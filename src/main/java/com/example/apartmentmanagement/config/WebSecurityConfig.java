@@ -30,7 +30,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .cors(withDefaults())
                 .authorizeHttpRequests(auth -> auth 
                         .requestMatchers("/api/**", "/bill/**", "/apartment/**", "/deposit/**", "/consumption/**",
-                                "/order/**", "/create-payment-link", "/success", "/cancel",
+                                "/order/**", "/create-payment-link", "/success", "/cancel", "/api/bank-account/**",
                                 "/payment/**","/user/**", "/user/search", "/notification/**", "/api/reports/**",
                                 "/public/**","/api/replies/report/**", "/api/replies/report/**", "/api/replies/**",
                                 "/ws/**", "/chat/**", "/app/**", "/post/**")

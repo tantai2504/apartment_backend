@@ -213,7 +213,58 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public BillResponseDTO sendBillToRenter(BillRequestDTO billRequestDTO) {
-        return null;
+        Consumption consumption = consumptionRepository.findById(billRequestDTO.getConsumptionId()).orElse(null);
+        if (consumption.isBillCreated()) {
+            throw new RuntimeException("Đã tạo hoá đơn cho consumption này");
+        }
+
+        Apartment apartment = apartmentRepository.findApartmentByApartmentName(billRequestDTO.getApartmentName());
+        if (apartment == null) {
+            throw new RuntimeException("Không tìm thấy căn hộ này");
+        }
+
+        User user = userRepository.findByUserNameOrEmail(apartment.getHouseholder());
+        if (user == null) {
+            throw new RuntimeException("Không tìm thấy chủ hộ");
+        }
+
+        Bill newBill = new Bill();
+
+        newBill.setManagementFee(billRequestDTO.getManagementFee());
+        newBill.setBillContent(billRequestDTO.getBillContent());
+
+        float waterCost = calculateWaterBill(consumption.getLastMonthWaterConsumption(), consumption.getWaterConsumption());
+        newBill.setWaterBill(waterCost);
+        newBill.setOthers(billRequestDTO.getOthers());
+        newBill.setTotal(billRequestDTO.getManagementFee() + waterCost + billRequestDTO.getOthers());
+
+        newBill.setBillDate(LocalDateTime.now());
+        newBill.setStatus("unpaid");
+        newBill.setUser(user);
+        newBill.setCreateBillUserId(billRequestDTO.getCreatedUserId());
+        newBill.setConsumption(consumption);
+        newBill.setApartment(apartment);
+
+        consumption.setBillCreated(true);
+        consumptionRepository.save(consumption);
+
+        String notificationContent = "Thông báo hóa đơn mới";
+
+        notificationService.createNotification(notificationContent, "1", user.getUserId());
+
+        billRepository.save(newBill);
+        return new BillResponseDTO(
+                newBill.getBillId(),
+                newBill.getBillContent(),
+                newBill.getMonthlyPaid(),
+                newBill.getWaterBill(),
+                newBill.getOthers(),
+                newBill.getTotal(),
+                newBill.getBillDate(),
+                newBill.getStatus(),
+                newBill.getUser().getUserName(),
+                newBill.getApartment().getApartmentName()
+        );
     }
 
     public float calculateWaterBill(float lastMonthWaterConsumption, float waterConsumption) {

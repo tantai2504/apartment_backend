@@ -83,7 +83,7 @@ public class BillController {
         Map<String, Object> response = new HashMap<>();
         if (result != null) {
             response.put("status", HttpStatus.CREATED.value());
-            response.put("data", request);
+            response.put("data", result);
             response.put("message", "Tạo hoá đơn thành công");
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } else {

@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class BillRequestDTO {
-    private String userName;
+    private String apartmentName;
     private String billContent;
     private float monthlyPaid;
     private float managementFee;
@@ -17,8 +17,8 @@ public class BillRequestDTO {
     private Long consumptionId;
     private Long createdUserId;
 
-    public BillRequestDTO(String userName, String billContent, float managementFee, float lastMonthWaterCons, float waterCons, float others, Long consumptionId, Long createdUserId) {
-        this.userName = userName;
+    public BillRequestDTO(String apartmentName, String billContent, float managementFee, float lastMonthWaterCons, float waterCons, float others, Long consumptionId, Long createdUserId) {
+        this.apartmentName = apartmentName;
         this.billContent = billContent;
         this.managementFee = managementFee;
         this.lastMonthWaterCons = lastMonthWaterCons;

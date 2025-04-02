@@ -2,10 +2,7 @@ package com.example.apartmentmanagement.serviceImpl;
 
 import com.example.apartmentmanagement.dto.BillResponseDTO;
 import com.example.apartmentmanagement.dto.BillRequestDTO;
-import com.example.apartmentmanagement.entities.Apartment;
-import com.example.apartmentmanagement.entities.Bill;
-import com.example.apartmentmanagement.entities.Payment;
-import com.example.apartmentmanagement.entities.User;
+import com.example.apartmentmanagement.entities.*;
 import com.example.apartmentmanagement.repository.*;
 import com.example.apartmentmanagement.service.BillService;
 import com.example.apartmentmanagement.service.NotificationService;
@@ -155,26 +152,28 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public BillResponseDTO addBill(String billContent, String name, float managementFee, float lastMonthCons, float waterCons, float otherCost) {
+    public BillResponseDTO addBill(BillRequestDTO billRequestDTO) {
 
-        User user = userRepository.findByUserName(name);
+        Consumption consumption = new Consumption();
+
+        User user = userRepository.findByUserName(billRequestDTO.getUserName());
 
         List<Apartment> apartments = user.getApartments();
 
         Bill newBill = new Bill();
 
-        newBill.setManagementFee(managementFee);
-        newBill.setBillContent(billContent);
+        newBill.setManagementFee(billRequestDTO.getManagementFee());
+        newBill.setBillContent(billRequestDTO.getBillContent());
 
-        float waterCost = calculateWaterBill(lastMonthCons, waterCons);
+        float waterCost = calculateWaterBill(billRequestDTO.getLastMonthWaterCons(), billRequestDTO.getWaterCons());
         newBill.setWaterBill(waterCost);
-        newBill.setOthers(otherCost);
-        newBill.setTotal(managementFee + waterCost + otherCost);
+        newBill.setOthers(billRequestDTO.getOthers());
+        newBill.setTotal(billRequestDTO.getManagementFee() + waterCost + billRequestDTO.getOthers());
 
         newBill.setBillDate(LocalDateTime.now());
         newBill.setStatus("unpaid");
-
         newBill.setUser(user);
+        newBill.setCreateBillUserId(billRequestDTO.getCreatedUserId());
 
         for (Apartment apartment : apartments) {
             newBill.setApartment(apartment);

@@ -63,7 +63,9 @@ public class ConsumptionServiceImpl implements ConsumptionService {
                         consumption.getConsumptionDate(),
                         consumption.getWaterConsumption(),
                         consumption.getLastMonthWaterConsumption(),
-                        consumption.getApartment().getApartmentName()
+                        consumption.getApartment().getHouseholder(),
+                        consumption.getApartment().getApartmentName(),
+                        consumption.isBillCreated()
                 ))
                 .collect(Collectors.toList());
     }
@@ -82,7 +84,9 @@ public class ConsumptionServiceImpl implements ConsumptionService {
                         consumption.getConsumptionDate(),
                         consumption.getWaterConsumption(),
                         consumption.getLastMonthWaterConsumption(),
-                        consumption.getApartment().getApartmentName()
+                        consumption.getApartment().getHouseholder(),
+                        consumption.getApartment().getApartmentName(),
+                        consumption.isBillCreated()
                 ))
                 .collect(Collectors.toList());
     }
@@ -109,7 +113,9 @@ public class ConsumptionServiceImpl implements ConsumptionService {
                         consumption.getConsumptionDate(),
                         consumption.getWaterConsumption(),
                         consumption.getLastMonthWaterConsumption(),
-                        consumption.getApartment().getApartmentName()
+                        consumption.getApartment().getHouseholder(),
+                        consumption.getApartment().getApartmentName(),
+                        consumption.isBillCreated()
                 ))
                 .collect(Collectors.toList());
     }

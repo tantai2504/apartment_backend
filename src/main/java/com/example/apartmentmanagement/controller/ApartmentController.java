@@ -84,32 +84,6 @@ public class ApartmentController {
         return ResponseEntity.ok(response);
     }
 
-//
-//    /**
-//     * Tao moi can ho
-//     *
-//     * @param apartment
-//     * @param imageFile
-//     * @param bindingResult
-//     * @return
-//     */
-//    @PostMapping("/createApartment")
-//    public ResponseEntity<Object> createApartment(
-//            @Valid @ModelAttribute Apartment apartment,
-//            @RequestParam(value = "file", required = false) MultipartFile imageFile,
-//            BindingResult bindingResult) {
-//        if (bindingResult.hasErrors()) {
-//            Map<String, String> errors = new HashMap<>();
-//            bindingResult.getFieldErrors().forEach(error -> errors.put(error.getField(), error.getDefaultMessage()));
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errors);
-//        }
-//        String result = apartmentService.addApartment(apartment);
-//        if (result.equals("Add successfully")) {
-//            return ResponseEntity.status(HttpStatus.CREATED).body("Add successfully");
-//        } else {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result);
-//        }
-//    }
     /**
      * Tìm kiếm căn hộ theo id
      *

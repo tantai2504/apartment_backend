@@ -84,6 +84,7 @@ public class HomeController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
     }
+
     @GetMapping("/getUser")
     public ResponseEntity<Object> getUser(@RequestParam(value = "id") Long id) {
         Map<String, Object> response = new HashMap<>();
@@ -98,7 +99,6 @@ public class HomeController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
-
 
     @PostMapping("/register")
     public ResponseEntity<Object> register(@RequestBody RegisterRequestDTO request) {

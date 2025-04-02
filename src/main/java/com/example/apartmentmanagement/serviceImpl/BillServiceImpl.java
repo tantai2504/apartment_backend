@@ -18,6 +18,9 @@ import java.util.stream.Collectors;
 public class BillServiceImpl implements BillService {
 
     @Autowired
+    private ApartmentRepository apartmentRepository;
+
+    @Autowired
     private ConsumptionRepository consumptionRepository;
 
     @Autowired
@@ -159,9 +162,15 @@ public class BillServiceImpl implements BillService {
             throw new RuntimeException("Đã tạo hoá đơn cho consumption này");
         }
 
-        User user = userRepository.findByUserName(billRequestDTO.getUserName());
+        Apartment apartment = apartmentRepository.findApartmentByApartmentName(billRequestDTO.getApartmentName());
+        if (apartment == null) {
+            throw new RuntimeException("Không tìm thấy căn hộ này");
+        }
 
-        List<Apartment> apartments = user.getApartments();
+        User user = userRepository.findByUserNameOrEmail(apartment.getHouseholder());
+        if (user == null) {
+            throw new RuntimeException("Không tìm thấy chủ hộ");
+        }
 
         Bill newBill = new Bill();
 
@@ -178,10 +187,7 @@ public class BillServiceImpl implements BillService {
         newBill.setUser(user);
         newBill.setCreateBillUserId(billRequestDTO.getCreatedUserId());
         newBill.setConsumption(consumption);
-
-        for (Apartment apartment : apartments) {
-            newBill.setApartment(apartment);
-        }
+        newBill.setApartment(apartment);
 
         consumption.setBillCreated(true);
         consumptionRepository.save(consumption);

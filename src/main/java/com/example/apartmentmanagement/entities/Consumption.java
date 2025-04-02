@@ -30,7 +30,7 @@ public class Consumption {
 
     private float lastMonthWaterConsumption;
 
-    private String isCreateBill;
+    private boolean isBillCreated;
 
     @ManyToOne
     @JoinColumn(name = "apartment_id", nullable = false)

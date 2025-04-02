@@ -79,12 +79,7 @@ public class BillController {
      */
     @PostMapping("/create")
     public ResponseEntity<Object> createBill(@RequestBody BillRequestDTO request) {
-        BillResponseDTO result = billService.addBill(request.getBillContent(),
-                request.getUserName(),
-                request.getManagementFee(),
-                request.getLastMonthWaterCons(),
-                request.getWaterCons(),
-                request.getOthers());
+        BillResponseDTO result = billService.addBill(request);
         Map<String, Object> response = new HashMap<>();
         if (result != null) {
             response.put("status", HttpStatus.CREATED.value());

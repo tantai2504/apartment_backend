@@ -19,7 +19,7 @@ public interface BillService {
 
     void deleteBill(Long id);
 
-    BillResponseDTO addBill(String billContent, String userName, float managementFee, float lastMonthWaterCons, float waterCons, float otherCost);
+    BillResponseDTO addBill(BillRequestDTO billRequestDTO);
 
     BillResponseDTO sendBillToRenter(BillRequestDTO billRequestDTO);
 }

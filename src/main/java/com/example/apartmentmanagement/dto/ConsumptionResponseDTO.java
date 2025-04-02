@@ -18,6 +18,7 @@ public class ConsumptionResponseDTO {
     private float waterConsumption;
     private String userName;
     private String apartmentName;
+    private String isCreateBill;
 
     public ConsumptionResponseDTO(Long id, LocalDate consumptionDate, float waterConsumption, float lastMonthWaterConsumption, String userName) {
         this.id = id;

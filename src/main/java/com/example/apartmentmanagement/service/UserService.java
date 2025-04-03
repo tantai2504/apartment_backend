@@ -36,6 +36,8 @@ public interface UserService {
 
     void saveUser(User user);
 
+    void removeUserVerificationForm(Long verificationFormId);
+
     List<VerifyUserResponseDTO> showAllVerifyUser();
 
 }

@@ -42,6 +42,21 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void removeUserVerificationForm(Long verificationFormId) {
+        VerificationForm verificationForm = verificationFormRepository.findById(verificationFormId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy form xác minh"));
+
+        User user = userRepository.findByUserName(verificationForm.getUserName());
+
+        if (user != null) {
+            user.setVerificationForm(null);
+            userRepository.save(user);
+        }
+
+        verificationFormRepository.delete(verificationForm);
+    }
+
+    @Override
     public List<VerifyUserResponseDTO> showAllVerifyUser() {
         return verificationFormRepository.findAll().stream().map(verificationForm -> {
             VerifyUserResponseDTO dto = new VerifyUserResponseDTO();
@@ -532,4 +547,6 @@ public class UserServiceImpl implements UserService {
                 verificationForm.isVerified()
         );
     }
+
+    
 }

@@ -18,4 +18,9 @@ public interface PostService {
     void deletePost(Long id);
 
     List<PostResponseDTO> filterPosts(String priceRange, String areaRange, String bedrooms, String sortBy);
+
+    boolean checkExistingPostForApartment(String apartmentName, String postType);
+
+    List<PostResponseDTO> getPostsByUserId(Long userId);
+
 }

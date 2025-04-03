@@ -70,6 +70,21 @@ public class ApartmentController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/getAll/no-householder")
+    public ResponseEntity<Object> showAllApartmentsWithoutHouseholder() {
+        List<ApartmentResponseDTO> apartments = apartmentService.findApartmentsWithoutHouseholder();
+        Map<String, Object> response = new HashMap<>();
+        if (apartments.isEmpty()) {
+            response.put("message", "Tất cả các căn hộ đều đã có chủ hộ");
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        response.put("data", apartments);
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
+    }
+
+    //lay danh sach can ho unrented theo id
     @GetMapping("/get_own_apartment")
     public ResponseEntity<Object> getOwnApartment(@RequestParam Long userId) {
         List<ApartmentResponseDTO> apartments = apartmentService.getOwnApartment(userId);
@@ -102,6 +117,55 @@ public class ApartmentController {
             response.put("message", "Không tìm thấy căn hộ này");
             response.put("status", HttpStatus.NOT_FOUND.value());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
+    @PutMapping("/update/{apartmentId}")
+    public ResponseEntity<Object> updateApartment(
+            @PathVariable Long apartmentId,
+            @RequestBody ApartmentResponseDTO apartmentDTO) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            ApartmentResponseDTO updatedApartment = apartmentService.updateApartment(apartmentId, apartmentDTO);
+            response.put("status", HttpStatus.OK.value());
+            response.put("data", updatedApartment);
+            response.put("message", "Cập nhật căn hộ thành công");
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<Object> createApartment(@RequestBody ApartmentResponseDTO apartmentDTO) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            ApartmentResponseDTO createdApartment = apartmentService.createApartment(apartmentDTO);
+            response.put("status", HttpStatus.CREATED.value());
+            response.put("data", createdApartment);
+            response.put("message", "Tạo căn hộ thành công");
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (RuntimeException e) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @DeleteMapping("/delete/{apartmentId}")
+    public ResponseEntity<Object> deleteApartment(@PathVariable Long apartmentId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            apartmentService.deleteApartment(apartmentId);
+            response.put("status", HttpStatus.NO_CONTENT.value());
+            response.put("message", "Xóa căn hộ thành công");
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);
+        } catch (RuntimeException e) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
     }
 }

@@ -18,4 +18,12 @@ public interface ApartmentService {
     List<ApartmentResponseDTO> totalUnrentedApartment ();
 
     List<ApartmentResponseDTO> getOwnApartment (Long userId);
+
+    List<ApartmentResponseDTO> findApartmentsWithoutHouseholder();
+
+    ApartmentResponseDTO updateApartment(Long apartmentId, ApartmentResponseDTO apartmentDTO);
+
+    ApartmentResponseDTO createApartment(ApartmentResponseDTO apartmentDTO);
+
+    void deleteApartment(Long apartmentId);
 }

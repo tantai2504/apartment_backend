@@ -7,6 +7,7 @@ import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.service.UserService;
 import com.example.apartmentmanagement.serviceImpl.ImageUploadService;
 import jakarta.servlet.http.HttpSession;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/user")
 public class UserController {
@@ -40,6 +42,21 @@ public class UserController {
             response.put("data", result);
             response.put("message", "Đã duyệt thành công");
             return ResponseEntity.status(HttpStatus.CREATED).body(result);
+        } catch (RuntimeException e) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @DeleteMapping("/reject_verification")
+    public ResponseEntity<Object> rejectVerification(@RequestParam Long verificationFormId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            userService.removeUserVerificationForm(verificationFormId);
+            response.put("status", HttpStatus.OK.value());
+            response.put("message", "Đã từ chối yêu cầu xác minh");
+            return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             response.put("status", HttpStatus.BAD_REQUEST.value());
             response.put("message", e.getMessage());

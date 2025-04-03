@@ -13,6 +13,7 @@ import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.service.DepositService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.example.apartmentmanagement.service.NotificationService;
 import vn.payos.PayOS;
 
 import java.time.LocalDateTime;
@@ -35,12 +36,16 @@ public class DepositServiceImpl implements DepositService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private NotificationService notificationService;
+
     @Override
     public DepositResponseDTO processPaymentSuccess(DepositRequestDTO depositRequestDTO) {
         Post post = postRepository.findById(depositRequestDTO.getPostId()).get();
 
         if (post.getDepositCheck().equals("ongoing") && post.getDepositUserId() != null) {
             User user = userRepository.findById(depositRequestDTO.getDepositUserId()).get();
+            User postOwner = post.getUser();
 
             Payment payment = new Payment();
             payment.setPaymentCheck(true);
@@ -60,6 +65,20 @@ public class DepositServiceImpl implements DepositService {
             post.setDepositCheck("done");
             post.setPayment(payment);
             postRepository.save(post);
+
+            // Tạo thông báo cho người đặt cọc
+            notificationService.createAndBroadcastNotification(
+                    "Bạn đã đặt cọc thành công cho bài đăng: " + post.getTitle(),
+                    "deposit",
+                    user.getUserId()
+            );
+
+            // Tạo thông báo cho chủ bài đăng
+            notificationService.createAndBroadcastNotification(
+                    "Bài đăng " + post.getTitle() + " đã được đặt cọc",
+                    "deposit",
+                    postOwner.getUserId()
+            );
 
             return new DepositResponseDTO(
                     deposit.getDepositId(),

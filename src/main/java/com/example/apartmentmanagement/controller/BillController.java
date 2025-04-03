@@ -114,7 +114,7 @@ public class BillController {
     public ResponseEntity<Object> createBillForRentor(@RequestBody BillRequestDTO request) {
         Map<String, Object> response = new HashMap<>();
         try {
-            BillResponseDTO result = billService.addBill(request);
+            BillResponseDTO result = billService.sendBillToRenter(request);
             response.put("status", HttpStatus.CREATED.value());
             response.put("data", result);
             response.put("message", "Tạo hoá đơn thành công");
@@ -140,11 +140,6 @@ public class BillController {
             response.put("data", billResponseDTO);
             return ResponseEntity.ok(response);
         }
-    }
-
-    @PostMapping("/monthly_paid")
-    public ResponseEntity<Object> monthlyPaid(@RequestBody BillRequestDTO request) {
-        return null;
     }
 
     @PutMapping("/update/{billid}")

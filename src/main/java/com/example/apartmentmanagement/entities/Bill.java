@@ -45,8 +45,12 @@ public class Bill {
 
     private Long createBillUserId;
 
+    private Float surcharge;
+
     @Nationalized
     private String status;
+
+    private String billType;
 
     @OneToOne
     @JoinColumn(name = "payment_id", referencedColumnName = "paymentId")
@@ -57,7 +61,7 @@ public class Bill {
     private User user;
 
     @OneToOne
-    @JoinColumn(name = "consumption_id", referencedColumnName = "consumptionId", nullable = false)
+    @JoinColumn(name = "consumption_id", referencedColumnName = "consumptionId")
     private Consumption consumption;
 
     @ManyToOne

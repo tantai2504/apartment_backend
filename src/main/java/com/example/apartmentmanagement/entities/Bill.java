@@ -60,8 +60,8 @@ public class Bill {
     @JoinColumn(name = "user_Id", nullable = false)
     private User user;
 
-    @OneToOne
-    @JoinColumn(name = "consumption_id", referencedColumnName = "consumptionId")
+    @ManyToOne
+    @JoinColumn(name = "consumption_id")
     private Consumption consumption;
 
     @ManyToOne

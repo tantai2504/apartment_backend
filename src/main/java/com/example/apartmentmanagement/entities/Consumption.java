@@ -12,6 +12,7 @@ import lombok.Setter;
 import org.hibernate.annotations.Nationalized;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "consumption")
@@ -34,8 +35,8 @@ public class Consumption {
 
     private Long uploadConsumptionUserId;
 
-    @OneToOne(mappedBy = "consumption", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Bill bill;
+    @OneToMany(mappedBy = "consumption", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Bill> bills;
 
     @ManyToOne
     @JoinColumn(name = "apartment_id", nullable = false)

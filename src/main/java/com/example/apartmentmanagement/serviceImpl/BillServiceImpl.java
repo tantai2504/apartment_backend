@@ -36,6 +36,25 @@ public class BillServiceImpl implements BillService {
     private PaymentRepository paymentRepository;
 
     @Override
+    public List<BillResponseDTO> getAllBill() {
+        List<Bill> bills = billRepository.findAll();
+        return bills.stream()
+                .map(bill -> new BillResponseDTO(
+                        bill.getBillId(),
+                        bill.getBillContent(),
+                        bill.getMonthlyPaid(),
+                        bill.getWaterBill(),
+                        bill.getOthers(),
+                        bill.getTotal(),
+                        bill.getBillDate(),
+                        bill.getStatus(),
+                        bill.getUser().getFullName(),
+                        bill.getApartment().getApartmentName()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<BillResponseDTO> getAllBillsWithinSpecTime(Long userId, int month, int year) {
         User user = userRepository.findById(userId).get();
         List<Bill> bills = user.getBills();

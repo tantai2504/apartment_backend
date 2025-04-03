@@ -7,6 +7,8 @@ import java.util.List;
 
 public interface BillService {
 
+    List<BillResponseDTO> getAllBill();
+
     List<BillResponseDTO> getAllBillsWithinSpecTime(Long userId, int month, int year);
 
     BillResponseDTO getBillById(Long id);

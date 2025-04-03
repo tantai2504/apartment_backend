@@ -46,14 +46,13 @@ public class BankAccountServiceImpl implements BankAccountService {
         bankAccount.setUser(user);
         // Lưu tài khoản
         bankAccountRepository.save(bankAccount);
-
         userRepository.save(user);
 
         // Trả về response
         return BankAccountQRResponseDTO.builder()
                 .userId(bankAccountRequestDTO.getUserId())
-                .accountNumber(bankAccountRequestDTO.getAccountName())
-                .accountName(bankAccountRequestDTO.getAccountNumber())
+                .accountNumber(bankAccountRequestDTO.getAccountNumber())
+                .accountName(bankAccountRequestDTO.getAccountName())
                 .bankName(bankAccount.getBank().getFullName())
                 .bankBin(bankAccount.getBank().getBin())
                 .build();
@@ -66,10 +65,12 @@ public class BankAccountServiceImpl implements BankAccountService {
             throw new RuntimeException("Không tìm thấy account bank");
         }
 
-        String amountString = Float.toString(bankAccountRequestDTO.getAmount());
+        String amountString = bankAccountRequestDTO.getAmount() > 0
+                ? String.valueOf((int) bankAccountRequestDTO.getAmount())
+                : "";
 
         String qrContent = generateVietQRContent(
-                bankAccountRequestDTO.getAccountNumber(),
+                bankAccount.getAccountNumber(),
                 bankAccountRequestDTO.getContent(),
                 amountString
         );
@@ -79,8 +80,8 @@ public class BankAccountServiceImpl implements BankAccountService {
         // Trả về response
         return BankAccountQRResponseDTO.builder()
                 .userId(bankAccount.getUser().getUserId())
-                .accountNumber(bankAccount.getAccountName())
-                .accountName(bankAccount.getAccountNumber())
+                .accountNumber(bankAccount.getAccountNumber())
+                .accountName(bankAccount.getAccountName())
                 .bankName(bankAccount.getBank().getFullName())
                 .bankBin(bankAccount.getBank().getBin())
                 .qrCodeContent(qrContent)
@@ -91,12 +92,13 @@ public class BankAccountServiceImpl implements BankAccountService {
     public String generateVietQRContent(String accountNumber, String description, String amount) {
         // Loại bỏ ký tự không hợp lệ
         String totalAmount = amount.replaceAll("[^0-9]", "");
-        String transferContent = description.substring(0, Math.min(description.length(), 50));
+        String transferContent = description.length() > 50 ? description.substring(0, 50) : description;
 
         // Tạo chuỗi VietQR
-        String qrData = "00020101021238570010A000000727012700069704050113" +
-                accountNumber + "0208QRIBFTTA5303704540" + totalAmount.length() + totalAmount +
-                "5802VN62" + transferContent + "63";
+        String qrData = String.format(
+                "00020101021238570010A000000727012700069704050113%s0208QRIBFTTA5303704540%s%s5802VN62%s63",
+                accountNumber, totalAmount.length(), totalAmount, transferContent
+        );
 
         // Tính CRC-16
         String crc = getCrc16Valid(qrData);
@@ -128,9 +130,9 @@ public class BankAccountServiceImpl implements BankAccountService {
     public static int crc16(final byte[] buffer) {
         int crc = 0xFFFF;
 
-        for (int j = 0; j < buffer.length; j++) {
+        for (byte b : buffer) {
             crc = ((crc >>> 8) | (crc << 8)) & 0xffff;
-            crc ^= (buffer[j] & 0xff);
+            crc ^= (b & 0xff);
             crc ^= ((crc & 0xff) >> 4);
             crc ^= (crc << 12) & 0xffff;
             crc ^= ((crc & 0xFF) << 5) & 0xffff;

@@ -307,13 +307,12 @@ public class BillServiceImpl implements BillService {
         );
     }
 
-    public float calculateWaterBill(float lastMonthWaterConsumption, float waterConsumption) {
+    public static float calculateWaterBill(float lastMonthWater, float waterConsumption) {
         float totalCost = 0;
 
-        float monthlyWaterPaid = waterConsumption - lastMonthWaterConsumption;
-
+        float monthlyWaterPaid = waterConsumption - lastMonthWater;
         if (monthlyWaterPaid <= 10) {
-            totalCost = waterConsumption * 10000;
+            totalCost = monthlyWaterPaid * 10000;
         } else if (monthlyWaterPaid <= 20) {
             totalCost = (10 * 10000) + (monthlyWaterPaid - 10) * 12000;
         } else if (monthlyWaterPaid <= 30) {

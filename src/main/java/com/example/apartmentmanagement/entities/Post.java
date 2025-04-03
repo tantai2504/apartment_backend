@@ -30,6 +30,7 @@ public class Post {
     @Nationalized
     private String title;
 
+    @Lob
     @Nationalized
     private String content;
 

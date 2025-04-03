@@ -24,4 +24,7 @@ public class BillResponseDTO {
     private String status;
     private String username;
     private String apartmentName;
+    private String billType;
+    private float surcharge;
+    private Long createBillUserId;
 }

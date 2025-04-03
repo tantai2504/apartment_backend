@@ -29,4 +29,16 @@ public class BankAccountController {
         BankAccountQRResponseDTO response = bankAccountService.generateQR(requestDTO);
         return ResponseEntity.ok(response);
     }
+
+    @PostMapping("/webhook")
+    public String receiveWebhook(@RequestBody String payload) {
+        // In ra dữ liệu nhận được từ webhook
+        System.out.println("Webhook đã nhận dữ liệu: " + payload);
+
+        // In ra thông báo "gọi webhook thành công"
+        System.out.println("Gọi webhook thành công");
+
+        // Trả về phản hồi cho Make
+        return "Webhook nhận thành công";
+    }
 }

@@ -46,7 +46,7 @@ public class ChatController {
         return ResponseEntity.ok(response);
     }
 
-    // Xử lý gửi tin nhắn qua WebSocket - Đã sửa
+    // Xử lý gửi tin nhắn qua WebSocket
     @MessageMapping("/chat.send")
     public void sendMessage(@Payload ChatMessageDTO chatMessageDTO) {
         // Sử dụng senderId từ chatMessageDTO thay vì từ HttpSession
@@ -57,17 +57,13 @@ public class ChatController {
 
         ChatMessage savedMessage = chatService.saveMessage(chatMessageDTO, sender);
 
-        // Chuyển đổi entity thành DTO để gửi đi
         ChatMessageDTO messageDTO = convertToDTO(savedMessage);
 
-        // Gửi tin nhắn đến người nhận
         messagingTemplate.convertAndSendToUser(
                 String.valueOf(savedMessage.getReceiver().getUserId()),
                 "/queue/messages",
                 messageDTO
         );
-
-        // Gửi xác nhận về cho người gửi
         messagingTemplate.convertAndSendToUser(
                 String.valueOf(sender.getUserId()),
                 "/queue/messages",
@@ -75,7 +71,7 @@ public class ChatController {
         );
     }
 
-    // API lấy lịch sử tin nhắn giữa 2 người
+
     @GetMapping("/history/{userId}")
     public ResponseEntity<?> getChatHistory(@PathVariable Long userId, @RequestParam Long currentUserId) {
         User currentUser = userRepository.findById(currentUserId).orElse(null);
@@ -89,7 +85,7 @@ public class ChatController {
 
             List<ChatMessage> messages = chatService.getMessagesBetweenUsers(currentUser, otherUser);
 
-            // Đánh dấu tin nhắn là đã đọc
+
             chatService.markMessagesAsRead(otherUser, currentUser);
 
             List<ChatMessageDTO> messageDTOs = messages.stream()
@@ -102,7 +98,6 @@ public class ChatController {
         }
     }
 
-    // API lấy danh sách người dùng đã chat với người dùng hiện tại
     @GetMapping("/contacts")
     public ResponseEntity<?> getChatContacts(@RequestParam Long currentUserId) {
         User currentUser = userRepository.findById(currentUserId).orElse(null);

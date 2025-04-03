@@ -49,6 +49,28 @@ public class PostController {
         }
     }
 
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<Object> getPostsByUserId(@PathVariable Long userId) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            List<PostResponseDTO> userPosts = postService.getPostsByUserId(userId);
+
+            if (userPosts.isEmpty()) {
+                response.put("message", "Không có bài đăng nào của người dùng này");
+                response.put("status", HttpStatus.OK.value());
+                return ResponseEntity.status(HttpStatus.OK).body(response);
+            } else {
+                response.put("status", HttpStatus.OK.value());
+                response.put("data", userPosts);
+                return ResponseEntity.status(HttpStatus.OK).body(response);
+            }
+        } catch (Exception e) {
+            response.put("message", e.getMessage());
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
     @PutMapping("/update/{postId}")
     public ResponseEntity<Object> updatePost(@PathVariable Long postId,
                                              @RequestParam ("title") String title,
@@ -127,6 +149,24 @@ public class PostController {
         }
 
         return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/check-existing-post")
+    public ResponseEntity<Object> checkExistingPost(
+            @RequestParam String apartmentName,
+            @RequestParam String postType
+    ) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            boolean exists = postService.checkExistingPostForApartment(apartmentName, postType);
+            response.put("status", HttpStatus.OK.value());
+            response.put("exists", exists);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
     }
 
 }

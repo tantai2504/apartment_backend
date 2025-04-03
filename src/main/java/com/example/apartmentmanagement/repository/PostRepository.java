@@ -7,4 +7,6 @@ import java.util.List;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
     List<Post> findByPriceLessThan(float price);
+
+    boolean existsByApartment_ApartmentNameAndPostType(String apartmentName, String postType);
 }

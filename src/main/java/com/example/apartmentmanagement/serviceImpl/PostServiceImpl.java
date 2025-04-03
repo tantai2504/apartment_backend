@@ -320,5 +320,32 @@ public class PostServiceImpl implements PostService {
         )).collect(Collectors.toList());
     }
 
+    @Override
+    public boolean checkExistingPostForApartment(String apartmentName, String postType) {
+        return postRepository.existsByApartment_ApartmentNameAndPostType(apartmentName, postType);
+    }
 
+    @Override
+    public List<PostResponseDTO> getPostsByUserId(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+
+        return user.getPosts().stream()
+                .map(post -> new PostResponseDTO(
+                        post.getPostId(),
+                        post.getUser().getUserId(),
+                        post.getTitle(),
+                        post.getContent(),
+                        post.getDepositCheck(),
+                        convertToApartmentDTO(post.getApartment()),
+                        post.getPrice(),
+                        post.getDepositPrice(),
+                        post.getPostType(),
+                        post.getPostDate(),
+                        post.getUser().getUserName(),
+                        post.getPostImages().stream().map(PostImages::getPostImagesUrl).toList(),
+                        post.getDepositUserId()
+                ))
+                .collect(Collectors.toList());
+    }
 }

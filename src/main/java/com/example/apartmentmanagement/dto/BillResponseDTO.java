@@ -18,6 +18,8 @@ public class BillResponseDTO {
     private float waterBill;
     private float others;
     private float total;
+    private float lastMonthWaterConsumption;
+    private float WaterConsumption;
     private LocalDateTime billDate;
     private String status;
     private String username;

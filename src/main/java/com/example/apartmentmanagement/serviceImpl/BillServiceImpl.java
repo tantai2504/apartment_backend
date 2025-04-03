@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,13 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public List<BillResponseDTO> getAllBill() {
-        List<Bill> bills = billRepository.findAll();
+        List<Bill> bills = new ArrayList<>();
+        List<Bill> allBills = billRepository.findAll();
+        for (Bill bill : allBills) {
+            if (bill.getConsumption() != null) {
+                bills.add(bill);
+            }
+        }
         return bills.stream()
                 .map(bill -> new BillResponseDTO(
                         bill.getBillId(),
@@ -46,6 +53,8 @@ public class BillServiceImpl implements BillService {
                         bill.getWaterBill(),
                         bill.getOthers(),
                         bill.getTotal(),
+                        bill.getConsumption().getLastMonthWaterConsumption(),
+                        bill.getConsumption().getWaterConsumption(),
                         bill.getBillDate(),
                         bill.getStatus(),
                         bill.getUser().getFullName(),
@@ -68,6 +77,8 @@ public class BillServiceImpl implements BillService {
                         bill.getWaterBill(),
                         bill.getOthers(),
                         bill.getTotal(),
+                        bill.getConsumption().getLastMonthWaterConsumption(),
+                        bill.getConsumption().getWaterConsumption(),
                         bill.getBillDate(),
                         bill.getStatus(),
                         bill.getUser().getFullName(),
@@ -86,6 +97,8 @@ public class BillServiceImpl implements BillService {
                 bill.getWaterBill(),
                 bill.getOthers(),
                 bill.getTotal(),
+                bill.getConsumption().getLastMonthWaterConsumption(),
+                bill.getConsumption().getWaterConsumption(),
                 bill.getBillDate(),
                 bill.getStatus(),
                 bill.getUser().getUserName(),
@@ -134,6 +147,8 @@ public class BillServiceImpl implements BillService {
                 bill.getWaterBill(),
                 bill.getOthers(),
                 bill.getTotal(),
+                bill.getConsumption().getLastMonthWaterConsumption(),
+                bill.getConsumption().getWaterConsumption(),
                 bill.getBillDate(),
                 bill.getStatus(),
                 bill.getUser().getUserName(),
@@ -155,6 +170,8 @@ public class BillServiceImpl implements BillService {
                         bill.getWaterBill(),
                         bill.getOthers(),
                         bill.getTotal(),
+                        bill.getConsumption().getLastMonthWaterConsumption(),
+                        bill.getConsumption().getWaterConsumption(),
                         bill.getBillDate(),
                         bill.getStatus(),
                         user.getUserName(),
@@ -223,6 +240,8 @@ public class BillServiceImpl implements BillService {
                 newBill.getWaterBill(),
                 newBill.getOthers(),
                 newBill.getTotal(),
+                newBill.getConsumption().getLastMonthWaterConsumption(),
+                newBill.getConsumption().getWaterConsumption(),
                 newBill.getBillDate(),
                 newBill.getStatus(),
                 newBill.getUser().getUserName(),
@@ -254,8 +273,8 @@ public class BillServiceImpl implements BillService {
 
         float waterCost = calculateWaterBill(consumption.getLastMonthWaterConsumption(), consumption.getWaterConsumption());
         newBill.setWaterBill(waterCost);
-        newBill.setOthers(billRequestDTO.getOthers());
-        newBill.setTotal(billRequestDTO.getManagementFee() + waterCost + billRequestDTO.getOthers());
+        newBill.setMonthlyPaid(billRequestDTO.getMonthlyPaid());
+        newBill.setTotal(billRequestDTO.getManagementFee() + waterCost + billRequestDTO.getMonthlyPaid());
 
         newBill.setBillDate(LocalDateTime.now());
         newBill.setStatus("unpaid");
@@ -279,6 +298,8 @@ public class BillServiceImpl implements BillService {
                 newBill.getWaterBill(),
                 newBill.getOthers(),
                 newBill.getTotal(),
+                newBill.getConsumption().getLastMonthWaterConsumption(),
+                newBill.getConsumption().getWaterConsumption(),
                 newBill.getBillDate(),
                 newBill.getStatus(),
                 newBill.getUser().getUserName(),

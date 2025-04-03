@@ -130,23 +130,23 @@ public class UserServiceImpl implements UserService {
         }
 
         apartment.setTotalNumber(apartment.getTotalNumber() + 1);
-        if (apartment.getTotalNumber() > 0) {
-            apartment.setStatus("rented");
-        }
-        apartmentRepository.save(apartment);
-
-        if (verificationForm.getVerificationFormType() == 1) {
-            user.setRole("Rentor");
-        }
 
         if (verificationForm.getVerificationFormType() == 2) {
             if (apartment.getHouseholder() == null) {
                 user.setRole("Owner");
                 apartment.setHouseholder(user.getUserName());
+                apartment.setStatus("bought");
             } else {
                 throw new RuntimeException("Căn hộ này đã có chủ sở hữu");
             }
         }
+
+        if (verificationForm.getVerificationFormType() == 1) {
+            user.setRole("Rentor");
+            apartment.setStatus("rented");
+        }
+
+        apartmentRepository.save(apartment);
 
         user.setVerificationForm(verificationForm);
 

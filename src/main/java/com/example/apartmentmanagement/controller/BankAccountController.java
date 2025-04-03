@@ -17,8 +17,7 @@ public class BankAccountController {
 
     @PostMapping("/add")
     public ResponseEntity<BankAccountQRResponseDTO> addBankAccount(
-            @RequestBody BankAccountRequestDTO requestDTO
-    ) {
+            @RequestBody BankAccountRequestDTO requestDTO) {
         // Thêm tài khoản và sinh QR
         BankAccountQRResponseDTO response = bankAccountService.addBankAccountWithQR(requestDTO);
 

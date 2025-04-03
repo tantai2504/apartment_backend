@@ -26,6 +26,20 @@ public class BillController {
     @Autowired
     private UserRepository userRepository;
 
+    @GetMapping("/viewAll")
+    public ResponseEntity<Object> getAllBills() {
+        List<BillResponseDTO> billResponseDTOS = billService.getAllBill();
+        Map<String, Object> response = new HashMap<>();
+        if (billResponseDTOS.isEmpty()) {
+            response.put("message", "Chưa có hoá đơn nào");
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        response.put("data", billResponseDTOS);
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
+    }
+
     /**
      * (Staff) Xem danh sach bill cua user bat ky trong khoang thoi gian cu the
      *

@@ -38,14 +38,7 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public List<BillResponseDTO> getAllBill() {
-        List<Bill> bills = new ArrayList<>();
-        List<Bill> allBills = billRepository.findAll();
-        for (Bill bill : allBills) {
-            if (bill.getBillType().equals("owner_type")) {
-                bills.add(bill);
-            }
-        }
-        return bills.stream()
+        return billRepository.findAll().stream().filter(bill -> "owner_bill".equals(bill.getBillType()))
                 .map(bill -> new BillResponseDTO(
                         bill.getBillId(),
                         bill.getBillContent(),
@@ -64,6 +57,7 @@ public class BillServiceImpl implements BillService {
                         bill.getCreateBillUserId()
                 ))
                 .collect(Collectors.toList());
+
     }
 
     @Override
@@ -207,11 +201,13 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public BillResponseDTO addBill(BillRequestDTO billRequestDTO) {
-
         Consumption consumption = consumptionRepository.findById(billRequestDTO.getConsumptionId()).orElse(null);
         if (consumption.isBillCreated()) {
-            if (consumption.getBill().getUser().getRole().equals("Owner")) {
-                throw new RuntimeException("Đã tạo hoá đơn cho consumption này");
+            List<Bill> bills = consumption.getBills();
+            for (Bill bill : bills) {
+                if (bill.getBillType().equals("owner_bill")) {
+                    throw new RuntimeException("Đã tạo hoá đơn cho toà nhà này");
+                }
             }
         }
 

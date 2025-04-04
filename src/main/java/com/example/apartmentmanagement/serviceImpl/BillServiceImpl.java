@@ -66,7 +66,7 @@ public class BillServiceImpl implements BillService {
         List<Bill> bills = user.getBills();
 
         return bills.stream()
-                .filter(bill -> bill.getBillDate().getMonthValue() == month && bill.getBillDate().getYear() == year)
+                .filter(bill -> bill.getConsumption().getConsumptionDate().getMonthValue() == month && bill.getConsumption().getConsumptionDate().getYear() == year)
                 .map(bill -> new BillResponseDTO(
                         bill.getBillId(),
                         bill.getBillContent(),
@@ -168,7 +168,7 @@ public class BillServiceImpl implements BillService {
         if (user == null || user.getBills() == null) return List.of();
 
         return user.getBills().stream()
-                .filter(bill -> bill.getBillDate().getMonthValue() == month && bill.getBillDate().getYear() == year)
+                .filter(bill -> bill.getConsumption().getConsumptionDate().getMonthValue() == month && bill.getConsumption().getConsumptionDate().getYear() == year)
                 .map(bill -> new BillResponseDTO(
                         bill.getBillId(),
                         bill.getBillContent(),

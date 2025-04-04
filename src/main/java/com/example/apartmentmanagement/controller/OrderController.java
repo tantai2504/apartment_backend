@@ -25,12 +25,11 @@ public class OrderController {
 
     @PostMapping(path = "/create")
     public ObjectNode createPaymentLink(
-            @RequestBody CreatePaymentLinkRequestBody requestBody,
-            @RequestParam("billId") Long billId) {
-        System.out.println("billid: " + billId);
+            @RequestBody CreatePaymentLinkRequestBody requestBody) {
         ObjectMapper objectMapper = new ObjectMapper();
         ObjectNode response = objectMapper.createObjectNode();
         try {
+            final Long billId = requestBody.getBillId();
             final String productName = requestBody.getProductName();
             final String description = requestBody.getDescription();
             final String returnUrl = requestBody.getReturnUrl();
@@ -53,9 +52,12 @@ public class OrderController {
 
             CheckoutResponseData data = payOS.createPaymentLink(paymentData);
 
+            ObjectNode dataNode = objectMapper.valueToTree(data);
+            dataNode.put("billId", billId);
+
             response.put("error", 0);
             response.put("message", "success");
-            response.set("data", objectMapper.valueToTree(data));
+            response.set("data", dataNode);
             return response;
         } catch (Exception e) {
             e.printStackTrace();

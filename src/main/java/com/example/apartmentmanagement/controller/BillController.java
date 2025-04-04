@@ -68,9 +68,24 @@ public class BillController {
      * @return
      */
     @GetMapping("/view_bill_list/{userId}")
-    public ResponseEntity<Object> getBillList(@RequestParam int month, @RequestParam int year, @PathVariable Long userId) {
+    public ResponseEntity<Object> getOwnBillListWithinSpecTime(@RequestParam int month, @RequestParam int year, @PathVariable Long userId) {
         User user = userRepository.findById(userId).get();
-        List<BillResponseDTO> billResponseDTOS = billService.viewBillList(month, year, user.getUserId());
+        List<BillResponseDTO> billResponseDTOS = billService.viewBillListWithinSpecTime(month, year, user.getUserId());
+        Map<String, Object> response = new HashMap<>();
+        if (billResponseDTOS.isEmpty()) {
+            response.put("message", "Chưa thanh toán hoá đơn nào");
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        response.put("data", billResponseDTOS);
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/view_own_bill_list/{userId}")
+    public ResponseEntity<Object> getOwnBillList(@PathVariable Long userId) {
+        User user = userRepository.findById(userId).get();
+        List<BillResponseDTO> billResponseDTOS = billService.viewBillList(user.getUserId());
         Map<String, Object> response = new HashMap<>();
         if (billResponseDTOS.isEmpty()) {
             response.put("message", "Chưa thanh toán hoá đơn nào");

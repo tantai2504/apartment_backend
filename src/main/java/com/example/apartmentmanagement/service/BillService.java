@@ -17,7 +17,9 @@ public interface BillService {
 
     BillResponseDTO updateBill(Long id, BillRequestDTO billRequestDTO);
 
-    List<BillResponseDTO> viewBillList(int month, int year, Long userId);
+    List<BillResponseDTO> viewBillListWithinSpecTime(int month, int year, Long userId);
+
+    List<BillResponseDTO> viewBillList(Long userId);
 
     void deleteBill(Long id);
 

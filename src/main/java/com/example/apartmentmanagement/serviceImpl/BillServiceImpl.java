@@ -163,12 +163,38 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public List<BillResponseDTO> viewBillList(int month, int year, Long userId) {
+    public List<BillResponseDTO> viewBillListWithinSpecTime(int month, int year, Long userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null || user.getBills() == null) return List.of();
 
         return user.getBills().stream()
                 .filter(bill -> bill.getConsumption().getConsumptionDate().getMonthValue() == month && bill.getConsumption().getConsumptionDate().getYear() == year)
+                .map(bill -> new BillResponseDTO(
+                        bill.getBillId(),
+                        bill.getBillContent(),
+                        bill.getMonthlyPaid(),
+                        bill.getWaterBill(),
+                        bill.getOthers(),
+                        bill.getTotal(),
+                        bill.getConsumption().getLastMonthWaterConsumption(),
+                        bill.getConsumption().getWaterConsumption(),
+                        bill.getBillDate(),
+                        bill.getStatus(),
+                        user.getUserName(),
+                        bill.getApartment().getApartmentName(),
+                        bill.getBillType(),
+                        bill.getSurcharge(),
+                        bill.getCreateBillUserId()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BillResponseDTO> viewBillList(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        if (user == null || user.getBills() == null) return List.of();
+
+        return user.getBills().stream()
                 .map(bill -> new BillResponseDTO(
                         bill.getBillId(),
                         bill.getBillContent(),

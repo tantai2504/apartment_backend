@@ -8,6 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CreatePaymentLinkRequestBody {
+    private Long billId;
     private String productName;
     private String description;
     private String returnUrl;

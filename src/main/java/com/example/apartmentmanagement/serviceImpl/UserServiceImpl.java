@@ -487,6 +487,7 @@ public class UserServiceImpl implements UserService {
         }
 
         apartment.setTotalNumber(apartment.getTotalNumber() - 1);
+        user.setRole("Rentor");
 
         user.getApartments().remove(apartment);
         apartment.getUsers().remove(user);

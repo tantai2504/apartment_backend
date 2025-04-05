@@ -58,7 +58,6 @@ public class ApartmentServiceImpl implements ApartmentService{
                         apartment.getHouseholder(),
                         apartment.getTotalNumber(),
                         apartment.getStatus(),
-                        apartment.getAptImgUrl(),
                         apartment.getNumberOfBedrooms(),
                         apartment.getNumberOfBathrooms(),
                         apartment.getNote(),
@@ -154,9 +153,6 @@ public class ApartmentServiceImpl implements ApartmentService{
         if (apartmentDTO.getStatus() != null) {
             apartment.setStatus(apartmentDTO.getStatus());
         }
-        if (apartmentDTO.getAptImgUrl() != null) {
-            apartment.setAptImgUrl(apartmentDTO.getAptImgUrl());
-        }
         if (apartmentDTO.getNumberOfBedrooms() > 0) {
             apartment.setNumberOfBedrooms(apartmentDTO.getNumberOfBedrooms());
         }
@@ -184,7 +180,6 @@ public class ApartmentServiceImpl implements ApartmentService{
                 apartment.getHouseholder(),
                 apartment.getTotalNumber(),
                 apartment.getStatus(),
-                apartment.getAptImgUrl(),
                 apartment.getNumberOfBedrooms(),
                 apartment.getNumberOfBathrooms(),
                 apartment.getNote(),
@@ -211,7 +206,6 @@ public class ApartmentServiceImpl implements ApartmentService{
         apartment.setHouseholder(apartmentDTO.getHouseholder());
         apartment.setTotalNumber(apartmentDTO.getTotalNumber());
         apartment.setStatus(apartmentDTO.getStatus() != null ? apartmentDTO.getStatus() : "unrented");
-        apartment.setAptImgUrl(apartmentDTO.getAptImgUrl());
         apartment.setNumberOfBedrooms(apartmentDTO.getNumberOfBedrooms());
         apartment.setNumberOfBathrooms(apartmentDTO.getNumberOfBathrooms());
         apartment.setNote(apartmentDTO.getNote());
@@ -227,7 +221,6 @@ public class ApartmentServiceImpl implements ApartmentService{
                 apartment.getHouseholder(),
                 apartment.getTotalNumber(),
                 apartment.getStatus(),
-                apartment.getAptImgUrl(),
                 apartment.getNumberOfBedrooms(),
                 apartment.getNumberOfBathrooms(),
                 apartment.getNote(),

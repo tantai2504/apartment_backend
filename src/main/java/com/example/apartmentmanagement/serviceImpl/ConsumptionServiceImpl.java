@@ -204,7 +204,6 @@ public class ConsumptionServiceImpl implements ConsumptionService {
                                 apartment.getHouseholder(),
                                 apartment.getTotalNumber(),
                                 apartment.getStatus(),
-                                apartment.getAptImgUrl(),
                                 apartment.getNumberOfBedrooms(),
                                 apartment.getNumberOfBathrooms(),
                                 apartment.getNote()

@@ -198,8 +198,11 @@ public class UserController {
     }
 
     @DeleteMapping("/delete")
-    public ResponseEntity<Object> deleteUser(Long userId) {
-        userService.deleteUserById(userId);
+    public ResponseEntity<Object> deleteUser(@RequestBody Map<String, Long> user_apartment) {
+        Long userId = user_apartment.get("userId");
+        Long apartmentId = user_apartment.get("apartmentId");
+        userService.deleteUserById(apartmentId, userId);
+        userService.setCurrentStatusForApartment(apartmentId);
         return ResponseEntity.noContent().build();
     }
 
@@ -214,10 +217,8 @@ public class UserController {
             @RequestParam(value = "contractEndDate", required = false) String contractEndDateStr,
             @RequestPart("imageFile") List<MultipartFile> imageFiles) {
 
-        // Chuyển đổi String sang LocalDateTime cho ngày bắt đầu
         LocalDateTime contractStartDate = LocalDateTime.parse(contractStartDateStr, DateTimeFormatter.ISO_DATE_TIME);
 
-        // Xử lý ngày kết thúc (có thể null cho chủ hộ)
         LocalDateTime contractEndDate = null;
         if (verificationFormType != 2 && contractEndDateStr != null && !contractEndDateStr.isEmpty()) {
             contractEndDate = LocalDateTime.parse(contractEndDateStr, DateTimeFormatter.ISO_DATE_TIME);
@@ -226,7 +227,7 @@ public class UserController {
         Map<String, Object> response = new HashMap<>();
         VerifyUserRequestDTO verifyUserDTO = new VerifyUserRequestDTO(
                 verificationFormName, verificationFormType, apartmentName, email, phoneNumber,
-                contractStartDate, contractEndDate); // contractEndDate có thể là null
+                contractStartDate, contractEndDate);
         try {
             VerifyUserResponseDTO result = userService.verifyUser(verifyUserDTO, imageFiles);
             response.put("status", HttpStatus.CREATED.value());

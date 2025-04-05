@@ -46,6 +46,8 @@ public class User {
 
     private LocalDate birthday;
 
+    private boolean isRentor;
+
     //CCCD
     private String idNumber;
 

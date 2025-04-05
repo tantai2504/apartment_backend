@@ -15,7 +15,6 @@ public class ApartmentResponseDTO {
     private String householder;
     private int totalNumber;
     private String status;
-    private String aptImgUrl;
     private int numberOfBedrooms;
     private int numberOfBathrooms;
     private String note;
@@ -24,13 +23,12 @@ public class ApartmentResponseDTO {
     private String area;
     private List<String> users;
 
-    public ApartmentResponseDTO(Long apartmentId, String apartmentName, String householder, int totalNumber, String status, String aptImgUrl, int numberOfBedrooms, int numberOfBathrooms, String note, String direction, String floor, String area) {
+    public ApartmentResponseDTO(Long apartmentId, String apartmentName, String householder, int totalNumber, String status, int numberOfBedrooms, int numberOfBathrooms, String note, String direction, String floor, String area) {
         this.apartmentId = apartmentId;
         this.apartmentName = apartmentName;
         this.householder = householder;
         this.totalNumber = totalNumber;
         this.status = status;
-        this.aptImgUrl = aptImgUrl;
         this.numberOfBedrooms = numberOfBedrooms;
         this.numberOfBathrooms = numberOfBathrooms;
         this.note = note;
@@ -39,13 +37,12 @@ public class ApartmentResponseDTO {
         this.area = area;
     }
 
-    public ApartmentResponseDTO(Long apartmentId, String apartmentName, String householder, int totalNumber, String status, String aptImgUrl, int numberOfBedrooms, int numberOfBathrooms, String note, String direction, String floor, String area, List<String> users) {
+    public ApartmentResponseDTO(Long apartmentId, String apartmentName, String householder, int totalNumber, String status, int numberOfBedrooms, int numberOfBathrooms, String note, String direction, String floor, String area, List<String> users) {
         this.apartmentId = apartmentId;
         this.apartmentName = apartmentName;
         this.householder = householder;
         this.totalNumber = totalNumber;
         this.status = status;
-        this.aptImgUrl = aptImgUrl;
         this.numberOfBedrooms = numberOfBedrooms;
         this.numberOfBathrooms = numberOfBathrooms;
         this.note = note;

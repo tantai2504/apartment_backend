@@ -28,7 +28,9 @@ public interface UserService {
 
     List<UserRequestDTO> getUserByFullName(String fullName);
 
-    String deleteUserById(Long id);
+    void deleteUserById(Long apartmentId, Long userId);
+
+    void setCurrentStatusForApartment(Long apartmentId);
 
     User getUserByEmailOrUserName(String email);
 

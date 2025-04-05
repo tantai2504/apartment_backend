@@ -49,8 +49,6 @@ public class Apartment {
     @Nationalized
     private String status;
 
-    private String aptImgUrl;
-
     @Nationalized
     private String direction;
 

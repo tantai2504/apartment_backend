@@ -237,7 +237,6 @@ public class PostServiceImpl implements PostService {
                 apartment.getHouseholder(),
                 apartment.getTotalNumber(),
                 apartment.getStatus(),
-                apartment.getAptImgUrl(),
                 apartment.getNumberOfBedrooms(),
                 apartment.getNumberOfBathrooms(),
                 apartment.getNote(),

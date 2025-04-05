@@ -17,7 +17,6 @@ public class ApartmentResponseInUserDTO {
     private String householder;
     private int totalNumber;
     private String status;
-    private String aptImgUrl;
     private int numberOfBedrooms;
     private int numberOfBathrooms;
     private String note;

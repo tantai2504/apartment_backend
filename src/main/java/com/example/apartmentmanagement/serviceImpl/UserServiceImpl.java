@@ -11,6 +11,7 @@ import com.example.apartmentmanagement.repository.VerificationFormRepository;
 import com.example.apartmentmanagement.service.EmailService;
 import com.example.apartmentmanagement.service.UserService;
 import com.example.apartmentmanagement.util.AESUtil;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -99,7 +100,6 @@ public class UserServiceImpl implements UserService {
                                     apartment.getHouseholder(),
                                     apartment.getTotalNumber(),
                                     apartment.getStatus(),
-                                    apartment.getAptImgUrl(),
                                     apartment.getNumberOfBedrooms(),
                                     apartment.getNumberOfBathrooms(),
                                     apartment.getNote()
@@ -135,7 +135,7 @@ public class UserServiceImpl implements UserService {
             if (apartment.getHouseholder() == null) {
                 user.setRole("Owner");
                 apartment.setHouseholder(user.getUserName());
-                apartment.setStatus("bought");
+                apartment.setStatus("sold");
             } else {
                 throw new RuntimeException("Căn hộ này đã có chủ sở hữu");
             }
@@ -173,7 +173,6 @@ public class UserServiceImpl implements UserService {
                         apartment1.getHouseholder(),
                         apartment1.getTotalNumber(),
                         apartment1.getStatus(),
-                        apartment1.getAptImgUrl(),
                         apartment1.getNumberOfBedrooms(),
                         apartment1.getNumberOfBathrooms(),
                         apartment1.getNote(),
@@ -251,7 +250,6 @@ public class UserServiceImpl implements UserService {
                                 apartment.getHouseholder(),
                                 apartment.getTotalNumber(),
                                 apartment.getStatus(),
-                                apartment.getAptImgUrl(),
                                 apartment.getNumberOfBedrooms(),
                                 apartment.getNumberOfBathrooms(),
                                 apartment.getNote()
@@ -292,7 +290,6 @@ public class UserServiceImpl implements UserService {
                         apartment.getHouseholder(),
                         apartment.getTotalNumber(),
                         apartment.getStatus(),
-                        apartment.getAptImgUrl(),
                         apartment.getNumberOfBedrooms(),
                         apartment.getNumberOfBathrooms(),
                         apartment.getNote()
@@ -391,7 +388,6 @@ public class UserServiceImpl implements UserService {
                                     apartment.getHouseholder(),
                                     apartment.getTotalNumber(),
                                     apartment.getStatus(),
-                                    apartment.getAptImgUrl(),
                                     apartment.getNumberOfBedrooms(),
                                     apartment.getNumberOfBathrooms(),
                                     apartment.getNote()
@@ -437,7 +433,6 @@ public class UserServiceImpl implements UserService {
                                     apartment.getHouseholder(),
                                     apartment.getTotalNumber(),
                                     apartment.getStatus(),
-                                    apartment.getAptImgUrl(),
                                     apartment.getNumberOfBedrooms(),
                                     apartment.getNumberOfBathrooms(),
                                     apartment.getNote()
@@ -464,11 +459,41 @@ public class UserServiceImpl implements UserService {
         }).collect(Collectors.toList());
     }
 
+    @Transactional
+    @Override
+    public void deleteUserById(Long apartmentId, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Apartment apartment = apartmentRepository.findById(apartmentId)
+                .orElseThrow(() -> new RuntimeException("Apartment not found"));
+
+        if (user.getRole().equals("Owner")) {
+            throw new RuntimeException("Không thể xoá owner ra khỏi căn hộ này");
+        }
+
+        apartment.setTotalNumber(apartment.getTotalNumber() - 1);
+
+        user.getApartments().remove(apartment);
+        apartment.getUsers().remove(user);
+
+        userRepository.save(user);
+        apartmentRepository.save(apartment);
+    }
 
     @Override
-    public String deleteUserById(Long id) {
-        userRepository.deleteById(id);
-        return "done";
+    public void setCurrentStatusForApartment(Long apartmentId) {
+        Apartment apartment = apartmentRepository.findById(apartmentId)
+                .orElseThrow(() -> new RuntimeException("Apartment not found"));
+
+        List<User> users = apartment.getUsers();
+
+        boolean hasRentor = users.stream()
+                .anyMatch(user -> "Rentor".equalsIgnoreCase(user.getRole()));
+
+        if (!hasRentor) {
+            apartment.setStatus("sold");
+            apartmentRepository.save(apartment);
+        }
     }
 
     @Override

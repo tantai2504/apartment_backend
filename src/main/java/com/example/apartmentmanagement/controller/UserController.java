@@ -268,8 +268,28 @@ public class UserController {
             @RequestParam("contractStartDate") String contractStartDateStr,
             @RequestParam(value = "contractEndDate", required = false) String contractEndDateStr,
             @RequestPart("imageFile") List<MultipartFile> imageFiles) {
+        LocalDateTime contractStartDate = LocalDateTime.parse(contractStartDateStr, DateTimeFormatter.ISO_DATE_TIME);
+
+        LocalDateTime contractEndDate = null;
+        if (verificationFormType != 2 && contractEndDateStr != null && !contractEndDateStr.isEmpty()) {
+            contractEndDate = LocalDateTime.parse(contractEndDateStr, DateTimeFormatter.ISO_DATE_TIME);
+        }
+
         Map<String, Object> response = new HashMap<>();
-        return null;
+        VerifyUserRequestDTO verifyUserDTO = new VerifyUserRequestDTO(
+                verificationFormName, verificationFormType, apartmentName, email, phoneNumber,
+                contractStartDate, contractEndDate);
+        try {
+            VerifyUserResponseDTO verifyUserResponseDTO = userService.updateVerifyUser(verificationId, verifyUserDTO, imageFiles);
+            response.put("status", HttpStatus.CREATED.value());
+            response.put("data", verifyUserResponseDTO);
+            response.put("message", "Cập nhật thành công");
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (RuntimeException e) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
 
 }

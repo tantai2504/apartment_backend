@@ -14,6 +14,8 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class VerifyUserResponseDTO {
+    private Long verificationId;
+
     private String verificationFormName;
 
     private String fullName;

@@ -1,6 +1,7 @@
 package com.example.apartmentmanagement.service;
 
 import com.example.apartmentmanagement.dto.ApartmentResponseDTO;
+import com.example.apartmentmanagement.dto.UserResponseDTO;
 import com.example.apartmentmanagement.entities.Apartment;
 
 import java.util.List;
@@ -17,7 +18,9 @@ public interface ApartmentService {
 
     List<ApartmentResponseDTO> totalUnrentedApartment ();
 
-    List<ApartmentResponseDTO> getOwnApartment (Long userId);
+    List<ApartmentResponseDTO> getOwnUnrentedApartment (Long userId);
+
+    List<ApartmentResponseDTO> getOwnRentedApartment (Long userId);
 
     List<ApartmentResponseDTO> findApartmentsWithoutHouseholder();
 
@@ -26,4 +29,6 @@ public interface ApartmentService {
     ApartmentResponseDTO createApartment(ApartmentResponseDTO apartmentDTO);
 
     void deleteApartment(Long apartmentId);
+
+    List<UserResponseDTO> getRentorByApartment(String apartmentName);
 }

@@ -88,6 +88,36 @@ public class UserServiceImpl implements UserService {
         }).toList();
     }
 
+    @Override
+    public VerifyUserResponseDTO findVerificationByUserName(String userName) {
+        VerificationForm verificationForm = verificationFormRepository.findVerificationFormByUserNameContainingIgnoreCase(userName);
+        if (verificationForm == null) {
+            throw new RuntimeException("Không tìm thấy hợp đồng này");
+        }
+        List<ContractImages> contractImages = verificationForm.getContractImages();
+        return new VerifyUserResponseDTO(
+                verificationForm.getVerificationFormId(),
+                verificationForm.getVerificationFormName(),
+                verificationForm.getFullName(),
+                verificationForm.getEmail(),
+                verificationForm.getPhoneNumber(),
+                verificationForm.getContractStartDate(),
+                verificationForm.getContractEndDate(),
+                contractImages.stream().map(ContractImages::getImageUrl).toList(),
+                verificationForm.getUser().getRole(),
+                verificationForm.getVerificationFormId(),
+                verificationForm.getVerificationFormType(),
+                verificationForm.getApartmentName(),
+                verificationForm.getUserName(),
+                verificationForm.isVerified()
+        );
+    }
+
+    @Override
+    public VerifyRegisterRequestDTO updateVerification(RegisterRequestDTO verifyRegisterRequestDTO) {
+        return null;
+    }
+
 
     @Override
     public List<UserRequestDTO> showAllUser() {
@@ -482,6 +512,8 @@ public class UserServiceImpl implements UserService {
         Apartment apartment = apartmentRepository.findById(apartmentId)
                 .orElseThrow(() -> new RuntimeException("Apartment not found"));
 
+        VerificationForm verificationForm = user.getVerificationForm();
+
         if (user.getRole().equals("Owner")) {
             throw new RuntimeException("Không thể xoá owner ra khỏi căn hộ này");
         }
@@ -558,6 +590,7 @@ public class UserServiceImpl implements UserService {
         verificationForm = verificationFormRepository.save(verificationForm);
 
         return new VerifyUserResponseDTO(
+                verificationForm.getVerificationFormId(),
                 verificationForm.getVerificationFormName(),
                 verificationForm.getFullName(),
                 verificationForm.getEmail(),

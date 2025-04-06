@@ -99,6 +99,21 @@ public class ApartmentController {
         return ResponseEntity.ok(response);
     }
 
+
+    //lay can ho da cho thue
+    @GetMapping("/getOwnerApartmentRented/{userId}")
+    public ResponseEntity<Object> getOwnApartmentRented(@PathVariable Long userId) {
+        List<ApartmentResponseDTO> apartments = apartmentService.getOwnApartmentRented(userId);
+        Map<String, Object> response = new HashMap<>();
+        if (apartments.isEmpty()) {
+            response.put("message", "Chưa cho thuê căn hộ nào");
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        response.put("data", apartments);
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
+    }
     /**
      * Tìm kiếm căn hộ theo id
      *

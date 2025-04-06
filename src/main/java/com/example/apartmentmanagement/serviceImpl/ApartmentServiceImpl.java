@@ -137,6 +137,28 @@ public class ApartmentServiceImpl implements ApartmentService{
     }
 
     @Override
+    public List<ApartmentResponseDTO> getOwnApartmentRented(Long userId) {
+        User user = userRepository.findById(userId).orElse(null);
+        return apartmentRepository.findApartmentByHouseholder(user.getUserName()).stream()
+                .filter(apartment -> apartment.getStatus().equalsIgnoreCase("rented"))
+                .map(apartment -> new ApartmentResponseDTO(
+                        apartment.getApartmentId(),
+                        apartment.getApartmentName(),
+                        apartment.getHouseholder(),
+                        apartment.getTotalNumber(),
+                        apartment.getStatus(),
+                        apartment.getNumberOfBedrooms(),
+                        apartment.getNumberOfBathrooms(),
+                        apartment.getNote(),
+                        apartment.getDirection(),
+                        apartment.getFloor(),
+                        apartment.getArea(),
+                        apartment.getUsers().stream().map(User::getUserName).toList()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public ApartmentResponseDTO updateApartment(Long apartmentId, ApartmentResponseDTO apartmentDTO) {
         Apartment apartment = apartmentRepository.findById(apartmentId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy căn hộ"));

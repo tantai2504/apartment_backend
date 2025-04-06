@@ -19,6 +19,8 @@ public interface ApartmentService {
 
     List<ApartmentResponseDTO> getOwnApartment (Long userId);
 
+    List<ApartmentResponseDTO> getOwnApartmentRented (Long userId);
+
     List<ApartmentResponseDTO> findApartmentsWithoutHouseholder();
 
     ApartmentResponseDTO updateApartment(Long apartmentId, ApartmentResponseDTO apartmentDTO);

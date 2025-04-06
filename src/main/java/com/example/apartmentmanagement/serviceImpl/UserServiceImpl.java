@@ -6,6 +6,7 @@ import com.example.apartmentmanagement.entities.ContractImages;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.entities.VerificationForm;
 import com.example.apartmentmanagement.repository.ApartmentRepository;
+import com.example.apartmentmanagement.repository.ContractImagesRepository;
 import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.repository.VerificationFormRepository;
 import com.example.apartmentmanagement.service.EmailService;
@@ -36,6 +37,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private EmailService emailService;
+
+    @Autowired
+    private ContractImagesRepository contractImagesRepository;
 
     @Override
     public void saveUser(User user) {
@@ -112,12 +116,6 @@ public class UserServiceImpl implements UserService {
                 verificationForm.isVerified()
         );
     }
-
-    @Override
-    public VerifyRegisterRequestDTO updateVerification(RegisterRequestDTO verifyRegisterRequestDTO) {
-        return null;
-    }
-
 
     @Override
     public List<UserRequestDTO> showAllUser() {
@@ -607,5 +605,61 @@ public class UserServiceImpl implements UserService {
         );
     }
 
-    
+
+    @Override
+    public VerifyUserResponseDTO updateVerifyUser(Long verificationUserId, VerifyUserRequestDTO verifyUserDTO, List<MultipartFile> imageFiles) {
+        VerificationForm verificationForm = verificationFormRepository.findById(verificationUserId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn xác thực với ID: " + verificationUserId));
+
+        User user = getUserByEmailOrUserName(verifyUserDTO.getEmail());
+
+        verificationForm.setVerificationFormName(verifyUserDTO.getVerificationFormName());
+        verificationForm.setVerificationFormType(verifyUserDTO.getVerificationFormType());
+        verificationForm.setEmail(verifyUserDTO.getEmail());
+        verificationForm.setApartmentName(verifyUserDTO.getApartmentName());
+        verificationForm.setPhoneNumber(user.getPhone());
+        verificationForm.setContractStartDate(verifyUserDTO.getContractStartDate());
+        verificationForm.setContractEndDate(verifyUserDTO.getContractEndDate());
+        verificationForm.setUserName(user.getUserName());
+        verificationForm.setFullName(user.getFullName());
+        verificationForm.setVerified(false);
+
+        // Xoá ảnh cũ nếu có
+        List<ContractImages> oldImages = verificationForm.getContractImages();
+        if (oldImages != null) {
+            contractImagesRepository.deleteAll(oldImages);
+        }
+
+        // Upload ảnh mới
+        List<ContractImages> newContractImages = new ArrayList<>();
+        for (MultipartFile file : imageFiles) {
+            ContractImages contractImage = new ContractImages();
+            contractImage.setImageUrl(imageUploadService.uploadImage(file));
+            contractImage.setVerificationForm(verificationForm);
+            newContractImages.add(contractImage);
+        }
+
+        verificationForm.setContractImages(newContractImages);
+        verificationForm = verificationFormRepository.save(verificationForm);
+
+        return new VerifyUserResponseDTO(
+                verificationForm.getVerificationFormId(),
+                verificationForm.getVerificationFormName(),
+                verificationForm.getFullName(),
+                verificationForm.getEmail(),
+                verificationForm.getPhoneNumber(),
+                verificationForm.getContractStartDate(),
+                verificationForm.getContractEndDate(),
+                newContractImages.stream().map(ContractImages::getImageUrl).toList(),
+                user.getRole(),
+                verificationForm.getVerificationFormId(),
+                verificationForm.getVerificationFormType(),
+                verificationForm.getApartmentName(),
+                verificationForm.getUserName(),
+                verificationForm.isVerified()
+        );
+    }
+
+
+
 }

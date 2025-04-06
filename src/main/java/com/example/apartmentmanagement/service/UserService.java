@@ -44,6 +44,5 @@ public interface UserService {
 
     VerifyUserResponseDTO findVerificationByUserName(String userName);
 
-    VerifyRegisterRequestDTO updateVerification(RegisterRequestDTO verifyRegisterRequestDTO);
-
+    VerifyUserResponseDTO updateVerifyUser(Long verificationId, VerifyUserRequestDTO verifyUserDTO, List<MultipartFile> imageFile);
 }

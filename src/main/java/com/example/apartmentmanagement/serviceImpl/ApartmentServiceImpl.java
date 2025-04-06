@@ -1,6 +1,7 @@
 package com.example.apartmentmanagement.serviceImpl;
 
 import com.example.apartmentmanagement.dto.ApartmentResponseDTO;
+import com.example.apartmentmanagement.dto.UserResponseDTO;
 import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.repository.ApartmentRepository;
@@ -9,6 +10,7 @@ import com.example.apartmentmanagement.service.ApartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -117,9 +119,54 @@ public class ApartmentServiceImpl implements ApartmentService{
     }
 
     @Override
-    public List<ApartmentResponseDTO> getOwnApartment(Long userId) {
+    public List<ApartmentResponseDTO> getOwnRentedApartment(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
-        return user.getApartments().stream().map(apartment -> new ApartmentResponseDTO(
+        if (!user.getRole().equals("Owner")) {
+            throw new RuntimeException("Không tìm thấy owner này");
+        }
+        List<Apartment> apartments = user.getApartments();
+        List<Apartment> returnApartments = new ArrayList<>();
+
+        for (Apartment apartment : apartments) {
+            if (apartment.getStatus().equals("rented")) {
+                returnApartments.add(apartment);
+            }
+        }
+
+        return returnApartments.stream().map(apartment -> new ApartmentResponseDTO(
+                        apartment.getApartmentId(),
+                        apartment.getApartmentName(),
+                        apartment.getHouseholder(),
+                        apartment.getTotalNumber(),
+                        apartment.getStatus(),
+                        apartment.getNumberOfBedrooms(),
+                        apartment.getNumberOfBathrooms(),
+                        apartment.getNote(),
+                        apartment.getDirection(),
+                        apartment.getFloor(),
+                        apartment.getArea(),
+                        apartment.getUsers().stream().map(User::getUserName).toList()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ApartmentResponseDTO> getOwnUnrentedApartment(Long userId) {
+
+        User user = userRepository.findById(userId).orElse(null);
+        if (!user.getRole().equals("Owner")) {
+            throw new RuntimeException("Không tìm thấy owner này");
+        }
+        List<Apartment> apartments = user.getApartments();
+        List<Apartment> returnApartments = new ArrayList<>();
+
+        for (Apartment apartment : apartments) {
+            if (apartment.getStatus().equals("sold")) {
+                returnApartments.add(apartment);
+            }
+        }
+
+        return returnApartments.stream().map(apartment -> new ApartmentResponseDTO(
                         apartment.getApartmentId(),
                         apartment.getApartmentName(),
                         apartment.getHouseholder(),
@@ -242,5 +289,34 @@ public class ApartmentServiceImpl implements ApartmentService{
             throw new RuntimeException("Không thể xóa căn hộ đang có người ở");
         }
         apartmentRepository.delete(apartment);
+    }
+
+    @Override
+    public List<UserResponseDTO> getRentorByApartment(String apartmentName) {
+        Apartment apartment = apartmentRepository.findApartmentByApartmentName(apartmentName);
+
+        if (apartment == null) {
+            throw new RuntimeException("Không tìm thấy căn hộ này");
+        }
+
+        List<User> users = apartment.getUsers();
+
+        return users.stream()
+                .filter(user -> "Rentor".equalsIgnoreCase(user.getRole()))
+                .map(user -> new UserResponseDTO(
+                        user.getUserId(),
+                        user.getUserName(),
+                        user.getFullName(),
+                        user.getEmail(),
+                        user.getDescription(),
+                        user.getPhone(),
+                        user.getUserImgUrl(),
+                        user.getAge(),
+                        user.getBirthday(),
+                        user.getIdNumber(),
+                        user.getJob(),
+                        user.getRole()
+                ))
+                .toList();
     }
 }

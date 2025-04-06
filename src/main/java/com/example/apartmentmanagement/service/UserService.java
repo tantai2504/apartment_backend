@@ -42,4 +42,8 @@ public interface UserService {
 
     List<VerifyUserResponseDTO> showAllVerifyUser();
 
+    VerifyUserResponseDTO findVerificationByUserName(String userName);
+
+    VerifyRegisterRequestDTO updateVerification(RegisterRequestDTO verifyRegisterRequestDTO);
+
 }

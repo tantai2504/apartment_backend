@@ -2,6 +2,7 @@ package com.example.apartmentmanagement.controller;
 
 import com.cloudinary.Cloudinary;
 import com.example.apartmentmanagement.dto.*;
+import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.service.UserService;
@@ -239,6 +240,36 @@ public class UserController {
             response.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
+    }
+
+    @GetMapping("/find_verification")
+    public ResponseEntity<Object> findVerification(@RequestParam String userName) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            VerifyUserResponseDTO result = userService.findVerificationByUserName(userName);
+            response.put("status", HttpStatus.OK.value());
+            response.put("data", result);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } catch (RuntimeException e) {
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+    }
+
+    @PutMapping("/update_verification")
+    public ResponseEntity<Object> updateVerification(
+            @RequestParam("verificationId") Long verificationId,
+            @RequestParam("verificationFormName") String verificationFormName,
+            @RequestParam("verificationFormType") int verificationFormType,
+            @RequestParam("email") String email,
+            @RequestParam("phoneNumber") String phoneNumber,
+            @RequestParam("apartmentName") String apartmentName,
+            @RequestParam("contractStartDate") String contractStartDateStr,
+            @RequestParam(value = "contractEndDate", required = false) String contractEndDateStr,
+            @RequestPart("imageFile") List<MultipartFile> imageFiles) {
+        Map<String, Object> response = new HashMap<>();
+        return null;
     }
 
 }

@@ -1,6 +1,8 @@
 package com.example.apartmentmanagement.controller;
 
 import com.example.apartmentmanagement.dto.ApartmentResponseDTO;
+import com.example.apartmentmanagement.dto.ConsumptionResponseDTO;
+import com.example.apartmentmanagement.dto.UserResponseDTO;
 import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.service.ApartmentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,10 +86,10 @@ public class ApartmentController {
         return ResponseEntity.ok(response);
     }
 
-    //lay danh sach can ho unrented theo id
-    @GetMapping("/get_own_apartment")
-    public ResponseEntity<Object> getOwnApartment(@RequestParam Long userId) {
-        List<ApartmentResponseDTO> apartments = apartmentService.getOwnApartment(userId);
+    //lay danh sach can ho unrented cua owner
+    @GetMapping("/get_own_unrented_apartment")
+    public ResponseEntity<Object> getOwnUnrentedApartment(@RequestParam Long userId) {
+        List<ApartmentResponseDTO> apartments = apartmentService.getOwnUnrentedApartment(userId);
         Map<String, Object> response = new HashMap<>();
         if (apartments.isEmpty()) {
             response.put("message", "Tất cả các căn hộ đều đã được cho thuê");
@@ -104,6 +106,7 @@ public class ApartmentController {
     @GetMapping("/getOwnerApartmentRented/{userId}")
     public ResponseEntity<Object> getOwnApartmentRented(@PathVariable Long userId) {
         List<ApartmentResponseDTO> apartments = apartmentService.getOwnApartmentRented(userId);
+
         Map<String, Object> response = new HashMap<>();
         if (apartments.isEmpty()) {
             response.put("message", "Chưa cho thuê căn hộ nào");
@@ -114,6 +117,7 @@ public class ApartmentController {
         response.put("status", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }
+
     /**
      * Tìm kiếm căn hộ theo id
      *
@@ -181,6 +185,21 @@ public class ApartmentController {
             response.put("status", HttpStatus.BAD_REQUEST.value());
             response.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    @GetMapping("/get_rentor")
+    public ResponseEntity<Object> getRentor(@RequestBody String apartmentName) {
+        List<UserResponseDTO> userResponseDTOS = apartmentService.getRentorByApartment(apartmentName);
+        Map<String, Object> response = new HashMap<>();
+        if (userResponseDTOS != null) {
+            response.put("data", userResponseDTOS);
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } else {
+            response.put("message", "Chưa có người thuê");
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
     }
 }

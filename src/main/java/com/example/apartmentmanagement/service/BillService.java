@@ -2,6 +2,7 @@ package com.example.apartmentmanagement.service;
 
 import com.example.apartmentmanagement.dto.BillResponseDTO;
 import com.example.apartmentmanagement.dto.BillRequestDTO;
+import com.example.apartmentmanagement.entities.Bill;
 
 import java.util.List;
 
@@ -21,9 +22,15 @@ public interface BillService {
 
     List<BillResponseDTO> viewBillList(Long userId);
 
+    List<BillResponseDTO> viewRentorBills(Long rentorId);
+
     void deleteBill(Long id);
 
     BillResponseDTO addBill(BillRequestDTO billRequestDTO);
+
+    BillResponseDTO addBillConsumption(BillRequestDTO billRequestDTO);
+
+    BillResponseDTO addBillMonthPaid(BillRequestDTO billRequestDTO);
 
     BillResponseDTO sendBillToRenter(BillRequestDTO billRequestDTO);
 }

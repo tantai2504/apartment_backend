@@ -38,26 +38,23 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public List<BillResponseDTO> getAllBill() {
-        return billRepository.findAll().stream().filter(bill -> "owner_bill".equals(bill.getBillType()))
+        return billRepository.findAll().stream()
                 .map(bill -> new BillResponseDTO(
                         bill.getBillId(),
                         bill.getBillContent(),
-                        bill.getMonthlyPaid(),
-                        bill.getWaterBill(),
-                        bill.getOthers(),
-                        bill.getTotal(),
-                        bill.getConsumption().getLastMonthWaterConsumption(),
-                        bill.getConsumption().getWaterConsumption(),
+                        bill.getAmount(),
                         bill.getBillDate(),
                         bill.getStatus(),
                         bill.getUser().getFullName(),
                         bill.getApartment().getApartmentName(),
                         bill.getBillType(),
                         bill.getSurcharge(),
-                        bill.getCreateBillUserId()
+                        bill.getCreateBillUserId(),
+                        bill.getApartment().getStatus(),
+                        bill.getPeriod(),
+                        bill.getConsumption()
                 ))
                 .collect(Collectors.toList());
-
     }
 
     @Override
@@ -70,19 +67,17 @@ public class BillServiceImpl implements BillService {
                 .map(bill -> new BillResponseDTO(
                         bill.getBillId(),
                         bill.getBillContent(),
-                        bill.getMonthlyPaid(),
-                        bill.getWaterBill(),
-                        bill.getOthers(),
-                        bill.getTotal(),
-                        bill.getConsumption().getLastMonthWaterConsumption(),
-                        bill.getConsumption().getWaterConsumption(),
+                        bill.getAmount(),
                         bill.getBillDate(),
                         bill.getStatus(),
                         bill.getUser().getFullName(),
                         bill.getApartment().getApartmentName(),
                         bill.getBillType(),
                         bill.getSurcharge(),
-                        bill.getCreateBillUserId()
+                        bill.getCreateBillUserId(),
+                        bill.getApartment().getStatus(),
+                        bill.getPeriod(),
+                        bill.getConsumption()
                 ))
                 .collect(Collectors.toList());
     }
@@ -93,19 +88,17 @@ public class BillServiceImpl implements BillService {
         BillResponseDTO billResponseDTO = new BillResponseDTO(
                 bill.getBillId(),
                 bill.getBillContent(),
-                bill.getMonthlyPaid(),
-                bill.getWaterBill(),
-                bill.getOthers(),
-                bill.getTotal(),
-                bill.getConsumption().getLastMonthWaterConsumption(),
-                bill.getConsumption().getWaterConsumption(),
+                bill.getAmount(),
                 bill.getBillDate(),
                 bill.getStatus(),
-                bill.getUser().getUserName(),
+                bill.getUser().getFullName(),
                 bill.getApartment().getApartmentName(),
                 bill.getBillType(),
                 bill.getSurcharge(),
-                bill.getCreateBillUserId()
+                bill.getCreateBillUserId(),
+                bill.getApartment().getStatus(),
+                bill.getPeriod(),
+                bill.getConsumption()
         );
         return billResponseDTO;
     }
@@ -119,6 +112,11 @@ public class BillServiceImpl implements BillService {
             throw new IllegalStateException("Hóa đơn này đã được thanh toán");
         }
 
+        if(bill.getBillType().equalsIgnoreCase("monthPaid")){
+            User u = bill.getUser();
+            u.setAccountBalance(u.getAccountBalance()+bill.getAmount());
+            userRepository.save(u);
+        }
         // Tạo bản ghi Payment
         Payment payment = new Payment();
         payment.setPaymentCheck(true);
@@ -140,25 +138,22 @@ public class BillServiceImpl implements BillService {
     public BillResponseDTO updateBill(Long id, BillRequestDTO billRequestDTO) {
         Bill bill = billRepository.findById(id).get();
         bill.setBillContent(billRequestDTO.getBillContent());
-        bill.setOthers(billRequestDTO.getOthers());
         bill.setBillDate(LocalDateTime.now());
         billRepository.save(bill);
         return new BillResponseDTO(
                 bill.getBillId(),
                 bill.getBillContent(),
-                bill.getMonthlyPaid(),
-                bill.getWaterBill(),
-                bill.getOthers(),
-                bill.getTotal(),
-                bill.getConsumption().getLastMonthWaterConsumption(),
-                bill.getConsumption().getWaterConsumption(),
+                bill.getAmount(),
                 bill.getBillDate(),
                 bill.getStatus(),
-                bill.getUser().getUserName(),
+                bill.getUser().getFullName(),
                 bill.getApartment().getApartmentName(),
                 bill.getBillType(),
                 bill.getSurcharge(),
-                bill.getCreateBillUserId()
+                bill.getCreateBillUserId(),
+                bill.getApartment().getStatus(),
+                bill.getPeriod(),
+                bill.getConsumption()
         );
     }
 
@@ -172,19 +167,17 @@ public class BillServiceImpl implements BillService {
                 .map(bill -> new BillResponseDTO(
                         bill.getBillId(),
                         bill.getBillContent(),
-                        bill.getMonthlyPaid(),
-                        bill.getWaterBill(),
-                        bill.getOthers(),
-                        bill.getTotal(),
-                        bill.getConsumption().getLastMonthWaterConsumption(),
-                        bill.getConsumption().getWaterConsumption(),
+                        bill.getAmount(),
                         bill.getBillDate(),
                         bill.getStatus(),
                         user.getUserName(),
                         bill.getApartment().getApartmentName(),
                         bill.getBillType(),
                         bill.getSurcharge(),
-                        bill.getCreateBillUserId()
+                        bill.getCreateBillUserId(),
+                        bill.getApartment().getStatus(),
+                        bill.getPeriod(),
+                        bill.getConsumption()
                 ))
                 .collect(Collectors.toList());
     }
@@ -193,26 +186,56 @@ public class BillServiceImpl implements BillService {
     public List<BillResponseDTO> viewBillList(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user == null || user.getBills() == null) return List.of();
-
+        List<Bill> bills = billRepository.findBillByUser(user);
         return user.getBills().stream()
                 .map(bill -> new BillResponseDTO(
                         bill.getBillId(),
                         bill.getBillContent(),
-                        bill.getMonthlyPaid(),
-                        bill.getWaterBill(),
-                        bill.getOthers(),
-                        bill.getTotal(),
-                        bill.getConsumption().getLastMonthWaterConsumption(),
-                        bill.getConsumption().getWaterConsumption(),
+                        bill.getAmount(),
                         bill.getBillDate(),
                         bill.getStatus(),
                         user.getUserName(),
                         bill.getApartment().getApartmentName(),
                         bill.getBillType(),
                         bill.getSurcharge(),
-                        bill.getCreateBillUserId()
+                        bill.getCreateBillUserId(),
+                        bill.getApartment().getStatus(),
+                        bill.getPeriod(),
+                        bill.getConsumption()
                 ))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BillResponseDTO> viewRentorBills(Long rentorId) {
+        List<BillResponseDTO> lists = new ArrayList<>();
+        List<Bill> bills = billRepository.findAll();
+        for(Bill bill: bills){
+            if(bill.getApartment().getStatus().equalsIgnoreCase("unrent")){
+                continue;
+            }
+            List<User> users = bill.getApartment().getUsers();
+            for(User u : users){
+                if(u.getUserId() == rentorId){
+                    lists.add(new BillResponseDTO(
+                            bill.getBillId(),
+                            bill.getBillContent(),
+                            bill.getAmount(),
+                            bill.getBillDate(),
+                            bill.getStatus(),
+                            bill.getUser().getFullName(),
+                            bill.getApartment().getApartmentName(),
+                            bill.getBillType(),
+                            bill.getSurcharge(),
+                            bill.getCreateBillUserId(),
+                            bill.getApartment().getStatus(),
+                            bill.getPeriod(),
+                            bill.getConsumption()
+                    ));
+                }
+            }
+        }
+        return lists;
     }
 
     @Override
@@ -227,43 +250,41 @@ public class BillServiceImpl implements BillService {
 
     @Override
     public BillResponseDTO addBill(BillRequestDTO billRequestDTO) {
+        return null;
+    }
+
+    @Override
+    public BillResponseDTO addBillConsumption(BillRequestDTO billRequestDTO) {
         Consumption consumption = consumptionRepository.findById(billRequestDTO.getConsumptionId()).orElse(null);
         if (consumption.isBillCreated()) {
-            List<Bill> bills = consumption.getBills();
-            for (Bill bill : bills) {
-                if (bill.getBillType().equals("owner_bill")) {
-                    throw new RuntimeException("Đã tạo hoá đơn cho toà nhà này");
-                }
-            }
+//            List<Bill> bills = consumption.getBills();
+//            for (Bill bill : bills) {
+//                if (bill.getBillType().equals("water")) {
+//                    throw new RuntimeException("Đã tạo hoá đơn cho toà nhà này");
+//                }
+//            }
+            throw new RuntimeException("Đã tạo hoá đơn này");
         }
 
         Apartment apartment = apartmentRepository.findApartmentByApartmentName(billRequestDTO.getApartmentName());
         if (apartment == null) {
             throw new RuntimeException("Không tìm thấy căn hộ này");
         }
-
         User user = userRepository.findByUserNameOrEmail(apartment.getHouseholder());
         if (user == null) {
-            throw new RuntimeException("Không tìm thấy chủ hộ");
+            throw new RuntimeException("Không tìm thấy chủ căn hộ này");
         }
-
         Bill newBill = new Bill();
-
-        newBill.setManagementFee(billRequestDTO.getManagementFee());
         newBill.setBillContent(billRequestDTO.getBillContent());
-
+        newBill.setBillType("water");
         float waterCost = calculateWaterBill(consumption.getLastMonthWaterConsumption(), consumption.getWaterConsumption());
-        newBill.setWaterBill(waterCost);
-        newBill.setOthers(billRequestDTO.getOthers());
-        newBill.setTotal(billRequestDTO.getManagementFee() + waterCost + billRequestDTO.getOthers());
-
+        newBill.setAmount(waterCost);
         newBill.setBillDate(LocalDateTime.now());
         newBill.setStatus("unpaid");
         newBill.setUser(user);
         newBill.setCreateBillUserId(billRequestDTO.getCreatedUserId());
         newBill.setConsumption(consumption);
         newBill.setApartment(apartment);
-        newBill.setBillType("owner_bill");
         newBill.setSurcharge(billRequestDTO.getSurcharge());
 
         consumption.setBillCreated(true);
@@ -273,19 +294,69 @@ public class BillServiceImpl implements BillService {
         return new BillResponseDTO(
                 newBill.getBillId(),
                 newBill.getBillContent(),
-                newBill.getMonthlyPaid(),
-                newBill.getWaterBill(),
-                newBill.getOthers(),
-                newBill.getTotal(),
-                newBill.getConsumption().getLastMonthWaterConsumption(),
-                newBill.getConsumption().getWaterConsumption(),
+                newBill.getAmount(),
                 newBill.getBillDate(),
                 newBill.getStatus(),
                 newBill.getUser().getUserName(),
                 newBill.getApartment().getApartmentName(),
                 newBill.getBillType(),
                 newBill.getSurcharge(),
-                newBill.getCreateBillUserId()
+                newBill.getCreateBillUserId(),
+                newBill.getApartment().getStatus(),
+                newBill.getPeriod(),
+                newBill.getConsumption()
+        );
+    }
+
+    @Override
+    public BillResponseDTO addBillMonthPaid(BillRequestDTO billRequestDTO) {
+//        Consumption consumption = consumptionRepository.findById(billRequestDTO.getConsumptionId()).orElse(null);
+//        if (consumption.isBillCreated()) {
+////            List<Bill> bills = consumption.getBills();
+////            for (Bill bill : bills) {
+////                if (bill.getBillType().equals("water")) {
+////                    throw new RuntimeException("Đã tạo hoá đơn cho toà nhà này");
+////                }
+////            }
+//            throw new RuntimeException("Đã tạo hoá đơn này");
+//        }
+
+        Apartment apartment = apartmentRepository.findApartmentByApartmentName(billRequestDTO.getApartmentName());
+        if (apartment == null) {
+            throw new RuntimeException("Không tìm thấy căn hộ này");
+        }
+        User user = userRepository.findByUserNameOrEmail(apartment.getHouseholder());
+        if (user == null) {
+            throw new RuntimeException("Không tìm thấy chủ căn hộ này");
+        }
+        Bill newBill = new Bill();
+        newBill.setBillContent(billRequestDTO.getBillContent());
+        newBill.setBillType("monthPaid");
+//        float waterCost = calculateWaterBill(consumption.getLastMonthWaterConsumption(), consumption.getWaterConsumption());
+        newBill.setAmount(billRequestDTO.getAmount());
+        newBill.setBillDate(LocalDateTime.now());
+        newBill.setStatus("unpaid");
+        newBill.setUser(user);
+        newBill.setCreateBillUserId(billRequestDTO.getCreatedUserId());
+        newBill.setConsumption(null);
+        newBill.setApartment(apartment);
+        newBill.setSurcharge(billRequestDTO.getSurcharge());
+
+        billRepository.save(newBill);
+        return new BillResponseDTO(
+                newBill.getBillId(),
+                newBill.getBillContent(),
+                newBill.getAmount(),
+                newBill.getBillDate(),
+                newBill.getStatus(),
+                newBill.getUser().getUserName(),
+                newBill.getApartment().getApartmentName(),
+                newBill.getBillType(),
+                newBill.getSurcharge(),
+                newBill.getCreateBillUserId(),
+                newBill.getApartment().getStatus(),
+                newBill.getPeriod(),
+                newBill.getConsumption()
         );
     }
 
@@ -301,13 +372,9 @@ public class BillServiceImpl implements BillService {
 
         Bill newBill = new Bill();
 
-        newBill.setManagementFee(billRequestDTO.getManagementFee());
         newBill.setBillContent(billRequestDTO.getBillContent());
 
         float waterCost = calculateWaterBill(consumption.getLastMonthWaterConsumption(), consumption.getWaterConsumption());
-        newBill.setWaterBill(waterCost);
-        newBill.setMonthlyPaid(billRequestDTO.getMonthlyPaid());
-        newBill.setTotal(billRequestDTO.getManagementFee() + waterCost + billRequestDTO.getMonthlyPaid());
 
         newBill.setBillDate(LocalDateTime.now());
         newBill.setStatus("unpaid");
@@ -322,19 +389,17 @@ public class BillServiceImpl implements BillService {
         return new BillResponseDTO(
                 newBill.getBillId(),
                 newBill.getBillContent(),
-                newBill.getMonthlyPaid(),
-                newBill.getWaterBill(),
-                newBill.getOthers(),
-                newBill.getTotal(),
-                consumption.getLastMonthWaterConsumption(),
-                consumption.getWaterConsumption(),
+                newBill.getAmount(),
                 newBill.getBillDate(),
                 newBill.getStatus(),
                 newBill.getUser().getUserName(),
                 newBill.getApartment().getApartmentName(),
                 newBill.getBillType(),
                 newBill.getSurcharge(),
-                newBill.getCreateBillUserId()
+                newBill.getCreateBillUserId(),
+                newBill.getApartment().getStatus(),
+                newBill.getPeriod(),
+                newBill.getConsumption()
         );
     }
 

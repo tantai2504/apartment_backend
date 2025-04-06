@@ -28,18 +28,11 @@ public class Bill {
     @Nationalized
     private String billContent;
 
-    // tiền thuê hằng tháng nếu căn hộ được đem cho thuê
-    private float monthlyPaid;
+    private String billType;
 
-    // tiền nước
-    private float waterBill;
+    private float amount;
 
-    // phí quản lý
-    private float managementFee;
-
-    private float others;
-
-    private float total;
+    private String period;
 
     private LocalDateTime billDate;
 
@@ -49,8 +42,6 @@ public class Bill {
 
     @Nationalized
     private String status;
-
-    private String billType;
 
     @OneToOne
     @JoinColumn(name = "payment_id", referencedColumnName = "paymentId")

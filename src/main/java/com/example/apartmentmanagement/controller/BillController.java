@@ -2,6 +2,7 @@ package com.example.apartmentmanagement.controller;
 
 import com.example.apartmentmanagement.dto.BillResponseDTO;
 import com.example.apartmentmanagement.dto.BillRequestDTO;
+import com.example.apartmentmanagement.entities.Bill;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.service.BillService;
@@ -26,6 +27,20 @@ public class BillController {
     @GetMapping("/viewAll")
     public ResponseEntity<Object> getAllBills() {
         List<BillResponseDTO> billResponseDTOS = billService.getAllBill();
+        Map<String, Object> response = new HashMap<>();
+        if (billResponseDTOS.isEmpty()) {
+            response.put("message", "Chưa có hoá đơn nào");
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+        response.put("data", billResponseDTOS);
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/getRentorBills/{rentorId}")
+    public ResponseEntity<Object> getRentorBills(@PathVariable Long rentorId) {
+        List<BillResponseDTO> billResponseDTOS = billService.viewRentorBills(rentorId);
         Map<String, Object> response = new HashMap<>();
         if (billResponseDTOS.isEmpty()) {
             response.put("message", "Chưa có hoá đơn nào");
@@ -88,7 +103,7 @@ public class BillController {
         List<BillResponseDTO> billResponseDTOS = billService.viewBillList(user.getUserId());
         Map<String, Object> response = new HashMap<>();
         if (billResponseDTOS.isEmpty()) {
-            response.put("message", "Chưa thanh toán hoá đơn nào");
+            response.put("message", "Chưa có hóa đơn nào");
             response.put("status", HttpStatus.NOT_FOUND.value());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
@@ -103,11 +118,33 @@ public class BillController {
      * @param request
      * @return
      */
-    @PostMapping("/create")
-    public ResponseEntity<Object> createBill(@RequestBody BillRequestDTO request) {
+    @PostMapping("/createBillConsumption")
+    public ResponseEntity<Object> createBillConsumption(@RequestBody BillRequestDTO request) {
         Map<String, Object> response = new HashMap<>();
         try {
-            BillResponseDTO result = billService.addBill(request);
+            BillResponseDTO result = billService.addBillConsumption(request);
+            response.put("status", HttpStatus.CREATED.value());
+            response.put("data", result);
+            response.put("message", "Tạo hoá đơn thành công");
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (RuntimeException e) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
+    /**
+     * (Owner) Tao hoa don cho rentor
+     *
+     * @param request
+     * @return
+     */
+    @PostMapping("/createBillMonthPaid")
+    public ResponseEntity<Object> createBillMonthPaid(@RequestBody BillRequestDTO request) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            BillResponseDTO result = billService.addBillMonthPaid(request);
             response.put("status", HttpStatus.CREATED.value());
             response.put("data", result);
             response.put("message", "Tạo hoá đơn thành công");

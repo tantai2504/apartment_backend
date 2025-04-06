@@ -68,6 +68,7 @@ public class HomeController {
             dto.put("birthday", user.getBirthday());
             dto.put("idNumber", user.getIdNumber());
             dto.put("job", user.getJob());
+            dto.put("accountBallance", user.getAccountBalance());
             dto.put("apartment",
                     (user.getApartments() != null && !user.getApartments().isEmpty())
                             ? user.getApartments().stream().map(Apartment::getApartmentName).toList()

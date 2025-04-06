@@ -101,10 +101,12 @@ public class ApartmentController {
         return ResponseEntity.ok(response);
     }
 
-    //lay danh sach can ho da cho thue cua owner
-    @GetMapping("/get_own_rented_apartment")
-    public ResponseEntity<Object> getOwnRentedApartment(@RequestParam Long userId) {
-        List<ApartmentResponseDTO> apartments = apartmentService.getOwnRentedApartment(userId);
+
+    //lay can ho da cho thue
+    @GetMapping("/getOwnerApartmentRented/{userId}")
+    public ResponseEntity<Object> getOwnApartmentRented(@PathVariable Long userId) {
+        List<ApartmentResponseDTO> apartments = apartmentService.getOwnApartmentRented(userId);
+
         Map<String, Object> response = new HashMap<>();
         if (apartments.isEmpty()) {
             response.put("message", "Chưa cho thuê căn hộ nào");

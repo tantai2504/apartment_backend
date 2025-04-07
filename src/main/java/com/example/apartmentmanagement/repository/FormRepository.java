@@ -10,4 +10,5 @@ import java.util.List;
 public interface FormRepository extends JpaRepository<Form, Long> {
     List<Form> findByUserUserId(Long userId);
     List<Form> findByFormType(String formType);
+    List<Form> findByApartmentApartmentId(Long apartmentId);
 }

@@ -2,8 +2,11 @@ package com.example.apartmentmanagement.serviceImpl;
 
 import com.cloudinary.Cloudinary;
 import com.cloudinary.utils.ObjectUtils;
+import com.example.apartmentmanagement.dto.FormRequestDTO;
+import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.Form;
 import com.example.apartmentmanagement.entities.User;
+import com.example.apartmentmanagement.repository.ApartmentRepository;
 import com.example.apartmentmanagement.repository.FormRepository;
 import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.service.FormService;
@@ -20,28 +23,39 @@ public class FormServiceImpl implements FormService {
 
     private final FormRepository formRepository;
     private final UserRepository userRepository;
+
+    private final ApartmentRepository apartmentRepository;
     private final Cloudinary cloudinary;
 
-    public FormServiceImpl(FormRepository formRepository, UserRepository userRepository, Cloudinary cloudinary) {
+    public FormServiceImpl(FormRepository formRepository, UserRepository userRepository,ApartmentRepository apartmentRepository, Cloudinary cloudinary) {
         this.formRepository = formRepository;
         this.userRepository = userRepository;
+        this.apartmentRepository = apartmentRepository;
         this.cloudinary = cloudinary;
     }
 
     @Override
-    public Form uploadForm(Long userId, String formType, MultipartFile file) {
+    public Form uploadForm(Long userId, FormRequestDTO dto) {
         try {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("User not found"));
+            Apartment apartment = apartmentRepository.findById(dto.getApartmentId())
+                    .orElseThrow(() -> new RuntimeException("Apartment not found"));
 
-            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            Map uploadResult = cloudinary.uploader().upload(dto.getFile().getBytes(), ObjectUtils.emptyMap());
 
             Form form = new Form();
-            form.setFormType(formType);
+            form.setFormType(dto.getFormType());
+            form.setStatus(dto.getStatus());
             form.setFileUrl(uploadResult.get("secure_url").toString());
-            form.setFileName(file.getOriginalFilename());
+            form.setFileName(dto.getFile().getOriginalFilename());
             form.setCreatedAt(new Date());
             form.setUser(user);
+            form.setApartment(apartment);
+
+            if ("approved".equalsIgnoreCase(dto.getStatus())) {
+                form.setExecutedAt(new Date());
+            }
 
             return formRepository.save(form);
         } catch (IOException e) {
@@ -50,23 +64,32 @@ public class FormServiceImpl implements FormService {
     }
 
     @Override
-    public Form editForm(Long formId, String formType, MultipartFile file) {
+    public Form editForm(Long formId, FormRequestDTO dto) {
         try {
             Form form = formRepository.findById(formId)
                     .orElseThrow(() -> new RuntimeException("Form not found"));
+            Apartment apartment = apartmentRepository.findById(dto.getApartmentId())
+                    .orElseThrow(() -> new RuntimeException("Apartment not found"));
 
-            Map uploadResult = cloudinary.uploader().upload(file.getBytes(), ObjectUtils.emptyMap());
+            Map uploadResult = cloudinary.uploader().upload(dto.getFile().getBytes(), ObjectUtils.emptyMap());
 
-            form.setFormType(formType);
+            form.setFormType(dto.getFormType());
+            form.setStatus(dto.getStatus());
             form.setFileUrl(uploadResult.get("secure_url").toString());
-            form.setFileName(file.getOriginalFilename());
+            form.setFileName(dto.getFile().getOriginalFilename());
             form.setCreatedAt(new Date());
+            form.setApartment(apartment);
+
+            if ("approved".equalsIgnoreCase(dto.getStatus())) {
+                form.setExecutedAt(new Date());
+            }
 
             return formRepository.save(form);
         } catch (IOException e) {
             throw new RuntimeException("File upload failed", e);
         }
     }
+
 
     @Override
     public void deleteForm(Long formId) {

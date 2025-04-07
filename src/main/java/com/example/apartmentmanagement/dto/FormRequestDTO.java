@@ -1,13 +1,12 @@
 package com.example.apartmentmanagement.dto;
 
-import lombok.*;
+import lombok.Data;
 import org.springframework.web.multipart.MultipartFile;
 
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-public class FormDto {
+@Data
+public class FormRequestDTO {
     private String formType;
+    private String status;
+    private Long apartmentId;
     private MultipartFile file;
 }

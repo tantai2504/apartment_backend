@@ -1,6 +1,6 @@
 package com.example.apartmentmanagement.controller;
 
-import com.example.apartmentmanagement.dto.FormDto;
+import com.example.apartmentmanagement.dto.FormRequestDTO;
 import com.example.apartmentmanagement.entities.Form;
 import com.example.apartmentmanagement.service.FormService;
 import org.springframework.http.HttpStatus;
@@ -26,13 +26,13 @@ public class FormController {
     @PostMapping(value = "/upload/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Object> uploadForm(
             @PathVariable Long userId,
-            @RequestParam("formType") String formType,
-            @RequestParam("file") MultipartFile file
+            @RequestPart("dto") FormRequestDTO dto,
+            @RequestPart("file") MultipartFile file
     ) {
-        FormDto formDto = new FormDto(formType, file);
+        dto.setFile(file);
         Map<String, Object> response = new HashMap<>();
         try {
-            Form form = formService.uploadForm(userId, formDto.getFormType(),formDto.getFile());
+            Form form = formService.uploadForm(userId, dto);
             response.put("status", HttpStatus.CREATED.value());
             response.put("data", form);
             response.put("message", "Form uploaded successfully");
@@ -44,16 +44,16 @@ public class FormController {
         }
     }
 
-    @PutMapping("/edit/{formId}")
+    @PutMapping(value = "/edit/{formId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Object> editForm(
             @PathVariable Long formId,
-            @RequestParam("formType") String formType,
-            @RequestParam("file") MultipartFile file
+            @RequestPart("dto") FormRequestDTO dto,
+            @RequestPart("file") MultipartFile file
     ) {
-        FormDto formDto = new FormDto(formType, file);
+        dto.setFile(file);
         Map<String, Object> response = new HashMap<>();
         try {
-            Form form = formService.editForm(formId, formDto.getFormType(), formDto.getFile());
+            Form form = formService.editForm(formId, dto);
             response.put("status", HttpStatus.OK.value());
             response.put("data", form);
             response.put("message", "Form edited successfully");

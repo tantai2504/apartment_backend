@@ -10,6 +10,9 @@ public interface ApartmentService {
 
     String addApartment(Apartment apartment);
 
+    //list danh sach can ho cua owner
+    List<ApartmentResponseDTO> getOwnApartments(Long userId);
+
     List<ApartmentResponseDTO> showApartment();
 
     Apartment getApartmentById (Long id);

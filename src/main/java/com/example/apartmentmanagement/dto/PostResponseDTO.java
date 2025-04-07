@@ -46,4 +46,8 @@ public class PostResponseDTO {
 
     private Long depositUserId;
 
+    private String role;
+
+    private String fullName;
+
 }

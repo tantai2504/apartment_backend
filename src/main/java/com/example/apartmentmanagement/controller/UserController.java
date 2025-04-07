@@ -260,25 +260,14 @@ public class UserController {
     @PutMapping("/update_verification")
     public ResponseEntity<Object> updateVerification(
             @RequestParam("verificationId") Long verificationId,
-            @RequestParam("verificationFormName") String verificationFormName,
-            @RequestParam("verificationFormType") int verificationFormType,
-            @RequestParam("email") String email,
-            @RequestParam("phoneNumber") String phoneNumber,
-            @RequestParam("apartmentName") String apartmentName,
             @RequestParam("contractStartDate") String contractStartDateStr,
             @RequestParam(value = "contractEndDate", required = false) String contractEndDateStr,
             @RequestPart("imageFile") List<MultipartFile> imageFiles) {
         LocalDateTime contractStartDate = LocalDateTime.parse(contractStartDateStr, DateTimeFormatter.ISO_DATE_TIME);
-
-        LocalDateTime contractEndDate = null;
-        if (verificationFormType != 2 && contractEndDateStr != null && !contractEndDateStr.isEmpty()) {
-            contractEndDate = LocalDateTime.parse(contractEndDateStr, DateTimeFormatter.ISO_DATE_TIME);
-        }
+        LocalDateTime contractEndDate = LocalDateTime.parse(contractEndDateStr, DateTimeFormatter.ISO_DATE_TIME);
 
         Map<String, Object> response = new HashMap<>();
-        VerifyUserRequestDTO verifyUserDTO = new VerifyUserRequestDTO(
-                verificationFormName, verificationFormType, apartmentName, email, phoneNumber,
-                contractStartDate, contractEndDate);
+        VerifyUserRequestDTO verifyUserDTO = new VerifyUserRequestDTO(contractStartDate, contractEndDate);
         try {
             VerifyUserResponseDTO verifyUserResponseDTO = userService.updateVerifyUser(verificationId, verifyUserDTO, imageFiles);
             response.put("status", HttpStatus.CREATED.value());

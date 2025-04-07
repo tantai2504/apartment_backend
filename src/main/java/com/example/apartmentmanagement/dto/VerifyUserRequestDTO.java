@@ -25,4 +25,9 @@ public class VerifyUserRequestDTO {
     private LocalDateTime contractStartDate;
 
     private LocalDateTime contractEndDate;
+
+    public VerifyUserRequestDTO(LocalDateTime contractStartDate, LocalDateTime contractEndDate) {
+        this.contractStartDate = contractStartDate;
+        this.contractEndDate = contractEndDate;
+    }
 }

@@ -613,16 +613,8 @@ public class UserServiceImpl implements UserService {
 
         User user = getUserByEmailOrUserName(verifyUserDTO.getEmail());
 
-        verificationForm.setVerificationFormName(verifyUserDTO.getVerificationFormName());
-        verificationForm.setVerificationFormType(verifyUserDTO.getVerificationFormType());
-        verificationForm.setEmail(verifyUserDTO.getEmail());
-        verificationForm.setApartmentName(verifyUserDTO.getApartmentName());
-        verificationForm.setPhoneNumber(user.getPhone());
         verificationForm.setContractStartDate(verifyUserDTO.getContractStartDate());
         verificationForm.setContractEndDate(verifyUserDTO.getContractEndDate());
-        verificationForm.setUserName(user.getUserName());
-        verificationForm.setFullName(user.getFullName());
-        verificationForm.setVerified(false);
 
         // Xoá ảnh cũ nếu có
         List<ContractImages> oldImages = verificationForm.getContractImages();

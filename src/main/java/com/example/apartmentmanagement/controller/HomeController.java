@@ -107,7 +107,7 @@ public class HomeController {
         Map<String, Object> response = new HashMap<>();
         try {
             VerifyRegisterRequestDTO verifyRegisterRequestDTO = userService.verifyRegister(request);
-            emailService.sendOtpEmail(request.getEmail(), otp);
+            emailService.sendRegistrationOtpEmail(request.getEmail(), otp);
             response.put("status", HttpStatus.OK.value());
             response.put("message", "Đã gửi otp");
             response.put("data", verifyRegisterRequestDTO);
@@ -169,7 +169,7 @@ public class HomeController {
 
         String otp = String.valueOf(new Random().nextInt(900000) + 100000); // Tạo mã OTP 6 chữ số
         otpStorage.put(email, otp);
-        emailService.sendOtpEmail(email, otp);
+        emailService.sendForgotPasswordOtpEmail(email, otp);
 
         response.put("message", "Mã OTP đã được gửi đến email của bạn");
         response.put("status", HttpStatus.OK.value());

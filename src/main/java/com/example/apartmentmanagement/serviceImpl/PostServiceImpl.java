@@ -56,7 +56,9 @@ public class PostServiceImpl implements PostService {
                 post.getPostDate(),
                 post.getUser().getUserName(),
                 post.getPostImages().stream().map(PostImages::getPostImagesUrl).toList(),
-                post.getDepositUserId()
+                post.getDepositUserId(),
+                post.getUser().getRole(),
+                post.getUser().getFullName()
                 ))
         .collect(Collectors.toList());
     }
@@ -78,7 +80,9 @@ public class PostServiceImpl implements PostService {
                 post.getPostDate(),
                 post.getUser().getUserName(),
                 post.getPostImages().stream().map(PostImages::getPostImagesUrl).toList(),
-                post.getDepositUserId()
+                post.getDepositUserId(),
+                post.getUser().getRole(),
+                post.getUser().getFullName()
         );
         return dto;
     }
@@ -154,7 +158,9 @@ public class PostServiceImpl implements PostService {
                 post.getPostDate(),
                 post.getUser().getUserName(),
                 post.getPostImages().stream().map(PostImages::getPostImagesUrl).toList(),
-                post.getDepositUserId()
+                post.getDepositUserId(),
+                post.getUser().getRole(),
+                post.getUser().getFullName()
         );
         return dto;
     }
@@ -225,7 +231,9 @@ public class PostServiceImpl implements PostService {
                 post.getPostDate(),
                 post.getUser().getUserName(),
                 post.getPostImages().stream().map(PostImages::getPostImagesUrl).toList(),
-                post.getDepositUserId()
+                post.getDepositUserId(),
+                post.getUser().getRole(),
+                post.getUser().getFullName()
         );
     }
 
@@ -315,7 +323,9 @@ public class PostServiceImpl implements PostService {
                 post.getPostDate(),
                 post.getUser().getUserName(),
                 post.getPostImages().stream().map(PostImages::getPostImagesUrl).toList(),
-                post.getDepositUserId()
+                post.getDepositUserId(),
+                post.getUser().getRole(),
+                post.getUser().getFullName()
         )).collect(Collectors.toList());
     }
 
@@ -343,7 +353,9 @@ public class PostServiceImpl implements PostService {
                         post.getPostDate(),
                         post.getUser().getUserName(),
                         post.getPostImages().stream().map(PostImages::getPostImagesUrl).toList(),
-                        post.getDepositUserId()
+                        post.getDepositUserId(),
+                        post.getUser().getRole(),
+                        post.getUser().getFullName()
                 ))
                 .collect(Collectors.toList());
     }

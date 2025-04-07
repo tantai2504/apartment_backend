@@ -33,6 +33,36 @@ public class ApartmentServiceImpl implements ApartmentService{
     }
 
     @Override
+    public List<ApartmentResponseDTO> getOwnApartments(Long userId) {
+        User user = userRepository.findById(userId).get();
+        if (user != null) {
+            if (!user.getRole().equals("Owner")) {
+                throw new RuntimeException("Only owner can add");
+            }
+
+            List<Apartment> apartments = user.getApartments();
+
+            return apartments.stream().map(apartment -> new ApartmentResponseDTO(
+                    apartment.getApartmentId(),
+                    apartment.getApartmentName(),
+                    apartment.getHouseholder(),
+                    apartment.getTotalNumber(),
+                    apartment.getStatus(),
+                    apartment.getNumberOfBedrooms(),
+                    apartment.getNumberOfBathrooms(),
+                    apartment.getNote(),
+                    apartment.getDirection(),
+                    apartment.getFloor(),
+                    apartment.getArea(),
+                    apartment.getUsers().stream().map(User::getUserName).toList()
+            )).toList();
+
+        } else {
+            throw new RuntimeException("User not found");
+        }
+    }
+
+    @Override
     public List<ApartmentResponseDTO> showApartment() {
         return apartmentRepository.findAll().stream().map(apartment -> new ApartmentResponseDTO(
                 apartment.getApartmentId(),

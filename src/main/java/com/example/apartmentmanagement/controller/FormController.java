@@ -1,6 +1,6 @@
 package com.example.apartmentmanagement.controller;
 
-import com.example.apartmentmanagement.dto.FormDto;
+import com.example.apartmentmanagement.dto.FormRequestDTO;
 import com.example.apartmentmanagement.entities.Form;
 import com.example.apartmentmanagement.service.FormService;
 import org.springframework.http.HttpStatus;
@@ -23,16 +23,17 @@ public class FormController {
         this.formService = formService;
     }
 
-    @PostMapping(value = "/upload/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/upload/{userId}/{apartmentId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Object> uploadForm(
             @PathVariable Long userId,
+            @PathVariable Long apartmentId,
             @RequestParam("formType") String formType,
             @RequestParam("file") MultipartFile file
     ) {
-        FormDto formDto = new FormDto(formType, file);
+        FormRequestDTO formDto = new FormRequestDTO(formType, file);
         Map<String, Object> response = new HashMap<>();
         try {
-            Form form = formService.uploadForm(userId, formDto.getFormType(),formDto.getFile());
+            Form form = formService.uploadForm(userId, apartmentId, formDto.getFormType(), formDto.getFile());
             response.put("status", HttpStatus.CREATED.value());
             response.put("data", form);
             response.put("message", "Form uploaded successfully");
@@ -44,16 +45,17 @@ public class FormController {
         }
     }
 
-    @PutMapping("/edit/{formId}")
+    @PutMapping("/edit/{formId}/{apartmentId}")
     public ResponseEntity<Object> editForm(
             @PathVariable Long formId,
+            @PathVariable Long apartmentId,
             @RequestParam("formType") String formType,
             @RequestParam("file") MultipartFile file
     ) {
-        FormDto formDto = new FormDto(formType, file);
+        FormRequestDTO formDto = new FormRequestDTO(formType, file);
         Map<String, Object> response = new HashMap<>();
         try {
-            Form form = formService.editForm(formId, formDto.getFormType(), formDto.getFile());
+            Form form = formService.editForm(formId, apartmentId, formDto.getFormType(), formDto.getFile());
             response.put("status", HttpStatus.OK.value());
             response.put("data", form);
             response.put("message", "Form edited successfully");

@@ -41,9 +41,6 @@ public class Post {
 
     private LocalDateTime postDate;
 
-    // Check trang thai cua post, neu la "hidden" thi an di
-    private String status;
-
     private Float price = 0.0f;
 
     private Float depositPrice = 0.0f;
@@ -55,9 +52,6 @@ public class Post {
     @ManyToOne
     @JoinColumn(name = "user_Id", nullable = false)
     private User user;
-
-    @OneToOne(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Deposit deposit;
 
     @OneToOne
     @JoinColumn(name = "payment_id", referencedColumnName = "paymentId")

@@ -26,8 +26,8 @@ public class Deposit {
     private String status;
 
     @OneToOne
-    @JoinColumn(name = "post_id", referencedColumnName = "postId")
-    private Post post;
+    @JoinColumn(name = "apartment_id", referencedColumnName = "apartment_id")
+    private Apartment apartment;
 
     @OneToOne
     @JoinColumn(name = "payment_id", referencedColumnName = "paymentId")

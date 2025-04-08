@@ -2,10 +2,7 @@ package com.example.apartmentmanagement.serviceImpl;
 
 import com.example.apartmentmanagement.dto.DepositRequestDTO;
 import com.example.apartmentmanagement.dto.DepositResponseDTO;
-import com.example.apartmentmanagement.entities.Deposit;
-import com.example.apartmentmanagement.entities.Payment;
-import com.example.apartmentmanagement.entities.Post;
-import com.example.apartmentmanagement.entities.User;
+import com.example.apartmentmanagement.entities.*;
 import com.example.apartmentmanagement.repository.DepositRepository;
 import com.example.apartmentmanagement.repository.PaymentRepository;
 import com.example.apartmentmanagement.repository.PostRepository;
@@ -43,6 +40,8 @@ public class DepositServiceImpl implements DepositService {
     public DepositResponseDTO processPaymentSuccess(DepositRequestDTO depositRequestDTO) {
         Post post = postRepository.findById(depositRequestDTO.getPostId()).get();
 
+        Apartment apartment = post.getApartment();
+
         if (post.getDepositCheck().equals("ongoing") && post.getDepositUserId() != null) {
             User user = userRepository.findById(depositRequestDTO.getDepositUserId()).get();
             User postOwner = post.getUser();
@@ -56,7 +55,7 @@ public class DepositServiceImpl implements DepositService {
             paymentRepository.save(payment);
 
             Deposit deposit = depositRepository.findById(depositRequestDTO.getDepositId()).get();
-            deposit.setPost(post);
+            deposit.setApartment(apartment);
             deposit.setUser(user);
             deposit.setPayment(payment);
             deposit.setStatus("done");
@@ -95,12 +94,14 @@ public class DepositServiceImpl implements DepositService {
     public DepositResponseDTO depositFlag(DepositRequestDTO depositRequestDTO) {
         Post post = postRepository.findById(depositRequestDTO.getPostId()).get();
 
+        Apartment apartment = post.getApartment();
+
         User user = post.getUser();
 
         if (post.getDepositUserId() == null) {
 
             Deposit deposit = new Deposit();
-            deposit.setPost(post);
+            deposit.setApartment(apartment);
             deposit.setUser(user);
             deposit.setPayment(null);
             deposit.setStatus("ongoing");
@@ -124,12 +125,14 @@ public class DepositServiceImpl implements DepositService {
     public DepositResponseDTO cancel(DepositRequestDTO depositRequestDTO) {
         Post post = postRepository.findById(depositRequestDTO.getPostId()).get();
 
+        Apartment apartment = post.getApartment();
+
         User user = post.getUser();
 
         if (post.getDepositCheck().equals("ongoing") && post.getDepositUserId() != null) {
 
             Deposit deposit = depositRepository.findById(depositRequestDTO.getDepositId()).get();
-            deposit.setPost(post);
+            deposit.setApartment(apartment);
             deposit.setUser(user);
             deposit.setPayment(null);
             deposit.setStatus("none");

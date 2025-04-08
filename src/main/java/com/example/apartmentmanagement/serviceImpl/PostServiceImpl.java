@@ -122,7 +122,6 @@ public class PostServiceImpl implements PostService {
         post.setDepositCheck(postDTO.getDepositCheck());
         post.setContent(postDTO.getContent());
         post.setApartment(apartment);
-        post.setStatus("ongoing");
         post.setDepositPrice(postDTO.getDepositPrice());
 
         User user = userRepository.findByUserNameOrEmail(postDTO.getUserName());
@@ -258,7 +257,6 @@ public class PostServiceImpl implements PostService {
     @Override
     public void hiddenPost(Long id) {
         Post post = postRepository.findById(id).get();
-        post.setStatus("hidden");
         postRepository.save(post);
     }
 

@@ -1,5 +1,6 @@
 package com.example.apartmentmanagement.controller;
 
+import com.example.apartmentmanagement.dto.DepositListResponseDTO;
 import com.example.apartmentmanagement.dto.DepositRequestDTO;
 import com.example.apartmentmanagement.dto.DepositResponseDTO;
 import com.example.apartmentmanagement.repository.PostRepository;
@@ -48,6 +49,22 @@ public class DepositController {
 //            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
 //        }
 //    }
+
+    @GetMapping("/getall")
+    public ResponseEntity<Object> getAllDeposits() {
+        List<DepositListResponseDTO> deposits = depositService.getAllDeposits();
+        Map<String, Object> response = new HashMap<>();
+
+        if (deposits.isEmpty()) {
+            response.put("message", "Không có đợt đặt cọc nào");
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.ok(response);
+        }
+
+        response.put("status", HttpStatus.OK.value());
+        response.put("data", deposits);
+        return ResponseEntity.ok(response);
+    }
 
     @PostMapping("/create")
     public ResponseEntity<Map<String, Object>> makeDeposit(

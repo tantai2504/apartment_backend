@@ -1,6 +1,7 @@
 package com.example.apartmentmanagement.serviceImpl;
 
 import com.example.apartmentmanagement.dto.ApartmentResponseInUserDTO;
+import com.example.apartmentmanagement.dto.ConsumptionRequestDTO;
 import com.example.apartmentmanagement.dto.ConsumptionResponseDTO;
 import com.example.apartmentmanagement.dto.UserResponseDTO;
 import com.example.apartmentmanagement.entities.Apartment;
@@ -123,10 +124,6 @@ public class ConsumptionServiceImpl implements ConsumptionService {
 
     @Override
     public List<ConsumptionResponseDTO> processExcelFile(MultipartFile file, Long createdUserId) throws IOException {
-        User verifiedUser = userRepository.findById(createdUserId).orElse(null);
-        if (verifiedUser.getRole().equals("Admin") || verifiedUser.getRole().equals("Staff")) {
-
-        }
         List<ConsumptionResponseDTO> responseDTOs = new ArrayList<>();
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
             Sheet sheet = workbook.getSheetAt(0);
@@ -142,15 +139,42 @@ public class ConsumptionServiceImpl implements ConsumptionService {
 
             for (Row row : sheet) {
                 if (row.getRowNum() == 0) {
+                    continue; // bỏ qua dòng tiêu đề
+                }
+
+                if (row == null) {
                     continue;
                 }
 
-                String apartmentName = row.getCell(0).getStringCellValue();
-                LocalDate consumptionDate = row.getCell(1).getLocalDateTimeCellValue().toLocalDate();
-                float lastMonthWaterConsumption = (float) row.getCell(2).getNumericCellValue();
-                float waterConsumption = (float) row.getCell(3).getNumericCellValue();
+                // Lấy từng cell, kiểm tra null trước khi dùng
+                Cell apartmentCell = row.getCell(0);
+                Cell dateCell = row.getCell(1);
+                Cell currentMonthCell = row.getCell(2);
+
+                // Nếu thiếu 1 trong 4 cell thì bỏ qua dòng
+                if (apartmentCell == null || dateCell == null || currentMonthCell == null) {
+                    continue;
+                }
+                String apartmentName = apartmentCell.getStringCellValue();
+                LocalDate consumptionDate = dateCell.getLocalDateTimeCellValue().toLocalDate();
+                float waterConsumption = (float) currentMonthCell.getNumericCellValue();
 
                 Apartment apartment = apartmentRepository.findApartmentByApartmentName(apartmentName);
+                if (apartment == null) continue;
+
+                // 🔥 Lấy consumption tháng trước từ DB
+                LocalDate lastMonth = consumptionDate.minusMonths(1);
+                Consumption lastMonthConsumption = consumptionRepository
+                        .findTopByApartmentAndConsumptionDateBetweenOrderByConsumptionDateDesc(
+                                apartment,
+                                lastMonth.withDayOfMonth(1),
+                                lastMonth.withDayOfMonth(lastMonth.lengthOfMonth())
+                        );
+
+                float lastMonthWaterConsumption = lastMonthConsumption != null
+                        ? lastMonthConsumption.getWaterConsumption()
+                        : 0f;
+
                 List<User> users = apartment.getUsers();
                 User owner = users.stream()
                         .filter(user -> "Owner".equals(user.getRole()))
@@ -171,7 +195,7 @@ public class ConsumptionServiceImpl implements ConsumptionService {
                         consumptionDate,
                         waterConsumption,
                         lastMonthWaterConsumption,
-                        owner.getUserName(),
+                        owner != null ? owner.getUserName() : "Unknown",
                         apartmentName
                 );
                 responseDTOs.add(responseDTO);
@@ -179,8 +203,23 @@ public class ConsumptionServiceImpl implements ConsumptionService {
         } catch (IOException e) {
             throw new RuntimeException("Failed to read Excel file", e);
         }
-
         return responseDTOs;
+    }
+
+    @Override
+    public ConsumptionResponseDTO getConsumptionById(Long consumptionId) {
+        Consumption consumption = consumptionRepository.findById(consumptionId).orElse(null);
+        return null;
+    }
+
+    @Override
+    public ConsumptionResponseDTO updateConsumption(Long consumptionId, ConsumptionRequestDTO response) {
+        return null;
+    }
+
+    @Override
+    public void deleteConsumption(Long consumptionId) {
+
     }
 
     private UserResponseDTO convertToUserResponseDTO(User user) {

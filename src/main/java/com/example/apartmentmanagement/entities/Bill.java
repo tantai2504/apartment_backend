@@ -48,7 +48,7 @@ public class Bill {
     private Payment payment;
 
     @ManyToOne
-    @JoinColumn(name = "user_Id", nullable = false)
+    @JoinColumn(name = "received_user_id", nullable = false)
     private User user;
 
     @ManyToOne

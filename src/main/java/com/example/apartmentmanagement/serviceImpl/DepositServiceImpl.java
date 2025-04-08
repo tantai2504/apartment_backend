@@ -55,7 +55,7 @@ public class DepositServiceImpl implements DepositService {
             payment.setPaymentType("deposit");
             paymentRepository.save(payment);
 
-            Deposit deposit = new Deposit();
+            Deposit deposit = depositRepository.findById(depositRequestDTO.getDepositId()).get();
             deposit.setPost(post);
             deposit.setUser(user);
             deposit.setPayment(payment);
@@ -94,7 +94,18 @@ public class DepositServiceImpl implements DepositService {
     @Override
     public DepositResponseDTO depositFlag(DepositRequestDTO depositRequestDTO) {
         Post post = postRepository.findById(depositRequestDTO.getPostId()).get();
+
+        User user = post.getUser();
+
         if (post.getDepositUserId() == null) {
+
+            Deposit deposit = new Deposit();
+            deposit.setPost(post);
+            deposit.setUser(user);
+            deposit.setPayment(null);
+            deposit.setStatus("ongoing");
+            depositRepository.save(deposit);
+
             post.setDepositUserId(depositRequestDTO.getDepositUserId());
             post.setDepositCheck("ongoing");
             post.setDepositPrice(depositRequestDTO.getDepositPrice());
@@ -112,7 +123,18 @@ public class DepositServiceImpl implements DepositService {
     @Override
     public DepositResponseDTO cancel(DepositRequestDTO depositRequestDTO) {
         Post post = postRepository.findById(depositRequestDTO.getPostId()).get();
+
+        User user = post.getUser();
+
         if (post.getDepositCheck().equals("ongoing") && post.getDepositUserId() != null) {
+
+            Deposit deposit = depositRepository.findById(depositRequestDTO.getDepositId()).get();
+            deposit.setPost(post);
+            deposit.setUser(user);
+            deposit.setPayment(null);
+            deposit.setStatus("none");
+            depositRepository.save(deposit);
+
             post.setDepositUserId(null);
             post.setDepositCheck("none");
             postRepository.save(post);

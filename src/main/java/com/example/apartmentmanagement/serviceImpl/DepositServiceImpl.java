@@ -1,5 +1,6 @@
 package com.example.apartmentmanagement.serviceImpl;
 
+import com.example.apartmentmanagement.dto.DepositListResponseDTO;
 import com.example.apartmentmanagement.dto.DepositRequestDTO;
 import com.example.apartmentmanagement.dto.DepositResponseDTO;
 import com.example.apartmentmanagement.entities.Deposit;
@@ -15,8 +16,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.apartmentmanagement.service.NotificationService;
 import vn.payos.PayOS;
+import java.util.List;
 
 import java.time.LocalDateTime;
+import java.util.stream.Collectors;
 
 @Service
 public class DepositServiceImpl implements DepositService {
@@ -124,5 +127,36 @@ public class DepositServiceImpl implements DepositService {
         } else {
             throw new RuntimeException("Không thể hoàn lại thanh toán");
         }
+    }
+
+    @Override
+    public List<DepositListResponseDTO> getAllDeposits() {
+        List<Deposit> deposits = depositRepository.findAll();
+        return deposits.stream().map(deposit -> {
+            DepositListResponseDTO dto = new DepositListResponseDTO();
+            dto.setDepositId(deposit.getDepositId());
+            dto.setStatus(deposit.getStatus());
+
+            dto.setPostOwnerId(deposit.getPost().getUser().getUserId());
+            dto.setPostOwnerName(deposit.getPost().getUser().getFullName());
+
+            dto.setDepositUserId(deposit.getUser().getUserId());
+            dto.setDepositUserName(deposit.getUser().getFullName());
+
+            dto.setPostId(deposit.getPost().getPostId());
+            dto.setPostTitle(deposit.getPost().getTitle());
+            dto.setDepositPrice(deposit.getPost().getDepositPrice());
+            dto.setDepositCheck(deposit.getPost().getDepositCheck());
+
+            if (deposit.getPayment() != null) {
+                dto.setPaymentId(deposit.getPayment().getPaymentId());
+                dto.setPaymentDate(deposit.getPayment().getPaymentDate());
+                dto.setPaymentInfo(deposit.getPayment().getPaymentInfo());
+            }
+
+            dto.setApartmentName(deposit.getPost().getApartment().getApartmentName());
+
+            return dto;
+        }).collect(Collectors.toList());
     }
 }

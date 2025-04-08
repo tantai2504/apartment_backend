@@ -175,6 +175,10 @@ public class ConsumptionServiceImpl implements ConsumptionService {
                         ? lastMonthConsumption.getWaterConsumption()
                         : 0f;
 
+                if (waterConsumption < lastMonthWaterConsumption) {
+                    throw new RuntimeException("water consumption less than last month consumption");
+                }
+
                 List<User> users = apartment.getUsers();
                 User owner = users.stream()
                         .filter(user -> "Owner".equals(user.getRole()))

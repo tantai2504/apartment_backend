@@ -30,8 +30,8 @@ public class BillController {
         Map<String, Object> response = new HashMap<>();
         if (billResponseDTOS.isEmpty()) {
             response.put("message", "Chưa có hoá đơn nào");
-            response.put("status", HttpStatus.NOT_FOUND.value());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         }
         response.put("data", billResponseDTOS);
         response.put("status", HttpStatus.OK.value());
@@ -44,8 +44,8 @@ public class BillController {
         Map<String, Object> response = new HashMap<>();
         if (billResponseDTOS.isEmpty()) {
             response.put("message", "Chưa có hoá đơn nào");
-            response.put("status", HttpStatus.NOT_FOUND.value());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         }
         response.put("data", billResponseDTOS);
         response.put("status", HttpStatus.OK.value());
@@ -66,8 +66,8 @@ public class BillController {
         Map<String, Object> response = new HashMap<>();
         if (billResponseDTOS.isEmpty()) {
             response.put("message", "Chưa thanh toán hoá đơn nào");
-            response.put("status", HttpStatus.NOT_FOUND.value());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         }
         response.put("data", billResponseDTOS);
         response.put("status", HttpStatus.OK.value());
@@ -89,8 +89,8 @@ public class BillController {
         Map<String, Object> response = new HashMap<>();
         if (billResponseDTOS.isEmpty()) {
             response.put("message", "Chưa thanh toán hoá đơn nào");
-            response.put("status", HttpStatus.NOT_FOUND.value());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         }
         response.put("data", billResponseDTOS);
         response.put("status", HttpStatus.OK.value());
@@ -104,8 +104,8 @@ public class BillController {
         Map<String, Object> response = new HashMap<>();
         if (billResponseDTOS.isEmpty()) {
             response.put("message", "Chưa có hóa đơn nào");
-            response.put("status", HttpStatus.NOT_FOUND.value());
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         }
         response.put("data", billResponseDTOS);
         response.put("status", HttpStatus.OK.value());
@@ -184,9 +184,9 @@ public class BillController {
         BillResponseDTO billResponseDTO = billService.getBillById(billId);
         Map<String, Object> response = new HashMap<>();
         if (billResponseDTO == null) {
-            response.put("status", HttpStatus.NOT_FOUND.value());
+            response.put("status", HttpStatus.OK.value());
             response.put("message", "Không tìm thấy hoá đơn này");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         } else {
             response.put("status", HttpStatus.OK.value());
             response.put("data", billResponseDTO);

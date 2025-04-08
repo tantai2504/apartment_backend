@@ -30,15 +30,17 @@ public class BankAccountController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/webhook")
-    public String receiveWebhook(@RequestBody String payload) {
-        // In ra dữ liệu nhận được từ webhook
-        System.out.println("Webhook đã nhận dữ liệu: " + payload);
+    @GetMapping("/check-payment-status/{billId}")
+    public ResponseEntity<String> checkPaymentStatus(@PathVariable Long billId) {
+        // Tạm thời mock luôn "PAID" để test FE
+        return ResponseEntity.ok("PAID");
+    }
 
-        // In ra thông báo "gọi webhook thành công"
-        System.out.println("Gọi webhook thành công");
+    @PostMapping("/update-payment-status")
+    public ResponseEntity<String> updatePaymentStatus(@RequestParam Long billId, @RequestParam String status) {
+        System.out.println("✅ Trạng thái thanh toán: " + status + " - Bill ID: " + billId);
 
-        // Trả về phản hồi cho Make
-        return "Webhook nhận thành công";
+
+        return ResponseEntity.ok("Đã nhận trạng thái thanh toán cho billId: " + billId);
     }
 }

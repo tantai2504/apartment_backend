@@ -255,8 +255,9 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void deletePost(Long id) {
-        postRepository.deleteById(id);
+    public void hiddenPost(Long id) {
+        Post post = postRepository.findById(id).get();
+        postRepository.save(post);
     }
 
     @Override

@@ -36,9 +36,6 @@ public class ApartmentServiceImpl implements ApartmentService{
     public List<ApartmentResponseDTO> getOwnApartments(Long userId) {
         User user = userRepository.findById(userId).get();
         if (user != null) {
-            if (!user.getRole().equals("Owner")) {
-                throw new RuntimeException("Only owner can add");
-            }
 
             List<Apartment> apartments = user.getApartments();
 

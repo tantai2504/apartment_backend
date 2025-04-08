@@ -78,12 +78,18 @@ public class ConsumptionController {
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (IllegalArgumentException e) {
             response.put("status", HttpStatus.BAD_REQUEST.value());
-            response.put("message", e.getMessage());
+            response.put("message", "IllegalArgumentException: " + e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         } catch (RuntimeException | IOException e) {
             response.put("status", HttpStatus.BAD_REQUEST.value());
             response.put("message", e.getMessage());
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
+    }
+
+    @PutMapping("/update_consumption/{consumptionId}")
+    public ResponseEntity<Object> updateConsumption(@PathVariable Long consumptionId, @RequestBody ConsumptionResponseDTO response) {
+        Map<String, Object> responseMap = new HashMap<>();
+        return null;
     }
 }

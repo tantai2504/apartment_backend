@@ -257,12 +257,6 @@ public class BillServiceImpl implements BillService {
     public BillResponseDTO addBillConsumption(BillRequestDTO billRequestDTO) {
         Consumption consumption = consumptionRepository.findById(billRequestDTO.getConsumptionId()).orElse(null);
         if (consumption.isBillCreated()) {
-//            List<Bill> bills = consumption.getBills();
-//            for (Bill bill : bills) {
-//                if (bill.getBillType().equals("water")) {
-//                    throw new RuntimeException("Đã tạo hoá đơn cho toà nhà này");
-//                }
-//            }
             throw new RuntimeException("Đã tạo hoá đơn này");
         }
 

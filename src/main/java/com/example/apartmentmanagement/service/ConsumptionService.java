@@ -1,5 +1,6 @@
 package com.example.apartmentmanagement.service;
 
+import com.example.apartmentmanagement.dto.ConsumptionRequestDTO;
 import com.example.apartmentmanagement.dto.ConsumptionResponseDTO;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,4 +12,7 @@ public interface ConsumptionService {
     List<ConsumptionResponseDTO> getAll();
     List<ConsumptionResponseDTO> viewAllConsumption(int month, int year);
     List<ConsumptionResponseDTO> processExcelFile(MultipartFile file, Long createdUserId) throws IOException;
+    ConsumptionResponseDTO getConsumptionById(Long consumptionId);
+    ConsumptionResponseDTO updateConsumption(Long consumptionId, ConsumptionRequestDTO response);
+    void deleteConsumption(Long consumptionId);
 }

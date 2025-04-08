@@ -193,8 +193,8 @@ public class ConsumptionServiceImpl implements ConsumptionService {
                 ConsumptionResponseDTO responseDTO = new ConsumptionResponseDTO(
                         consumption.getConsumptionId(),
                         consumptionDate,
-                        waterConsumption,
                         lastMonthWaterConsumption,
+                        waterConsumption,
                         owner != null ? owner.getUserName() : "Unknown",
                         apartmentName
                 );

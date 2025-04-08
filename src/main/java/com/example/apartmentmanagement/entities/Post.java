@@ -41,6 +41,9 @@ public class Post {
 
     private LocalDateTime postDate;
 
+    // Check trang thai cua post, neu la "hidden" thi an di
+    private String status;
+
     private Float price = 0.0f;
 
     private Float depositPrice = 0.0f;

@@ -93,6 +93,39 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public List<VerifyUserResponseDTO> showAllContract(String apartmentName) {
+        List<VerificationForm> forms = verificationFormRepository.findByApartmentNameIgnoreCaseAndVerified(apartmentName, true);
+
+        return forms.stream().map(verificationForm -> {
+            VerifyUserResponseDTO dto = new VerifyUserResponseDTO();
+            dto.setVerificationFormId(verificationForm.getVerificationFormId());
+            dto.setVerificationFormName(verificationForm.getVerificationFormName());
+            dto.setVerificationFormType(verificationForm.getVerificationFormType());
+            dto.setApartmentName(verificationForm.getApartmentName());
+            dto.setFullName(verificationForm.getFullName());
+            dto.setUsername(verificationForm.getUserName());
+            dto.setEmail(verificationForm.getEmail());
+            dto.setPhoneNumber(verificationForm.getPhoneNumber());
+            dto.setContractStartDate(verificationForm.getContractStartDate());
+            dto.setContractEndDate(verificationForm.getContractEndDate());
+            dto.setVerified(verificationForm.isVerified());
+
+            User user = userRepository.findByUserName(verificationForm.getUserName());
+
+            dto.setUserRole(user.getRole());
+
+            // Chuyển đổi danh sách ảnh
+            dto.setImageFiles(
+                    verificationForm.getContractImages().stream()
+                            .map(ContractImages::getImageUrl)
+                            .toList()
+            );
+
+            return dto;
+        }).toList();
+    }
+
+    @Override
     public VerifyUserResponseDTO findVerificationByUserName(String userName) {
         VerificationForm verificationForm = verificationFormRepository.findVerificationFormByUserNameContainingIgnoreCase(userName);
         if (verificationForm == null) {

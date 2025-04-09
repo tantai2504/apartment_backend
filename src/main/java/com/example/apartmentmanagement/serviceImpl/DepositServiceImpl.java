@@ -174,12 +174,12 @@ public class DepositServiceImpl implements DepositService {
 
             dto.setDepositUserId(deposit.getUser().getUserId());
             dto.setDepositUserName(deposit.getUser().getFullName());
-            dto.setDepositPrice(deposit.getPayment().getPaymentInfo());
 
             if (deposit.getPayment() != null) {
                 dto.setPaymentId(deposit.getPayment().getPaymentId());
                 dto.setPaymentDate(deposit.getPayment().getPaymentDate());
                 dto.setPaymentInfo(deposit.getPayment().getPaymentInfo());
+                dto.setDepositPrice(deposit.getPayment().getPrice());
             }
 
             dto.setApartmentName(deposit.getApartment().getApartmentName());

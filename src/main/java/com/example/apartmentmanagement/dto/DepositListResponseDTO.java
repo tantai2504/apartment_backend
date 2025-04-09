@@ -24,7 +24,7 @@ public class DepositListResponseDTO {
     private Long paymentId;
     private LocalDateTime paymentDate;
     private String paymentInfo;
-    private String depositPrice;
+    private Float depositPrice;
 
     private String apartmentName;
 }

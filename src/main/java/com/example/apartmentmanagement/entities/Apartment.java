@@ -65,8 +65,8 @@ public class Apartment {
     @OneToMany(mappedBy = "apartment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Consumption> consumptions;
 
-    @OneToOne(mappedBy = "apartment", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Deposit deposit;
+    @OneToMany(mappedBy = "apartment", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Deposit> deposit;
 
     @OneToMany(mappedBy = "apartment", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Post> posts;

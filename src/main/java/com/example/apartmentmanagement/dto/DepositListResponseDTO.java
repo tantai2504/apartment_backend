@@ -21,14 +21,10 @@ public class DepositListResponseDTO {
     private Long depositUserId;
     private String depositUserName;
 
-    private Long postId;
-    private String postTitle;
-    private float depositPrice;
-    private String depositCheck;
-
     private Long paymentId;
     private LocalDateTime paymentDate;
     private String paymentInfo;
+    private String depositPrice;
 
     private String apartmentName;
 }

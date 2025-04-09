@@ -25,7 +25,7 @@ public class Deposit {
 
     private String status;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "apartment_id", referencedColumnName = "apartment_id")
     private Apartment apartment;
 

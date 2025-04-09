@@ -9,6 +9,7 @@ import com.example.apartmentmanagement.repository.PaymentRepository;
 import com.example.apartmentmanagement.repository.PostRepository;
 import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.service.DepositService;
+import com.example.apartmentmanagement.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.apartmentmanagement.service.NotificationService;
@@ -38,6 +39,9 @@ public class DepositServiceImpl implements DepositService {
 
     @Autowired
     private NotificationService notificationService;
+
+    @Autowired
+    private UserService userService;
 
     @Override
     public DepositResponseDTO processPaymentSuccess(DepositRequestDTO depositRequestDTO) {
@@ -163,16 +167,13 @@ public class DepositServiceImpl implements DepositService {
             dto.setDepositId(deposit.getDepositId());
             dto.setStatus(deposit.getStatus());
 
-            dto.setPostOwnerId(deposit.getPost().getUser().getUserId());
-            dto.setPostOwnerName(deposit.getPost().getUser().getFullName());
+            User getUsername = userService.getUserByEmailOrUserName(deposit.getApartment().getHouseholder());
+            dto.setPostOwnerId(getUsername.getUserId());
+            dto.setPostOwnerName(getUsername.getFullName());
 
             dto.setDepositUserId(deposit.getUser().getUserId());
             dto.setDepositUserName(deposit.getUser().getFullName());
-
-            dto.setPostId(deposit.getPost().getPostId());
-            dto.setPostTitle(deposit.getPost().getTitle());
-            dto.setDepositPrice(deposit.getPost().getDepositPrice());
-            dto.setDepositCheck(deposit.getPost().getDepositCheck());
+            dto.setDepositPrice(deposit.getPayment().getPaymentInfo());
 
             if (deposit.getPayment() != null) {
                 dto.setPaymentId(deposit.getPayment().getPaymentId());
@@ -180,7 +181,7 @@ public class DepositServiceImpl implements DepositService {
                 dto.setPaymentInfo(deposit.getPayment().getPaymentInfo());
             }
 
-            dto.setApartmentName(deposit.getPost().getApartment().getApartmentName());
+            dto.setApartmentName(deposit.getApartment().getApartmentName());
 
             return dto;
         }).collect(Collectors.toList());

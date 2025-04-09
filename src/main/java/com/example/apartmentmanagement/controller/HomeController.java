@@ -204,5 +204,37 @@ public class HomeController {
         response.put("status", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }
+    @PostMapping("/change_password")
+    public ResponseEntity<Object> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
+        Map<String, Object> response = new HashMap<>();
+
+        String email = changePasswordDTO.getEmail();
+        String currentPassword = changePasswordDTO.getCurrentPassword();
+        String newPassword = changePasswordDTO.getNewPassword();
+
+        User user = userService.getUserByEmailOrUserName(email);
+
+        if (user == null) {
+            response.put("status", HttpStatus.NOT_FOUND.value());
+            response.put("message", "Người dùng không tồn tại");
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
+        }
+
+        // So sánh mật khẩu hiện tại
+        if (!AESUtil.decrypt(user.getPassword()).equals(currentPassword)) {
+            response.put("status", HttpStatus.UNAUTHORIZED.value());
+            response.put("message", "Mật khẩu hiện tại không đúng");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        // Cập nhật mật khẩu mới
+        user.setPassword(AESUtil.encrypt(newPassword));
+        userService.saveUser(user);
+
+        response.put("message", "Mật khẩu đã được thay đổi thành công");
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
+    }
+
 
 }

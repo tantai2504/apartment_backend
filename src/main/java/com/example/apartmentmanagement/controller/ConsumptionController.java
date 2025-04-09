@@ -1,6 +1,7 @@
 package com.example.apartmentmanagement.controller;
 
 import com.example.apartmentmanagement.dto.BillResponseDTO;
+import com.example.apartmentmanagement.dto.ConsumptionRequestDTO;
 import com.example.apartmentmanagement.dto.ConsumptionResponseDTO;
 import com.example.apartmentmanagement.service.ConsumptionService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,9 +88,25 @@ public class ConsumptionController {
         }
     }
 
-    @PutMapping("/update_consumption/{consumptionId}")
-    public ResponseEntity<Object> updateConsumption(@PathVariable Long consumptionId, @RequestBody ConsumptionResponseDTO response) {
-        Map<String, Object> responseMap = new HashMap<>();
-        return null;
+    @PutMapping("/update_consumption")
+    public ResponseEntity<Object> updateConsumption(@RequestBody Map<String, Object> input) {
+        Map<String, Object> response = new HashMap<>();
+        Long consumptionId = (Long) input.get("consumptionId");
+        float waterConsumption = (Float) input.get("waterConsumption");
+        try {
+            ConsumptionResponseDTO consumptions = consumptionService.updateConsumption(consumptionId, waterConsumption);
+            response.put("status", HttpStatus.CREATED.value());
+            response.put("data", consumptions);
+            response.put("message", "Update thành công");
+            return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (IllegalArgumentException e) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", "IllegalArgumentException: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        } catch (RuntimeException e) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
     }
 }

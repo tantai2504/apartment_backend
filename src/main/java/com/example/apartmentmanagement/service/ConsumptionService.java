@@ -13,6 +13,6 @@ public interface ConsumptionService {
     List<ConsumptionResponseDTO> viewAllConsumption(int month, int year);
     List<ConsumptionResponseDTO> processExcelFile(MultipartFile file, Long createdUserId) throws IOException;
     ConsumptionResponseDTO getConsumptionById(Long consumptionId);
-    ConsumptionResponseDTO updateConsumption(Long consumptionId, ConsumptionRequestDTO response);
+    ConsumptionResponseDTO updateConsumption(Long consumptionId, float waterConsumption);
     void deleteConsumption(Long consumptionId);
 }

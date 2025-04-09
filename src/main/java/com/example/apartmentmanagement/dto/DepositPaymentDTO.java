@@ -9,10 +9,9 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class DepositResponseDTO {
+public class DepositPaymentDTO {
     private Long depositUserId;
     private Long postId;
-    private Float depositPrice;
+    private float depositPrice;
     private Long depositId;
-    private String status;
 }

@@ -53,10 +53,6 @@ public class Post {
     @JoinColumn(name = "user_Id", nullable = false)
     private User user;
 
-    @OneToOne
-    @JoinColumn(name = "payment_id", referencedColumnName = "paymentId")
-    private Payment payment;
-
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostImages> postImages;
 

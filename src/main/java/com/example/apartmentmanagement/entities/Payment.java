@@ -48,8 +48,5 @@ public class Payment {
     private Bill bill;
 
     @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL)
-    private Post post;
-
-    @OneToOne(mappedBy = "payment", cascade = CascadeType.ALL)
     private Deposit deposit;
 }

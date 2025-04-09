@@ -10,19 +10,9 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DepositRequestDTO {
-    private Long depositId;
     private Long depositUserId;
     private Long postId;
-    private float amount;
     private float depositPrice;
     private String successUrl;
     private String cancelUrl;
-
-    public DepositRequestDTO(Long depositId, Long depositUserId, Long postId, float depositPrice, float amount) {
-        this.depositId = depositUserId;
-        this.depositUserId = depositUserId;
-        this.postId = postId;
-        this.depositPrice = depositPrice;
-        this.amount = amount;
-    }
 }

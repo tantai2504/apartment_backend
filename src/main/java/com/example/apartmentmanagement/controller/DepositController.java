@@ -1,6 +1,7 @@
 package com.example.apartmentmanagement.controller;
 
 import com.example.apartmentmanagement.dto.DepositListResponseDTO;
+import com.example.apartmentmanagement.dto.DepositPaymentDTO;
 import com.example.apartmentmanagement.dto.DepositRequestDTO;
 import com.example.apartmentmanagement.dto.DepositResponseDTO;
 import com.example.apartmentmanagement.repository.PostRepository;
@@ -54,13 +55,11 @@ public class DepositController {
     public ResponseEntity<Object> getAllDeposits() {
         List<DepositListResponseDTO> deposits = depositService.getAllDeposits();
         Map<String, Object> response = new HashMap<>();
-
         if (deposits.isEmpty()) {
             response.put("message", "Không có đợt đặt cọc nào");
             response.put("status", HttpStatus.OK.value());
             return ResponseEntity.ok(response);
         }
-
         response.put("status", HttpStatus.OK.value());
         response.put("data", deposits);
         return ResponseEntity.ok(response);
@@ -96,12 +95,12 @@ public class DepositController {
             // Tạo link thanh toán
             CheckoutResponseData checkoutData = payOS.createPaymentLink(paymentData);
 
+
             // Chuẩn bị response
             Map<String, Object> response = new HashMap<>();
             response.put("error", 0);
             response.put("message", "Bắt đầu quá trình đặt cọc");
-            response.put("data", createPaymentResponseData(checkoutData));
-
+            response.put("data", createPaymentResponseData(checkoutData,dto));
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, Object> errorResponse = new HashMap<>();
@@ -112,27 +111,21 @@ public class DepositController {
         }
     }
 
-    private Map<String, Object> createPaymentResponseData(CheckoutResponseData checkoutData) {
+    private Map<String, Object> createPaymentResponseData(CheckoutResponseData checkoutData, DepositResponseDTO dto) {
         Map<String, Object> data = new HashMap<>();
-        data.put("bin", "970422");
-        data.put("accountNumber", "VQRQABVKS5356");
-        data.put("accountName", "HUYNH LE PHUONG NAM");
-        data.put("amount", checkoutData.getAmount());
-        data.put("description", "Hoa don can ho");
-        data.put("orderCode", checkoutData.getOrderCode());
-        data.put("currency", "VND");
-        data.put("paymentLinkId", checkoutData.getPaymentLinkId());
-        data.put("status", "PENDING");
+        data.put("depositId",dto.getDepositId());
+        data.put("postId",dto.getPostId());
+        data.put("depositUserId",dto.getDepositUserId());
+        data.put("depositPrice",dto.getDepositPrice());
         data.put("checkoutUrl", checkoutData.getCheckoutUrl());
-        data.put("qrCode", checkoutData.getQrCode());
         return data;
     }
 
     @PostMapping("/cancel")
-    public ResponseEntity<Object> cancelDeposit(@RequestBody DepositRequestDTO depositRequestDTO) {
+    public ResponseEntity<Object> cancelDeposit(@RequestBody DepositPaymentDTO depositPaymentDTO) {
         Map<String, Object> response = new HashMap<>();
         try {
-            DepositResponseDTO dto = depositService.cancel(depositRequestDTO);
+            DepositResponseDTO dto = depositService.cancel(depositPaymentDTO);
             response.put("status", HttpStatus.CREATED.value());
             response.put("message", "Huỷ cọc");
             response.put("data", dto);

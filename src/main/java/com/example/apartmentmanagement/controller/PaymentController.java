@@ -1,5 +1,6 @@
 package com.example.apartmentmanagement.controller;
 
+import com.example.apartmentmanagement.dto.DepositPaymentDTO;
 import com.example.apartmentmanagement.dto.DepositRequestDTO;
 import com.example.apartmentmanagement.dto.DepositResponseDTO;
 import com.example.apartmentmanagement.dto.PaymentHistoryResponseDTO;
@@ -73,7 +74,7 @@ public class PaymentController {
       String description = payload.get("paymentInfo");
       float price = Float.parseFloat(payload.get("amount"));
       response.put("status", HttpStatus.OK.value());
-      response.put("message", "Payment successful");
+      response.put("message", "Thanh toán thành công");
       response.put("data", payload);
       billService.processPaymentSuccess(billId, description, price);
       return ResponseEntity.ok(response);
@@ -85,12 +86,12 @@ public class PaymentController {
   }
 
   @PostMapping("/deposit_success")
-  public ResponseEntity<Object> depositSuccess(@RequestBody DepositRequestDTO depositRequestDTO) {
+  public ResponseEntity<Object> depositSuccess(@RequestBody DepositPaymentDTO depositPaymentDTO) {
     Map<String, Object> response = new HashMap<>();
     try {
-      DepositResponseDTO dto = depositService.processPaymentSuccess(depositRequestDTO);
+      DepositResponseDTO dto = depositService.processPaymentSuccess(depositPaymentDTO);
       response.put("status", HttpStatus.OK.value());
-      response.put("message", "Payment successful");
+      response.put("message", "Thanh toán thành công");
       response.put("data", dto);
       return ResponseEntity.ok(response);
     } catch (Exception e) {

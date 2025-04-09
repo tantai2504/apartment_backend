@@ -124,6 +124,7 @@ public class BillServiceImpl implements BillService {
         payment.setPaymentDate(LocalDateTime.now());
         payment.setUser(bill.getUser());
         payment.setBill(bill);
+        payment.setPrice(bill.getAmount());
         payment.setPaymentType("bill");
         paymentRepository.save(payment);
 

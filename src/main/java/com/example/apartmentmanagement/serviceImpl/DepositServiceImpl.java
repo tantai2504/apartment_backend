@@ -55,6 +55,7 @@ public class DepositServiceImpl implements DepositService {
 
             Payment payment = new Payment();
             payment.setPaymentCheck(true);
+            payment.setPrice(post.getDepositPrice());
             payment.setPaymentInfo("Thanh toán tiền đặt cọc");
             payment.setPaymentDate(LocalDateTime.now());
             payment.setUser(user);

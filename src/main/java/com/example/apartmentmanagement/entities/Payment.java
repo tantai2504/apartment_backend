@@ -38,6 +38,8 @@ public class Payment {
 
     private String paymentType;
 
+    private float price;
+
     @ManyToOne
     @JoinColumn(name = "user_Id", nullable = false)
     private User user;

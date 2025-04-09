@@ -12,6 +12,7 @@ import com.example.apartmentmanagement.repository.PostImagesRepository;
 import com.example.apartmentmanagement.repository.PostRepository;
 import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.service.PostService;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 
@@ -255,9 +257,25 @@ public class PostServiceImpl implements PostService {
     }
 
     @Override
-    public void hiddenPost(Long id) {
-        Post post = postRepository.findById(id).get();
-        postRepository.save(post);
+    @Transactional
+    public void deletePost(Long id) {
+        Optional<Post> postOpt = postRepository.findById(id);
+        if (postOpt.isPresent()) {
+            Post post = postOpt.get();
+
+            if (post.getPayment() != null) {
+                post.setPayment(null);
+            }
+
+            if (post.getPostImages() != null) {
+                for (PostImages image : post.getPostImages()) {
+                    image.setPost(null); // xóa liên kết 2 chiều
+                }
+                post.getPostImages().clear();
+            }
+
+            postRepository.delete(post);
+        }
     }
 
     @Override

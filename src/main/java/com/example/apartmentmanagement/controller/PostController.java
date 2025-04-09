@@ -124,7 +124,7 @@ public class PostController {
 
     @DeleteMapping("/delete/{postId}")
     public ResponseEntity<Object> deletePost(@PathVariable Long postId) {
-        postService.hiddenPost(postId);
+        postService.deletePost(postId);
         Map<String, Object> response = new HashMap<>();
         response.put("status", HttpStatus.NO_CONTENT.value());
         return ResponseEntity.status(HttpStatus.NO_CONTENT).body(response);

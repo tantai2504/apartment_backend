@@ -37,6 +37,7 @@ public class HomeController {
     private UserService userService;
 
     private final Map<String, String> otpStorage = new HashMap<>();
+    private Map<String, Long> otpVerifiedTime = new HashMap<>(); // email -> timestamp (ms)
     @PostMapping("/login")
     public ResponseEntity<Object> login(@RequestBody LoginRequestDTO loginRequestDTO, HttpSession session) {
         Map<String, Object> response = new HashMap<>();
@@ -175,17 +176,46 @@ public class HomeController {
         response.put("status", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }
-
-    @PostMapping("/reset_password")
-    public ResponseEntity<Object> resetPassword(@RequestBody ResetPasswordDTO resetPasswordDTO) {
+    @PostMapping("/verify_otp")
+    public ResponseEntity<Object> verifyOtp(@RequestBody VerifyOtpForgotPassDTO verifyOtpDTO) {
         Map<String, Object> response = new HashMap<>();
-        String email = resetPasswordDTO.getEmail();
-        String otp = resetPasswordDTO.getOtp();
-        String newPassword = resetPasswordDTO.getNewPassword();
+        String email = verifyOtpDTO.getEmail();
+        String otp = verifyOtpDTO.getOtp();
 
         if (!otpStorage.containsKey(email) || !otpStorage.get(email).equals(otp)) {
             response.put("status", HttpStatus.UNAUTHORIZED.value());
             response.put("message", "Mã OTP không hợp lệ hoặc đã hết hạn");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        otpVerifiedTime.put(email, System.currentTimeMillis()); // Ghi nhận thời gian xác thực
+
+        response.put("message", "Xác thực OTP thành công. Vui lòng đặt lại mật khẩu trong 5 phút.");
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
+    }
+    @PostMapping("/reset_password")
+    public ResponseEntity<Object> resetPassword(@RequestBody ResetPasswordDTO resetPasswordDTO) {
+        Map<String, Object> response = new HashMap<>();
+        String email = resetPasswordDTO.getEmail();
+        String newPassword = resetPasswordDTO.getNewPassword();
+
+        if (!otpVerifiedTime.containsKey(email)) {
+            response.put("status", HttpStatus.UNAUTHORIZED.value());
+            response.put("message", "Bạn chưa xác thực OTP hoặc OTP đã hết hạn");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        long verifiedTime = otpVerifiedTime.get(email);
+        long now = System.currentTimeMillis();
+        long fiveMinutes = 5 * 60 * 1000;
+
+        if (now - verifiedTime > fiveMinutes) {
+            // Hết hạn rồi
+            otpVerifiedTime.remove(email);
+            otpStorage.remove(email);
+            response.put("status", HttpStatus.UNAUTHORIZED.value());
+            response.put("message", "Phiên xác thực OTP đã hết hạn. Vui lòng xác thực lại.");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         }
 
@@ -198,12 +228,16 @@ public class HomeController {
 
         user.setPassword(AESUtil.encrypt(newPassword));
         userService.saveUser(user);
-        otpStorage.remove(email);
 
-        response.put("message", "Mật khẩu đã được thay đổi thành công");
+        // Xoá OTP và thời gian xác thực
+        otpStorage.remove(email);
+        otpVerifiedTime.remove(email);
+
+        response.put("message", "Mật khẩu đã được đặt lại thành công");
         response.put("status", HttpStatus.OK.value());
         return ResponseEntity.ok(response);
     }
+
     @PostMapping("/change_password")
     public ResponseEntity<Object> changePassword(@RequestBody ChangePasswordDTO changePasswordDTO) {
         Map<String, Object> response = new HashMap<>();

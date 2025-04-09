@@ -1,14 +1,14 @@
 package com.example.apartmentmanagement.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
-@Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class PaymentRequestDTO {
     private Long billId;
-    private Long amount;
-    private String description;
+    private float amount;
+    private String paymentInfo;
+    private Long userPaymentId;
 }

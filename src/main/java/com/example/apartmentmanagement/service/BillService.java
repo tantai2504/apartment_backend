@@ -2,6 +2,7 @@ package com.example.apartmentmanagement.service;
 
 import com.example.apartmentmanagement.dto.BillResponseDTO;
 import com.example.apartmentmanagement.dto.BillRequestDTO;
+import com.example.apartmentmanagement.dto.PaymentRequestDTO;
 import com.example.apartmentmanagement.entities.Bill;
 
 import java.util.List;
@@ -14,7 +15,7 @@ public interface BillService {
 
     BillResponseDTO getBillById(Long id);
 
-    void processPaymentSuccess(Long billId, String paymentInfo, float price);
+    void processPaymentSuccess(PaymentRequestDTO paymentRequestDTO);
 
     BillResponseDTO updateBill(Long id, BillRequestDTO billRequestDTO);
 

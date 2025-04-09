@@ -2,6 +2,7 @@ package com.example.apartmentmanagement.serviceImpl;
 
 import com.example.apartmentmanagement.dto.BillResponseDTO;
 import com.example.apartmentmanagement.dto.BillRequestDTO;
+import com.example.apartmentmanagement.dto.PaymentRequestDTO;
 import com.example.apartmentmanagement.entities.*;
 import com.example.apartmentmanagement.repository.*;
 import com.example.apartmentmanagement.service.BillService;
@@ -104,33 +105,34 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public void processPaymentSuccess(Long billId, String paymentInfo, float price) {
-        Bill bill = billRepository.findById(billId)
+    public void processPaymentSuccess(PaymentRequestDTO paymentRequestDTO) {
+        Bill bill = billRepository.findById(paymentRequestDTO.getBillId())
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy hóa đơn"));
 
-        if ("paid".equalsIgnoreCase(bill.getStatus())) {
+        User userPayment = userRepository.findById(paymentRequestDTO.getUserPaymentId()).get();
+        User owner = bill.getUser();
+
+        if (bill.getStatus().equalsIgnoreCase("paid")) {
             throw new IllegalStateException("Hóa đơn này đã được thanh toán");
         }
 
-        if(bill.getBillType().equalsIgnoreCase("monthPaid")){
-            User u = bill.getUser();
-            u.setAccountBalance(u.getAccountBalance()+bill.getAmount());
-            userRepository.save(u);
+        if(userPayment.getUserId() != owner.getUserId() && bill.getBillType().equalsIgnoreCase("monthPaid")){
+            owner.setAccountBalance(owner.getAccountBalance()+bill.getAmount());
+            userRepository.save(owner);
         }
         // Tạo bản ghi Payment
         Payment payment = new Payment();
         payment.setPaymentCheck(true);
-        payment.setPaymentInfo(paymentInfo);
+        payment.setPaymentInfo(paymentRequestDTO.getPaymentInfo());
         payment.setPaymentDate(LocalDateTime.now());
-        payment.setUser(bill.getUser());
+        payment.setUser(userPayment);
         payment.setBill(bill);
-        payment.setPrice(price);
+        payment.setPrice(paymentRequestDTO.getAmount());
         payment.setPaymentType("bill");
-        paymentRepository.save(payment);
+        Payment savedPayment = paymentRepository.save(payment);
 
         bill.setStatus("paid");
-        bill.setPayment(payment);
-
+        bill.setPayment(savedPayment);
         billRepository.save(bill);
     }
 

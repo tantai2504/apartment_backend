@@ -14,7 +14,7 @@ public interface BillService {
 
     BillResponseDTO getBillById(Long id);
 
-    void processPaymentSuccess(Long billId, String paymentInfo);
+    void processPaymentSuccess(Long billId, String paymentInfo, float price);
 
     BillResponseDTO updateBill(Long id, BillRequestDTO billRequestDTO);
 

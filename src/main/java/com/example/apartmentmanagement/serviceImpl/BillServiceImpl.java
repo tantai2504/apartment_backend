@@ -104,7 +104,7 @@ public class BillServiceImpl implements BillService {
     }
 
     @Override
-    public void processPaymentSuccess(Long billId, String paymentInfo) {
+    public void processPaymentSuccess(Long billId, String paymentInfo, float price) {
         Bill bill = billRepository.findById(billId)
                 .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy hóa đơn"));
 
@@ -124,7 +124,7 @@ public class BillServiceImpl implements BillService {
         payment.setPaymentDate(LocalDateTime.now());
         payment.setUser(bill.getUser());
         payment.setBill(bill);
-        payment.setPrice(bill.getAmount());
+        payment.setPrice(price);
         payment.setPaymentType("bill");
         paymentRepository.save(payment);
 

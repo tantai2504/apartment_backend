@@ -71,10 +71,11 @@ public class PaymentController {
     try {
       Long billId = Long.parseLong(payload.get("billId"));
       String description = payload.get("paymentInfo");
+      float price = Float.parseFloat(payload.get("amount"));
       response.put("status", HttpStatus.OK.value());
       response.put("message", "Payment successful");
       response.put("data", payload);
-      billService.processPaymentSuccess(billId, description);
+      billService.processPaymentSuccess(billId, description, price);
       return ResponseEntity.ok(response);
     } catch (Exception e) {
       response.put("message", e.getMessage());

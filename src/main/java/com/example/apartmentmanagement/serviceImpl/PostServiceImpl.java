@@ -259,23 +259,23 @@ public class PostServiceImpl implements PostService {
     @Override
     @Transactional
     public void deletePost(Long id) {
-        Optional<Post> postOpt = postRepository.findById(id);
-        if (postOpt.isPresent()) {
-            Post post = postOpt.get();
-
-            if (post.getPayment() != null) {
-                post.setPayment(null);
-            }
-
-            if (post.getPostImages() != null) {
-                for (PostImages image : post.getPostImages()) {
-                    image.setPost(null); // xóa liên kết 2 chiều
-                }
-                post.getPostImages().clear();
-            }
-
-            postRepository.delete(post);
-        }
+//        Optional<Post> postOpt = postRepository.findById(id);
+//        if (postOpt.isPresent()) {
+//            Post post = postOpt.get();
+//
+//            if (post.getPayment() != null) {
+//                post.setPayment(null);
+//            }
+//
+//            if (post.getPostImages() != null) {
+//                for (PostImages image : post.getPostImages()) {
+//                    image.setPost(null); // xóa liên kết 2 chiều
+//                }
+//                post.getPostImages().clear();
+//            }
+//
+//            postRepository.delete(post);
+//        }
     }
 
     @Override

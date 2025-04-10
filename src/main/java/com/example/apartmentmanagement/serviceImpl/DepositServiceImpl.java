@@ -1,6 +1,7 @@
 package com.example.apartmentmanagement.serviceImpl;
 
 import com.example.apartmentmanagement.dto.DepositListResponseDTO;
+import com.example.apartmentmanagement.dto.DepositPaymentDTO;
 import com.example.apartmentmanagement.dto.DepositRequestDTO;
 import com.example.apartmentmanagement.dto.DepositResponseDTO;
 import com.example.apartmentmanagement.entities.*;
@@ -17,6 +18,7 @@ import vn.payos.PayOS;
 import java.util.List;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -44,33 +46,31 @@ public class DepositServiceImpl implements DepositService {
     private UserService userService;
 
     @Override
-    public DepositResponseDTO processPaymentSuccess(DepositRequestDTO depositRequestDTO) {
-        Post post = postRepository.findById(depositRequestDTO.getPostId()).get();
-
+    public DepositResponseDTO processPaymentSuccess(DepositPaymentDTO depositPaymentDTO) {
+        Deposit deposit = depositRepository.findById(depositPaymentDTO.getDepositId()).get();
+        Post post = postRepository.findById(depositPaymentDTO.getPostId()).get();
         Apartment apartment = post.getApartment();
+        User user = userRepository.findById(depositPaymentDTO.getDepositUserId()).get();
 
         if (post.getDepositCheck().equals("ongoing") && post.getDepositUserId() != null) {
-            User user = userRepository.findById(depositRequestDTO.getDepositUserId()).get();
             User postOwner = post.getUser();
-
             Payment payment = new Payment();
             payment.setPaymentCheck(true);
-            payment.setPrice(depositRequestDTO.getAmount());
+            payment.setPrice(depositPaymentDTO.getDepositPrice());
             payment.setPaymentInfo("Thanh toán tiền đặt cọc");
             payment.setPaymentDate(LocalDateTime.now());
             payment.setUser(user);
             payment.setPaymentType("deposit");
-            paymentRepository.save(payment);
+            payment.setDeposit(deposit);
+            Payment paymentSaved =  paymentRepository.save(payment);
 
-            Deposit deposit = depositRepository.findById(depositRequestDTO.getDepositId()).get();
             deposit.setApartment(apartment);
             deposit.setUser(user);
-            deposit.setPayment(payment);
+            deposit.setPayment(paymentSaved);
             deposit.setStatus("done");
             depositRepository.save(deposit);
 
             post.setDepositCheck("done");
-            post.setPayment(payment);
             postRepository.save(post);
 
             // Tạo thông báo cho người đặt cọc
@@ -88,9 +88,11 @@ public class DepositServiceImpl implements DepositService {
             );
 
             return new DepositResponseDTO(
-                    deposit.getDepositId(),
-                    deposit.getStatus(),
-                    deposit.getUser().getUserId()
+                    depositPaymentDTO.getDepositUserId(),
+                    depositPaymentDTO.getPostId(),
+                    depositPaymentDTO.getDepositPrice(),
+                    depositPaymentDTO.getDepositId(),
+                    "done"
             );
         }
         else {
@@ -101,58 +103,58 @@ public class DepositServiceImpl implements DepositService {
     @Override
     public DepositResponseDTO depositFlag(DepositRequestDTO depositRequestDTO) {
         Post post = postRepository.findById(depositRequestDTO.getPostId()).get();
-
         Apartment apartment = post.getApartment();
-
-        User user = post.getUser();
+        User user = userRepository.findById(depositRequestDTO.getDepositUserId()).get();
 
         if (post.getDepositUserId() == null) {
-
             Deposit deposit = new Deposit();
             deposit.setApartment(apartment);
             deposit.setUser(user);
             deposit.setPayment(null);
             deposit.setStatus("ongoing");
-            depositRepository.save(deposit);
+            deposit.setPrice(post.getDepositPrice());
+            Deposit depositSave = depositRepository.save(deposit);
+            Long depositSaveId = depositSave.getDepositId();
 
             post.setDepositUserId(depositRequestDTO.getDepositUserId());
             post.setDepositCheck("ongoing");
-            post.setDepositPrice(depositRequestDTO.getDepositPrice());
             postRepository.save(post);
+
+            return new DepositResponseDTO(
+                    depositRequestDTO.getDepositUserId(),
+                    depositRequestDTO.getPostId(),
+                    depositRequestDTO.getDepositPrice(),
+                    depositSaveId,
+                    "ongoing"
+            );
         } else if (post.getDepositUserId() != null && post.getDepositCheck().equals("ongoing")) {
             throw new RuntimeException("Đang có người thực hiện quá trình đặt cọc");
         }
-        return new DepositResponseDTO(
-                post.getPostId(),
-                post.getDepositCheck(),
-                post.getDepositUserId()
-        );
+        return null;
     }
 
     @Override
-    public DepositResponseDTO cancel(DepositRequestDTO depositRequestDTO) {
-        Post post = postRepository.findById(depositRequestDTO.getPostId()).get();
-
+    public DepositResponseDTO cancel(DepositPaymentDTO depositPaymentDTO) {
+        Post post = postRepository.findById(depositPaymentDTO.getPostId()).get();
         Apartment apartment = post.getApartment();
-
-        User user = post.getUser();
-
+        User user = userRepository.findById(depositPaymentDTO.getDepositUserId()).get();
+        Deposit deposit = depositRepository.findById(depositPaymentDTO.getDepositId()).get();
         if (post.getDepositCheck().equals("ongoing") && post.getDepositUserId() != null) {
-
-            Deposit deposit = depositRepository.findById(depositRequestDTO.getDepositId()).get();
             deposit.setApartment(apartment);
             deposit.setUser(user);
             deposit.setPayment(null);
-            deposit.setStatus("none");
+            deposit.setStatus("cancel");
             depositRepository.save(deposit);
 
             post.setDepositUserId(null);
-            post.setDepositCheck("none");
+            post.setDepositCheck(null);
             postRepository.save(post);
             return new DepositResponseDTO(
-                    post.getPostId(),
-                    post.getDepositCheck(),
-                    post.getDepositUserId()
+                    depositPaymentDTO.getDepositUserId(),
+                    depositPaymentDTO.getPostId(),
+                    depositPaymentDTO.getDepositPrice(),
+                    depositPaymentDTO.getDepositId(),
+                    "cancel"
             );
         } else {
             throw new RuntimeException("Không thể hoàn lại thanh toán");
@@ -166,24 +168,12 @@ public class DepositServiceImpl implements DepositService {
         return deposits.stream().map(deposit -> {
             DepositListResponseDTO dto = new DepositListResponseDTO();
             dto.setDepositId(deposit.getDepositId());
-            dto.setStatus(deposit.getStatus());
-
-            User getUsername = userService.getUserByEmailOrUserName(deposit.getApartment().getHouseholder());
-            dto.setPostOwnerId(getUsername.getUserId());
-            dto.setPostOwnerName(getUsername.getFullName());
-
-            dto.setDepositUserId(deposit.getUser().getUserId());
-            dto.setDepositUserName(deposit.getUser().getFullName());
-
-            if (deposit.getPayment() != null) {
-                dto.setPaymentId(deposit.getPayment().getPaymentId());
-                dto.setPaymentDate(deposit.getPayment().getPaymentDate());
-                dto.setPaymentInfo(deposit.getPayment().getPaymentInfo());
-                dto.setDepositPrice(deposit.getPayment().getPrice());
-            }
-
             dto.setApartmentName(deposit.getApartment().getApartmentName());
-
+            dto.setDepositUserName(deposit.getUser().getFullName());
+            dto.setDepositPrice(deposit.getPrice());
+            dto.setStatus(deposit.getStatus());
+            User getUsername = userService.getUserByEmailOrUserName(deposit.getApartment().getHouseholder());
+            dto.setPostOwnerName(getUsername.getFullName());
             return dto;
         }).collect(Collectors.toList());
     }

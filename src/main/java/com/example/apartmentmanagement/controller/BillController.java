@@ -113,7 +113,7 @@ public class BillController {
     }
 
     /**
-     * (Staff) Tao hoa don cho owner
+     * (Staff) Tao hoa don cho owner or rentor
      *
      * @param request
      * @return

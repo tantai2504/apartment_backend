@@ -225,6 +225,12 @@ public class HomeController {
             response.put("message", "Người dùng không tồn tại");
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         }
+        String decryptedOldPassword = AESUtil.decrypt(user.getPassword());
+        if (decryptedOldPassword.equals(newPassword)) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", "Mật khẩu mới không được giống với mật khẩu cũ");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
 
         user.setPassword(AESUtil.encrypt(newPassword));
         userService.saveUser(user);
@@ -259,6 +265,12 @@ public class HomeController {
             response.put("status", HttpStatus.UNAUTHORIZED.value());
             response.put("message", "Mật khẩu hiện tại không đúng");
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+        // Không cho phép mật khẩu mới trùng mật khẩu hiện tại
+        if (currentPassword.equals(newPassword)) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", "Mật khẩu mới không được trùng với mật khẩu hiện tại");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
         // Cập nhật mật khẩu mới

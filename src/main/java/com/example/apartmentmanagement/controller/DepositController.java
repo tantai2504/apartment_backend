@@ -51,7 +51,7 @@ public class DepositController {
 //        }
 //    }
 
-    @GetMapping("/getall")
+    @GetMapping("/getAll")
     public ResponseEntity<Object> getAllDeposits() {
         List<DepositListResponseDTO> deposits = depositService.getAllDeposits();
         Map<String, Object> response = new HashMap<>();

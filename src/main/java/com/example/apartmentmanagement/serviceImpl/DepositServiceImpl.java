@@ -112,6 +112,7 @@ public class DepositServiceImpl implements DepositService {
             deposit.setUser(user);
             deposit.setPayment(null);
             deposit.setStatus("ongoing");
+            deposit.setPrice(post.getDepositPrice());
             Deposit depositSave = depositRepository.save(deposit);
             Long depositSaveId = depositSave.getDepositId();
 
@@ -171,24 +172,12 @@ public class DepositServiceImpl implements DepositService {
         return deposits.stream().map(deposit -> {
             DepositListResponseDTO dto = new DepositListResponseDTO();
             dto.setDepositId(deposit.getDepositId());
-            dto.setStatus(deposit.getStatus());
-
-            User getUsername = userService.getUserByEmailOrUserName(deposit.getApartment().getHouseholder());
-            dto.setPostOwnerId(getUsername.getUserId());
-            dto.setPostOwnerName(getUsername.getFullName());
-
-            dto.setDepositUserId(deposit.getUser().getUserId());
-            dto.setDepositUserName(deposit.getUser().getFullName());
-            dto.setDepositPrice(deposit.getPayment().getPaymentInfo());
-
-            if (deposit.getPayment() != null) {
-                dto.setPaymentId(deposit.getPayment().getPaymentId());
-                dto.setPaymentDate(deposit.getPayment().getPaymentDate());
-                dto.setPaymentInfo(deposit.getPayment().getPaymentInfo());
-            }
-
             dto.setApartmentName(deposit.getApartment().getApartmentName());
-
+            dto.setDepositUserName(deposit.getUser().getFullName());
+            dto.setDepositPrice(deposit.getPrice());
+            dto.setStatus(deposit.getStatus());
+            User getUsername = userService.getUserByEmailOrUserName(deposit.getApartment().getHouseholder());
+            dto.setPostOwnerName(getUsername.getFullName());
             return dto;
         }).collect(Collectors.toList());
     }

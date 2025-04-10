@@ -13,18 +13,9 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class DepositListResponseDTO {
     private Long depositId;
-    private String status;
-
-    private Long postOwnerId;
-    private String postOwnerName;
-
-    private Long depositUserId;
-    private String depositUserName;
-
-    private Long paymentId;
-    private LocalDateTime paymentDate;
-    private String paymentInfo;
-    private String depositPrice;
-
     private String apartmentName;
+    private String depositUserName;
+    private float depositPrice;
+    private String status;
+    private String postOwnerName;
 }

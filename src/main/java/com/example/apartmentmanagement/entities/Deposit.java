@@ -1,9 +1,7 @@
 package com.example.apartmentmanagement.entities;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 /***
  * Entity deposit: luu du lieu dat coc
@@ -12,6 +10,8 @@ import lombok.NoArgsConstructor;
 @Entity
 @Table(name = "deposit")
 @Data
+@Getter
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 public class Deposit {
@@ -24,6 +24,8 @@ public class Deposit {
     private User user;
 
     private String status;
+
+    private float price;
 
     @ManyToOne
     @JoinColumn(name = "apartment_id", referencedColumnName = "apartment_id")

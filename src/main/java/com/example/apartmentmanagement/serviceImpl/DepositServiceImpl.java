@@ -136,22 +136,18 @@ public class DepositServiceImpl implements DepositService {
     @Override
     public DepositResponseDTO cancel(DepositPaymentDTO depositPaymentDTO) {
         Post post = postRepository.findById(depositPaymentDTO.getPostId()).get();
-
         Apartment apartment = post.getApartment();
-
-        User user = post.getUser();
-
+        User user = userRepository.findById(depositPaymentDTO.getDepositUserId()).get();
+        Deposit deposit = depositRepository.findById(depositPaymentDTO.getDepositId()).get();
         if (post.getDepositCheck().equals("ongoing") && post.getDepositUserId() != null) {
-
-            Deposit deposit = depositRepository.findById(depositPaymentDTO.getDepositId()).get();
             deposit.setApartment(apartment);
             deposit.setUser(user);
             deposit.setPayment(null);
-            deposit.setStatus("none");
+            deposit.setStatus("cancel");
             depositRepository.save(deposit);
 
             post.setDepositUserId(null);
-            post.setDepositCheck("none");
+            post.setDepositCheck(null);
             postRepository.save(post);
             return new DepositResponseDTO(
                     depositPaymentDTO.getDepositUserId(),

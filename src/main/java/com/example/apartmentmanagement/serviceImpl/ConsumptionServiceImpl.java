@@ -213,12 +213,40 @@ public class ConsumptionServiceImpl implements ConsumptionService {
     @Override
     public ConsumptionResponseDTO getConsumptionById(Long consumptionId) {
         Consumption consumption = consumptionRepository.findById(consumptionId).orElse(null);
-        return null;
+
+        User user = userRepository.findByUserName(consumption.getApartment().getHouseholder());
+
+        return new ConsumptionResponseDTO(
+                consumption.getConsumptionId(),
+                consumption.getConsumptionDate(),
+                consumption.getLastMonthWaterConsumption(),
+                consumption.getWaterConsumption(),
+                user.getFullName(),
+                consumption.getApartment().getApartmentName()
+        );
     }
 
     @Override
-    public ConsumptionResponseDTO updateConsumption(Long consumptionId, ConsumptionRequestDTO response) {
-        return null;
+    public ConsumptionResponseDTO updateConsumption(Long consumptionId, float waterConsumption) {
+        Consumption consumption = consumptionRepository.findById(consumptionId).orElse(null);
+
+        if (consumption == null) {
+            throw new RuntimeException("consumption not found");
+        }
+
+        User user = userRepository.findByUserName(consumption.getApartment().getHouseholder());
+
+        consumption.setWaterConsumption(waterConsumption);
+        consumption.setConsumptionDate(LocalDate.now());
+        consumptionRepository.save(consumption);
+        return new ConsumptionResponseDTO(
+                consumption.getConsumptionId(),
+                consumption.getConsumptionDate(),
+                consumption.getLastMonthWaterConsumption(),
+                consumption.getWaterConsumption(),
+                user.getFullName(),
+                consumption.getApartment().getApartmentName()
+        );
     }
 
     @Override

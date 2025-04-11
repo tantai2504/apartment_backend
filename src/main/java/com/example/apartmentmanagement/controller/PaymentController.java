@@ -79,6 +79,22 @@ public class PaymentController {
     }
   }
 
+  @PostMapping("/cancel")
+  public ResponseEntity<Object> paymentCancel(@RequestBody PaymentRequestDTO paymentRequestDTO) {
+    Map<String, Object> response = new HashMap<>();
+    try {
+      billService.processPaymentCancel(paymentRequestDTO);
+      response.put("status", HttpStatus.OK.value());
+      response.put("message", "Hủy thanh toán thành công");
+      response.put("data", paymentRequestDTO);
+      return ResponseEntity.ok(response);
+    } catch (Exception e) {
+      response.put("message", e.getMessage());
+      response.put("status", HttpStatus.BAD_REQUEST.value());
+      return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+  }
+
   @PostMapping("/deposit_success")
   public ResponseEntity<Object> depositSuccess(@RequestBody DepositPaymentDTO depositPaymentDTO) {
     Map<String, Object> response = new HashMap<>();

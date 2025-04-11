@@ -17,6 +17,8 @@ public interface BillService {
 
     void processPaymentSuccess(PaymentRequestDTO paymentRequestDTO);
 
+    void processPaymentCancel(PaymentRequestDTO paymentRequestDTO);
+
     BillResponseDTO updateBill(Long id, BillRequestDTO billRequestDTO);
 
     List<BillResponseDTO> viewBillListWithinSpecTime(int month, int year, Long userId);

@@ -136,6 +136,14 @@ public class BillServiceImpl implements BillService {
         billRepository.save(bill);
     }
 
+    @Override
+    public void processPaymentCancel(PaymentRequestDTO paymentRequestDTO) {
+        Bill bill = billRepository.findById(paymentRequestDTO.getBillId())
+                .orElseThrow(() -> new EntityNotFoundException("Không tìm thấy hóa đơn"));
+        bill.setStatus("unpaid");
+        billRepository.save(bill);
+    }
+
 
     @Override
     public BillResponseDTO updateBill(Long id, BillRequestDTO billRequestDTO) {

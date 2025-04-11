@@ -157,7 +157,7 @@ public class DepositServiceImpl implements DepositService {
                     "cancel"
             );
         } else {
-            throw new RuntimeException("Không thể hoàn lại thanh toán");
+            throw new RuntimeException("Không thể hủy thanh toán mục chưa thực hiện thanh toán");
         }
     }
 

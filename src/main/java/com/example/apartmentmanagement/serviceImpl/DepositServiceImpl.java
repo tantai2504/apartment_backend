@@ -161,7 +161,6 @@ public class DepositServiceImpl implements DepositService {
         }
     }
 
-
     @Override
     public List<DepositListResponseDTO> getAllDeposits() {
         List<Deposit> deposits = depositRepository.findAll();
@@ -169,7 +168,7 @@ public class DepositServiceImpl implements DepositService {
             DepositListResponseDTO dto = new DepositListResponseDTO();
             dto.setDepositId(deposit.getDepositId());
             dto.setApartmentName(deposit.getApartment().getApartmentName());
-            dto.setDepositUserName(deposit.getUser().getFullName());
+            dto.setDepositUserName(deposit.getUser().getUserName());
             dto.setDepositPrice(deposit.getPrice());
             dto.setStatus(deposit.getStatus());
             User getUsername = userService.getUserByEmailOrUserName(deposit.getApartment().getHouseholder());

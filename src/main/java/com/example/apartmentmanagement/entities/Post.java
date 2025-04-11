@@ -56,7 +56,7 @@ public class Post {
     @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<PostImages> postImages;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "apartment_id", nullable = false)
     private Apartment apartment;
 }

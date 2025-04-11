@@ -86,6 +86,22 @@ public class UserController {
         }
     }
 
+    @GetMapping("/list_contract_owner")
+    public ResponseEntity<Object> listContractOwner(@RequestParam String apartmentName) {
+        Map<String, Object> response = new HashMap<>();
+        List<VerifyUserResponseDTO> contractList = userService.showAllContract(apartmentName);
+
+        if (!contractList.isEmpty()) {
+            response.put("status", HttpStatus.OK.value());
+            response.put("data", contractList);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } else {
+            response.put("status", HttpStatus.OK.value());
+            response.put("message", "Không có hợp đồng nào");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+    }
+
     @GetMapping("/find")
     public ResponseEntity<Object> findAll(String username) {
         List<UserRequestDTO> userRequestDTOS = userService.getUserByFullName(username);

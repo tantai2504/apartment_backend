@@ -22,5 +22,4 @@ public interface UserRepository extends JpaRepository<User, Long> {
     @Transactional
     @Query(value = "INSERT INTO user_apartment (user_id, apartment_id) VALUES (:userId, :apartmentId)", nativeQuery = true)
     void addUserToApartment(@Param("userId") Long userId, @Param("apartmentId") Long apartmentId);
-
 }

@@ -42,6 +42,8 @@ public interface UserService {
 
     List<VerifyUserResponseDTO> showAllVerifyUser();
 
+    List<VerifyUserResponseDTO> showAllContract(String apartmentName);
+
     VerifyUserResponseDTO findVerificationByUserName(String userName);
 
     VerifyUserResponseDTO updateVerifyUser(Long verificationId, VerifyUserRequestDTO verifyUserDTO, List<MultipartFile> imageFile);

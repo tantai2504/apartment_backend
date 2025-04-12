@@ -65,6 +65,7 @@ public class FormController {
         }
     }
 
+    //get form by user id
     @GetMapping("/user/{userId}")
     public ResponseEntity<Object> getFormsByUser(@PathVariable Long userId) {
         List<Form> forms = formService.getFormsByUser(userId);
@@ -79,6 +80,7 @@ public class FormController {
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
     }
+
 
     @GetMapping("/{formId}")
     public ResponseEntity<Object> getFormById(@PathVariable Long formId) {

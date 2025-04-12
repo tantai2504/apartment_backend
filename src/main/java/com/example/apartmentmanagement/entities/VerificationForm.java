@@ -47,6 +47,8 @@ public class VerificationForm {
 
     private boolean verified;
 
+    private boolean expired;
+
     @OneToOne(mappedBy = "verificationForm", cascade = CascadeType.ALL, orphanRemoval = true)
     private User user;
 

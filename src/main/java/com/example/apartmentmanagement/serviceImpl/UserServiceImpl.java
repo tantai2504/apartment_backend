@@ -639,33 +639,76 @@ public class UserServiceImpl implements UserService {
     }
 
 
+//    @Override
+//    public VerifyUserResponseDTO updateVerifyUser(Long verificationUserId, VerifyUserRequestDTO verifyUserDTO, List<MultipartFile> imageFiles) {
+//        VerificationForm verificationForm = verificationFormRepository.findById(verificationUserId)
+//                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn xác thực với ID: " + verificationUserId));
+//
+//        User user = getUserByEmailOrUserName(verifyUserDTO.getEmail());
+//
+//        verificationForm.setContractStartDate(verifyUserDTO.getContractStartDate());
+//        verificationForm.setContractEndDate(verifyUserDTO.getContractEndDate());
+//
+//        // Xoá ảnh cũ nếu có
+//        List<ContractImages> oldImages = verificationForm.getContractImages();
+//        if (oldImages != null) {
+//            contractImagesRepository.deleteAll(oldImages);
+//        }
+//
+//        // Upload ảnh mới
+//        List<ContractImages> newContractImages = new ArrayList<>();
+//        for (MultipartFile file : imageFiles) {
+//            ContractImages contractImage = new ContractImages();
+//            contractImage.setImageUrl(imageUploadService.uploadImage(file));
+//            contractImage.setVerificationForm(verificationForm);
+//            newContractImages.add(contractImage);
+//        }
+//
+//        verificationForm.setContractImages(newContractImages);
+//        verificationForm = verificationFormRepository.save(verificationForm);
+//
+//        return new VerifyUserResponseDTO(
+//                verificationForm.getVerificationFormId(),
+//                verificationForm.getVerificationFormName(),
+//                verificationForm.getFullName(),
+//                verificationForm.getEmail(),
+//                verificationForm.getPhoneNumber(),
+//                verificationForm.getContractStartDate(),
+//                verificationForm.getContractEndDate(),
+//                newContractImages.stream().map(ContractImages::getImageUrl).toList(),
+//                user.getRole(),
+//                verificationForm.getVerificationFormId(),
+//                verificationForm.getVerificationFormType(),
+//                verificationForm.getApartmentName(),
+//                verificationForm.getUserName(),
+//                verificationForm.isVerified()
+//        );
+//    }
+
     @Override
     public VerifyUserResponseDTO updateVerifyUser(Long verificationUserId, VerifyUserRequestDTO verifyUserDTO, List<MultipartFile> imageFiles) {
         VerificationForm verificationForm = verificationFormRepository.findById(verificationUserId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn xác thực với ID: " + verificationUserId));
 
-        User user = getUserByEmailOrUserName(verifyUserDTO.getEmail());
-
         verificationForm.setContractStartDate(verifyUserDTO.getContractStartDate());
         verificationForm.setContractEndDate(verifyUserDTO.getContractEndDate());
 
-        // Xoá ảnh cũ nếu có
-        List<ContractImages> oldImages = verificationForm.getContractImages();
-        if (oldImages != null) {
-            contractImagesRepository.deleteAll(oldImages);
+        if (verificationForm.getContractImages() == null) {
+            verificationForm.setContractImages(new ArrayList<>());
+        } else {
+            verificationForm.getContractImages().clear();
         }
 
-        // Upload ảnh mới
-        List<ContractImages> newContractImages = new ArrayList<>();
         for (MultipartFile file : imageFiles) {
             ContractImages contractImage = new ContractImages();
             contractImage.setImageUrl(imageUploadService.uploadImage(file));
-            contractImage.setVerificationForm(verificationForm);
-            newContractImages.add(contractImage);
+            contractImage.setVerificationForm(verificationForm); // Quan hệ ngược
+            verificationForm.getContractImages().add(contractImage);
         }
 
-        verificationForm.setContractImages(newContractImages);
         verificationForm = verificationFormRepository.save(verificationForm);
+
+        User user = getUserByEmailOrUserName(verificationForm.getEmail());
 
         return new VerifyUserResponseDTO(
                 verificationForm.getVerificationFormId(),
@@ -675,7 +718,7 @@ public class UserServiceImpl implements UserService {
                 verificationForm.getPhoneNumber(),
                 verificationForm.getContractStartDate(),
                 verificationForm.getContractEndDate(),
-                newContractImages.stream().map(ContractImages::getImageUrl).toList(),
+                verificationForm.getContractImages().stream().map(ContractImages::getImageUrl).toList(),
                 user.getRole(),
                 verificationForm.getVerificationFormId(),
                 verificationForm.getVerificationFormType(),
@@ -684,5 +727,4 @@ public class UserServiceImpl implements UserService {
                 verificationForm.isVerified()
         );
     }
-
 }

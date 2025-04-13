@@ -35,6 +35,11 @@ public class FormServiceImpl implements FormService {
     }
 
     @Override
+    public List<Form> getAllForms() {
+        return formRepository.findAll();
+    }
+
+    @Override
     public Form uploadForm(Long userId, FormRequestDTO dto) {
         try {
             User user = userRepository.findById(userId)
@@ -128,5 +133,26 @@ public class FormServiceImpl implements FormService {
         Form form = formRepository.findById(formId)
                 .orElseThrow(() -> new RuntimeException("Form not found"));
         return form.getFileUrl();
+    }
+    @Override
+    public Form approveForm(Long formId, String status) {
+        Form form = formRepository.findById(formId)
+                .orElseThrow(() -> new RuntimeException("Form not found"));
+
+        if (!"pending".equalsIgnoreCase(form.getStatus())) {
+            throw new RuntimeException("Only pending forms can be approved/rejected");
+        }
+
+        if (!"approved".equalsIgnoreCase(status) && !"rejected".equalsIgnoreCase(status)) {
+            throw new RuntimeException("Invalid status. Must be 'approved' or 'rejected'");
+        }
+
+        form.setStatus(status.toLowerCase());
+
+        if ("approved".equalsIgnoreCase(status)) {
+            form.setExecutedAt(new Date());
+        }
+
+        return formRepository.save(form);
     }
 }

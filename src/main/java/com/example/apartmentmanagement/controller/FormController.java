@@ -132,4 +132,34 @@ public class FormController {
         response.put("fileUrl", fileUrl);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+    //  NEW: Get all forms (admin)
+    @GetMapping("/all")
+    public ResponseEntity<Object> getAllForms() {
+        List<Form> forms = formService.getAllForms();
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", HttpStatus.OK.value());
+        response.put("forms", forms);
+        return ResponseEntity.ok(response);
+    }
+
+    //  NEW: Approve or reject a form
+    @PutMapping("/approve/{formId}")
+    public ResponseEntity<Object> approveForm(
+            @PathVariable Long formId,
+            @RequestParam String status
+    ) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Form form = formService.approveForm(formId, status);
+            response.put("status", HttpStatus.OK.value());
+            response.put("message", "Form status updated successfully");
+            response.put("form", form);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
 }

@@ -305,6 +305,10 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
-
+    @GetMapping("/show_user_and_role")
+    public ResponseEntity<Object> showUserAndRole() {
+        Map<String, Object> response = userService.show_user_and_role();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 }
 

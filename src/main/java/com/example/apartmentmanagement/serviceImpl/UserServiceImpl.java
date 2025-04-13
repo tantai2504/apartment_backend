@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<VerifyUserResponseDTO> showAllContract(String apartmentName) {
-        List<VerificationForm> forms = verificationFormRepository.findByApartmentNameIgnoreCaseAndVerified(apartmentName, true);
+        List<VerificationForm> forms = verificationFormRepository.findByApartmentNameIgnoreCaseAndVerifiedAndVerificationFormType(apartmentName, true, 1);
 
         return forms.stream().map(verificationForm -> {
             VerifyUserResponseDTO dto = new VerifyUserResponseDTO();

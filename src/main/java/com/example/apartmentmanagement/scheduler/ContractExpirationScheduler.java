@@ -110,7 +110,6 @@ public class ContractExpirationScheduler {
         if (user.getApartments().contains(apartment)) {
             user.getApartments().remove(apartment);
             apartment.getUsers().remove(user);
-            userRepository.save(user);
 
             // Cập nhật số lượng người trong căn hộ
             if (apartment.getTotalNumber() > 0) {
@@ -123,6 +122,29 @@ public class ContractExpirationScheduler {
             }
 
             apartmentRepository.save(apartment);
+
+            // Kiểm tra xem user còn thuê căn hộ nào khác không
+            // Nếu không còn, chuyển vai trò từ Rentor thành User
+            if (user.getRole().equals("Rentor")) {
+                boolean stillRenting = false;
+                for (Apartment userApartment : user.getApartments()) {
+                    if (!userApartment.equals(apartment)) {
+                        stillRenting = true;
+                        break;
+                    }
+                }
+
+                if (!stillRenting) {
+                    user.setRole("User");
+                    notificationService.createAndBroadcastNotification(
+                            "Bạn không còn thuê căn hộ nào. Vai trò của bạn đã được chuyển thành User.",
+                            "Thông báo cập nhật vai trò",
+                            user.getUserId()
+                    );
+                }
+            }
+
+            userRepository.save(user);
         }
 
         // Đánh dấu hợp đồng đã xử lý

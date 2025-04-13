@@ -10,7 +10,11 @@ public interface VerificationFormRepository extends JpaRepository<VerificationFo
     VerificationForm findVerificationFormByUserNameContainingIgnoreCase(String fullName);
 
     List<VerificationForm> findByApartmentName(String apartmentName);
-    List<VerificationForm> findByApartmentNameIgnoreCaseAndVerified(String apartmentName, boolean verified);
+    List<VerificationForm> findByApartmentNameIgnoreCaseAndVerifiedAndVerificationFormType(
+            String apartmentName,
+            boolean verified,
+            int verificationFormType
+    );
     List<VerificationForm> findByContractEndDateBetweenAndVerifiedIsTrue(LocalDateTime start, LocalDateTime end);
 
     List<VerificationForm> findByContractEndDateBeforeAndVerifiedIsTrueAndExpiredIsFalse(LocalDateTime date);

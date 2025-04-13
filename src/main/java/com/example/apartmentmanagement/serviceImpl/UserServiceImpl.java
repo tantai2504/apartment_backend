@@ -1,5 +1,6 @@
 package com.example.apartmentmanagement.serviceImpl;
 
+import com.beust.ah.A;
 import com.example.apartmentmanagement.dto.*;
 import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.ContractImages;
@@ -504,6 +505,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Apartment apartment = apartmentRepository.findById(apartmentId)
                 .orElseThrow(() -> new RuntimeException("Apartment not found"));
+        VerificationForm verificationForm = user.getVerificationForm();
 
         boolean hasOtherRentor = apartment.getUsers().stream()
                 .anyMatch(u -> !u.getUserId().equals(userId) && "Rentor".equals(u.getRole()));
@@ -516,6 +518,11 @@ public class UserServiceImpl implements UserService {
         apartment.setStatus("unrented");
         apartment.setHouseholder(null);
         user.setRole("User");
+
+        if (verificationForm != null) {
+            verificationFormRepository.delete(verificationForm);
+            user.setVerificationForm(null);
+        }
 
         user.getApartments().remove(apartment);
         apartment.getUsers().remove(user);
@@ -753,4 +760,26 @@ public class UserServiceImpl implements UserService {
                 verificationForm.isVerified()
         );
     }
+
+    @Override
+    public Map<String, Object> show_user_and_role() {
+        Map<String, Object> response = new HashMap<>();
+        List<Map<String, Object>> apartmentList = new ArrayList<>();
+
+        List<Apartment> apartments = apartmentRepository.findAll();
+        for (Apartment apartment : apartments) {
+            Map<String, Object> apartmentInfo = new HashMap<>();
+            List<User> users = apartment.getUsers();
+
+            apartmentInfo.put("apartment", apartment.getApartmentName());
+            apartmentInfo.put("users", users.stream().map(User::getUserName).collect(Collectors.toList()));
+            apartmentInfo.put("roles", users.stream().map(User::getRole).collect(Collectors.toList()));
+
+            apartmentList.add(apartmentInfo);
+        }
+
+        response.put("apartments", apartmentList);
+        return response;
+    }
+
 }

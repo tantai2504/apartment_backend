@@ -26,6 +26,8 @@ public interface UserService {
 
     User getUserByName(String name);
 
+    void removeOwner(Long userId, Long apartmentId);
+
     List<UserRequestDTO> getUserByFullName(String fullName);
 
     void deleteUserById(Long apartmentId, Long userId);

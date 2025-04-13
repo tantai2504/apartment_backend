@@ -497,6 +497,33 @@ public class UserServiceImpl implements UserService {
         return user;
     }
 
+    @Transactional
+    @Override
+    public void removeOwner(Long userId, Long apartmentId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        Apartment apartment = apartmentRepository.findById(apartmentId)
+                .orElseThrow(() -> new RuntimeException("Apartment not found"));
+
+        boolean hasOtherRentor = apartment.getUsers().stream()
+                .anyMatch(u -> !u.getUserId().equals(userId) && "Rentor".equals(u.getRole()));
+
+        if (hasOtherRentor) {
+            throw new RuntimeException("Vẫn còn rentor tồn tại trong căn hộ");
+        }
+
+        apartment.setTotalNumber(apartment.getTotalNumber() - 1);
+        apartment.setStatus("unrented");
+        apartment.setHouseholder(null);
+        user.setRole("User");
+
+        user.getApartments().remove(apartment);
+        apartment.getUsers().remove(user);
+
+        userRepository.save(user);
+        apartmentRepository.save(apartment);
+    }
+
     @Override
     public List<UserRequestDTO> getUserByFullName(String fullName) {
         return userRepository.searchByUserName(fullName).stream().map(user -> {

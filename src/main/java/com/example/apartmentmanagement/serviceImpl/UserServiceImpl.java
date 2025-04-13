@@ -205,8 +205,6 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Không tìm thấy căn hộ");
         }
 
-        apartment.setTotalNumber(apartment.getTotalNumber() + 1);
-
         if (verificationForm.getVerificationFormType() == 2) {
             if (apartment.getHouseholder() == null) {
                 user.setRole("Owner");
@@ -220,6 +218,7 @@ public class UserServiceImpl implements UserService {
         if (verificationForm.getVerificationFormType() == 1) {
             user.setRole("Rentor");
             apartment.setStatus("rented");
+            apartment.setTotalNumber(apartment.getTotalNumber() + 1);
         }
 
         apartmentRepository.save(apartment);

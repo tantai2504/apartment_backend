@@ -297,5 +297,14 @@ public class UserController {
         }
     }
 
+    @DeleteMapping("/remove_owner")
+    public ResponseEntity<Object> removeOwner(@RequestBody Map<String, Long> user_apartment) {
+        Long userId = user_apartment.get("userId");
+        Long apartmentId = user_apartment.get("apartmentId");
+        userService.removeOwner(apartmentId, userId);
+        return ResponseEntity.noContent().build();
+    }
+
+
 }
 

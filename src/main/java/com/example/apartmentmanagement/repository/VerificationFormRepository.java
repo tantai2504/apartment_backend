@@ -20,8 +20,6 @@ public interface VerificationFormRepository extends JpaRepository<VerificationFo
 
     List<VerificationForm> findByContractEndDateBetweenAndVerifiedIsTrue(LocalDateTime start, LocalDateTime end);
 
-    List<VerificationForm> findByContractEndDateBeforeAndVerifiedIsTrueAndExpiredIsFalse(LocalDateTime date);
-
     List<VerificationForm> findByContractEndDateBeforeAndVerifiedIsTrueAndExpiredIsFalseAndVerificationFormType(
             LocalDateTime date,
             int formType

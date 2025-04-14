@@ -3,6 +3,7 @@ package com.example.apartmentmanagement.controller;
 import com.example.apartmentmanagement.dto.BillResponseDTO;
 import com.example.apartmentmanagement.dto.ConsumptionRequestDTO;
 import com.example.apartmentmanagement.dto.ConsumptionResponseDTO;
+import com.example.apartmentmanagement.exception.ConsumptionValidationException;
 import com.example.apartmentmanagement.service.ConsumptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -77,6 +78,11 @@ public class ConsumptionController {
             response.put("status", HttpStatus.CREATED.value());
             response.put("data", consumptions);
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        } catch (ConsumptionValidationException e) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", e.getErrors());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+
         } catch (IllegalArgumentException e) {
             response.put("status", HttpStatus.BAD_REQUEST.value());
             response.put("message", "IllegalArgumentException: " + e.getMessage());

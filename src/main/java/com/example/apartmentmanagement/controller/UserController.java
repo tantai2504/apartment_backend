@@ -305,6 +305,30 @@ public class UserController {
         return ResponseEntity.noContent().build();
     }
 
+    @GetMapping("/show_user_and_role")
+    public ResponseEntity<Object> showUserAndRole() {
+        Map<String, Object> response = userService.show_user_and_role();
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
 
+    @PostMapping("/terminate_contract")
+    public ResponseEntity<Object> terminateContract(@RequestBody TerminateContractRequestDTO requestDTO) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            userService.terminateContract(
+                    requestDTO.getUserId(),
+                    requestDTO.getApartmentId(),
+                    requestDTO.getReason()
+            );
+
+            response.put("status", HttpStatus.OK.value());
+            response.put("message", "Hợp đồng đã được chấm dứt thành công");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
 }
 

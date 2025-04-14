@@ -5,11 +5,9 @@ import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.ContractImages;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.entities.VerificationForm;
-import com.example.apartmentmanagement.repository.ApartmentRepository;
-import com.example.apartmentmanagement.repository.ContractImagesRepository;
-import com.example.apartmentmanagement.repository.UserRepository;
-import com.example.apartmentmanagement.repository.VerificationFormRepository;
+import com.example.apartmentmanagement.repository.*;
 import com.example.apartmentmanagement.service.EmailService;
+import com.example.apartmentmanagement.service.NotificationService;
 import com.example.apartmentmanagement.service.UserService;
 import com.example.apartmentmanagement.util.AESUtil;
 import jakarta.transaction.Transactional;
@@ -40,6 +38,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ContractImagesRepository contractImagesRepository;
+
+    @Autowired
+    private NotificationService notificationService;
 
     @Override
     public void saveUser(User user) {
@@ -504,6 +505,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Apartment apartment = apartmentRepository.findById(apartmentId)
                 .orElseThrow(() -> new RuntimeException("Apartment not found"));
+        VerificationForm verificationForm = user.getVerificationForm();
 
         boolean hasOtherRentor = apartment.getUsers().stream()
                 .anyMatch(u -> !u.getUserId().equals(userId) && "Rentor".equals(u.getRole()));
@@ -516,6 +518,11 @@ public class UserServiceImpl implements UserService {
         apartment.setStatus("unrented");
         apartment.setHouseholder(null);
         user.setRole("User");
+
+        if (verificationForm != null) {
+            verificationFormRepository.delete(verificationForm);
+            user.setVerificationForm(null);
+        }
 
         user.getApartments().remove(apartment);
         apartment.getUsers().remove(user);
@@ -580,6 +587,11 @@ public class UserServiceImpl implements UserService {
 
         user.getApartments().remove(apartment);
         apartment.getUsers().remove(user);
+
+        if (verificationForm != null) {
+            verificationFormRepository.delete(verificationForm);
+            user.setVerificationForm(null);
+        }
 
         userRepository.save(user);
         apartmentRepository.save(apartment);
@@ -752,5 +764,134 @@ public class UserServiceImpl implements UserService {
                 verificationForm.getUserName(),
                 verificationForm.isVerified()
         );
+    }
+
+    @Override
+    public Map<String, Object> show_user_and_role() {
+        Map<String, Object> response = new HashMap<>();
+        List<Map<String, Object>> apartmentList = new ArrayList<>();
+
+        List<Apartment> apartments = apartmentRepository.findAll();
+        for (Apartment apartment : apartments) {
+            Map<String, Object> apartmentInfo = new HashMap<>();
+            List<User> users = apartment.getUsers();
+
+            apartmentInfo.put("apartment", apartment.getApartmentName());
+            apartmentInfo.put("users", users.stream().map(User::getUserName).collect(Collectors.toList()));
+            apartmentInfo.put("roles", users.stream().map(User::getRole).collect(Collectors.toList()));
+
+            apartmentList.add(apartmentInfo);
+        }
+
+        response.put("apartments", apartmentList);
+        return response;
+    }
+
+    @Override
+    @Transactional
+    public void terminateContract(Long userId, Long apartmentId, String reason) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy người dùng"));
+
+        Apartment apartment = apartmentRepository.findById(apartmentId)
+                .orElseThrow(() -> new RuntimeException("Không tìm thấy căn hộ"));
+
+        // Kiểm tra xem người dùng có phải là người thuê căn hộ này không
+        if (!user.getApartments().contains(apartment)) {
+            throw new RuntimeException("Người dùng không thuê căn hộ này");
+        }
+
+        if (!"Rentor".equals(user.getRole())) {
+            throw new RuntimeException("Người dùng này không phải là người thuê");
+        }
+
+        // Tìm form xác minh/hợp đồng liên quan
+        VerificationForm contract = null;
+        if (user.getVerificationForm() != null &&
+                user.getVerificationForm().getApartmentName().equals(apartment.getApartmentName())) {
+            contract = user.getVerificationForm();
+        } else {
+            // Tìm trong danh sách các hợp đồng đã xác minh
+            List<VerificationForm> verificationForms = verificationFormRepository
+                    .findByApartmentNameIgnoreCaseAndVerified(apartment.getApartmentName(), true);
+
+            for (VerificationForm form : verificationForms) {
+                if (form.getUserName().equals(user.getUserName())) {
+                    contract = form;
+                    break;
+                }
+            }
+        }
+
+        if (contract == null) {
+            throw new RuntimeException("Không tìm thấy hợp đồng liên quan");
+        }
+
+        // Loại bỏ người thuê khỏi căn hộ
+        user.getApartments().remove(apartment);
+        apartment.getUsers().remove(user);
+
+        // Cập nhật số lượng người trong căn hộ
+        if (apartment.getTotalNumber() > 0) {
+            apartment.setTotalNumber(apartment.getTotalNumber() - 1);
+        }
+
+        // Nếu không còn ai thuê, đặt trạng thái là "sold" (chỉ còn chủ sở hữu)
+        if (apartment.getUsers().stream().noneMatch(u -> "Rentor".equals(u.getRole()))) {
+            apartment.setStatus("sold");
+        }
+
+        // Kiểm tra xem user còn thuê căn hộ nào khác không
+        // Nếu không còn, chuyển vai trò từ Rentor thành User
+        boolean stillRenting = false;
+        for (Apartment userApartment : user.getApartments()) {
+            if (!userApartment.equals(apartment)) {
+                stillRenting = true;
+                break;
+            }
+        }
+
+        if (!stillRenting) {
+            user.setRole("User");
+        }
+
+        // Đánh dấu hợp đồng đã kết thúc
+        contract.setExpired(true);
+        contract.setVerified(false);
+
+        // Lưu các thay đổi
+        apartmentRepository.save(apartment);
+        userRepository.save(user);
+        verificationFormRepository.save(contract);
+
+        // Gửi thông báo cho người thuê
+        notificationService.createAndBroadcastNotification(
+                String.format("Hợp đồng thuê căn hộ %s của bạn đã bị chấm dứt với lý do: %s",
+                        apartment.getApartmentName(), reason),
+                "Thông báo chấm dứt hợp đồng",
+                user.getUserId()
+        );
+
+        // Gửi thông báo cho chủ nhà nếu có
+        if (apartment.getHouseholder() != null) {
+            User owner = userRepository.findByUserName(apartment.getHouseholder());
+            if (owner != null && !owner.getUserId().equals(user.getUserId())) {
+                notificationService.createAndBroadcastNotification(
+                        String.format("Hợp đồng thuê căn hộ %s của người thuê %s đã bị chấm dứt.",
+                                apartment.getApartmentName(), user.getFullName()),
+                        "Thông báo chấm dứt hợp đồng",
+                        owner.getUserId()
+                );
+            }
+        }
+
+        // Nếu vai trò đã chuyển từ Rentor sang User
+        if (!stillRenting) {
+            notificationService.createAndBroadcastNotification(
+                    "Bạn không còn thuê căn hộ nào. Vai trò của bạn đã được chuyển thành User.",
+                    "Thông báo cập nhật vai trò",
+                    user.getUserId()
+            );
+        }
     }
 }

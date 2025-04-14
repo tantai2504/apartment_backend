@@ -5,6 +5,7 @@ import com.example.apartmentmanagement.entities.User;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 public interface UserService {
 
@@ -49,4 +50,8 @@ public interface UserService {
     VerifyUserResponseDTO findVerificationByUserName(String userName);
 
     VerifyUserResponseDTO updateVerifyUser(Long verificationId, VerifyUserRequestDTO verifyUserDTO, List<MultipartFile> imageFile);
+
+    Map<String, Object> show_user_and_role();
+
+    void terminateContract(Long userId, Long apartmentId, String reason);
 }

@@ -10,8 +10,6 @@ import java.util.Optional;
 public interface VerificationFormRepository extends JpaRepository<VerificationForm, Long> {
     VerificationForm findVerificationFormByUserNameContainingIgnoreCase(String fullName);
 
-    List<VerificationForm> findByApartmentName(String apartmentName);
-
     List<VerificationForm> findByApartmentNameIgnoreCaseAndVerified(String apartmentName, boolean verified);
 
     List<VerificationForm> findByApartmentNameIgnoreCaseAndVerifiedAndVerificationFormType(
@@ -29,18 +27,4 @@ public interface VerificationFormRepository extends JpaRepository<VerificationFo
             int formType
     );
 
-    Optional<VerificationForm> findByUserNameAndApartmentNameAndVerifiedIsTrue(
-            String userName,
-            String apartmentName
-    );
-
-    List<VerificationForm> findByUserNameAndVerifiedIsTrueAndExpiredIsFalseAndVerificationFormType(
-            String userName,
-            int verificationFormType
-    );
-
-    List<VerificationForm> findByUserIdAndVerifiedIsTrueAndExpiredIsFalseAndVerificationFormType(
-            Long userId,
-            int verificationFormType
-    );
 }

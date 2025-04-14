@@ -2,7 +2,7 @@ package com.example.apartmentmanagement.exception;
 
 import java.util.List;
 
-public class ConsumptionValidationException extends Exception{
+public class ConsumptionValidationException extends RuntimeException {
     private final List<String> errors;
 
     public ConsumptionValidationException(List<String> errors) {

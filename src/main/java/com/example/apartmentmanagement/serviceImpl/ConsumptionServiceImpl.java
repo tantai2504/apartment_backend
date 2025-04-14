@@ -7,22 +7,24 @@ import com.example.apartmentmanagement.dto.UserResponseDTO;
 import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.Consumption;
 import com.example.apartmentmanagement.entities.User;
+import com.example.apartmentmanagement.exception.ConsumptionValidationException;
 import com.example.apartmentmanagement.repository.ApartmentRepository;
 import com.example.apartmentmanagement.repository.ConsumptionRepository;
 import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.service.ConsumptionService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -125,88 +127,112 @@ public class ConsumptionServiceImpl implements ConsumptionService {
     @Override
     public List<ConsumptionResponseDTO> processExcelFile(MultipartFile file, Long createdUserId) throws IOException {
         List<ConsumptionResponseDTO> responseDTOs = new ArrayList<>();
+        List<Consumption> validConsumptions = new ArrayList<>();
+        List<String> errorMessages = new ArrayList<>();
+
         try (Workbook workbook = new XSSFWorkbook(file.getInputStream())) {
             Sheet sheet = workbook.getSheetAt(0);
 
             String firstSheetName = workbook.getSheetName(0);
-
-            LocalDate currentDate = LocalDate.now();
-            String expectedSheetName = currentDate.format(DateTimeFormatter.ofPattern("yyyy-MM"));
-
+            String expectedSheetName = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM"));
             if (!firstSheetName.equals(expectedSheetName)) {
                 throw new IllegalArgumentException("Tên sheet không khớp với tháng/năm hiện tại");
             }
 
             for (Row row : sheet) {
-                if (row.getRowNum() == 0) {
-                    continue; // bỏ qua dòng tiêu đề
-                }
+                if (row.getRowNum() == 0 || row == null) continue;
 
-                if (row == null) {
-                    continue;
-                }
-
-                // Lấy từng cell, kiểm tra null trước khi dùng
                 Cell apartmentCell = row.getCell(0);
                 Cell dateCell = row.getCell(1);
                 Cell currentMonthCell = row.getCell(2);
 
-                // Nếu thiếu 1 trong 4 cell thì bỏ qua dòng
-                if (apartmentCell == null || dateCell == null || currentMonthCell == null) {
-                    continue;
+                try {
+                    String apartmentName = apartmentCell.getStringCellValue();
+                    LocalDate consumptionDate = dateCell.getLocalDateTimeCellValue().toLocalDate();
+                    float waterConsumption = (float) currentMonthCell.getNumericCellValue();
+
+                    Apartment apartment = apartmentRepository.findApartmentByApartmentName(apartmentName);
+                    if (apartment == null) {
+                        errorMessages.add("Dòng " + (row.getRowNum() + 1) + ": Không tìm thấy căn hộ " + apartmentName);
+                        continue;
+                    }
+
+                    // Lấy consumption tháng trước
+                    LocalDate lastMonth = consumptionDate.minusMonths(1);
+                    Consumption lastMonthConsumption = consumptionRepository
+                            .findTopByApartmentAndConsumptionDateBetweenOrderByConsumptionDateDesc(
+                                    apartment,
+                                    lastMonth.withDayOfMonth(1),
+                                    lastMonth.withDayOfMonth(lastMonth.lengthOfMonth())
+                            );
+                    LocalDate currentMonth = LocalDate.now().withDayOfMonth(1); // Đầu tháng hiện tại
+
+                    if (!consumptionDate.isAfter(currentMonth.minusDays(1)) || !consumptionDate.isBefore(currentMonth.plusMonths(1).minusDays(1))) {
+                        errorMessages.add("Dòng " + (row.getRowNum() + 1) + ": Ngày không phải của tháng hiện tại");
+                        continue;
+                    }
+
+                    Consumption existingConsumption = consumptionRepository
+                            .findTopByApartmentAndConsumptionDateBetweenOrderByConsumptionDateDesc(
+                                    apartment,
+                                    currentMonth,
+                                    currentMonth.withDayOfMonth(currentMonth.lengthOfMonth())
+                            );
+                    if (existingConsumption != null) {
+                        errorMessages.add("Dòng " + (row.getRowNum() + 1) + ": Căn hộ " + apartmentName + " đã có dữ liệu tiêu thụ nước cho tháng này");
+                        continue;
+                    }
+
+                    float lastMonthWaterConsumption = lastMonthConsumption != null
+                            ? lastMonthConsumption.getWaterConsumption()
+                            : 0f;
+
+                    if (waterConsumption < lastMonthWaterConsumption) {
+                        errorMessages.add("Dòng " + (row.getRowNum() + 1) + ": Trị số tiêu thụ nước tháng trước không được bé hơn tháng" +
+                                " này: " + apartmentName + " - Tháng trước: " + lastMonthWaterConsumption + " >< Tháng này: " + waterConsumption);
+                        continue;
+                    }
+
+                    Consumption consumption = new Consumption();
+                    consumption.setApartment(apartment);
+                    consumption.setConsumptionDate(consumptionDate);
+                    consumption.setWaterConsumption(waterConsumption);
+                    consumption.setLastMonthWaterConsumption(lastMonthWaterConsumption);
+                    consumption.setBillCreated(false);
+                    consumption.setUploadConsumptionUserId(createdUserId);
+
+                    validConsumptions.add(consumption);
+                } catch (Exception e) {
+                    errorMessages.add("Dòng " + (row.getRowNum() + 1) + ": Dữ liệu không hợp lệ");
                 }
-                String apartmentName = apartmentCell.getStringCellValue();
-                LocalDate consumptionDate = dateCell.getLocalDateTimeCellValue().toLocalDate();
-                float waterConsumption = (float) currentMonthCell.getNumericCellValue();
-
-                Apartment apartment = apartmentRepository.findApartmentByApartmentName(apartmentName);
-                if (apartment == null) continue;
-
-                // 🔥 Lấy consumption tháng trước từ DB
-                LocalDate lastMonth = consumptionDate.minusMonths(1);
-                Consumption lastMonthConsumption = consumptionRepository
-                        .findTopByApartmentAndConsumptionDateBetweenOrderByConsumptionDateDesc(
-                                apartment,
-                                lastMonth.withDayOfMonth(1),
-                                lastMonth.withDayOfMonth(lastMonth.lengthOfMonth())
-                        );
-
-                float lastMonthWaterConsumption = lastMonthConsumption != null
-                        ? lastMonthConsumption.getWaterConsumption()
-                        : 0f;
-
-                if (waterConsumption < lastMonthWaterConsumption) {
-                    throw new RuntimeException("water consumption less than last month consumption");
-                }
-
-                List<User> users = apartment.getUsers();
-                User owner = users.stream()
-                        .filter(user -> "Owner".equals(user.getRole()))
-                        .findFirst()
-                        .orElse(null);
-
-                Consumption consumption = new Consumption();
-                consumption.setApartment(apartment);
-                consumption.setConsumptionDate(consumptionDate);
-                consumption.setWaterConsumption(waterConsumption);
-                consumption.setLastMonthWaterConsumption(lastMonthWaterConsumption);
-                consumption.setBillCreated(false);
-                consumption.setUploadConsumptionUserId(createdUserId);
-                consumptionRepository.save(consumption);
-
-                ConsumptionResponseDTO responseDTO = new ConsumptionResponseDTO(
-                        consumption.getConsumptionId(),
-                        consumptionDate,
-                        lastMonthWaterConsumption,
-                        waterConsumption,
-                        owner != null ? owner.getUserName() : "Unknown",
-                        apartmentName
-                );
-                responseDTOs.add(responseDTO);
             }
-        } catch (IOException e) {
-            throw new RuntimeException("Failed to read Excel file", e);
         }
+
+        if (!errorMessages.isEmpty()) {
+            throw new ConsumptionValidationException(errorMessages);
+        }
+
+        List<Consumption> saved = consumptionRepository.saveAll(validConsumptions);
+
+        for (Consumption consumption : saved) {
+            Apartment apartment = consumption.getApartment();
+            List<User> users = apartment.getUsers();
+            User owner = users.stream()
+                    .filter(user -> "Owner".equals(user.getRole()))
+                    .findFirst()
+                    .orElse(null);
+
+            ConsumptionResponseDTO dto = new ConsumptionResponseDTO(
+                    consumption.getConsumptionId(),
+                    consumption.getConsumptionDate(),
+                    consumption.getLastMonthWaterConsumption(),
+                    consumption.getWaterConsumption(),
+                    owner != null ? owner.getUserName() : "Unknown",
+                    apartment.getApartmentName()
+            );
+            responseDTOs.add(dto);
+        }
+
         return responseDTOs;
     }
 
@@ -252,34 +278,5 @@ public class ConsumptionServiceImpl implements ConsumptionService {
     @Override
     public void deleteConsumption(Long consumptionId) {
 
-    }
-
-    private UserResponseDTO convertToUserResponseDTO(User user) {
-        if (user == null) return null;
-        return new UserResponseDTO(
-                user.getUserId(),
-                user.getUserName(),
-                user.getFullName(),
-                user.getEmail(),
-                user.getDescription(),
-                user.getPhone(),
-                user.getUserImgUrl(),
-                user.getAge(),
-                user.getBirthday(),
-                user.getIdNumber(),
-                user.getJob(),
-                user.getApartments().stream()
-                        .map(apartment -> new ApartmentResponseInUserDTO(
-                                apartment.getApartmentId(),
-                                apartment.getApartmentName(),
-                                apartment.getHouseholder(),
-                                apartment.getTotalNumber(),
-                                apartment.getStatus(),
-                                apartment.getNumberOfBedrooms(),
-                                apartment.getNumberOfBathrooms(),
-                                apartment.getNote()
-                        )).collect(Collectors.toList()),
-                user.getRole()
-        );
     }
 }

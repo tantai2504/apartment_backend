@@ -1,6 +1,5 @@
 package com.example.apartmentmanagement.serviceImpl;
 
-import com.beust.ah.A;
 import com.example.apartmentmanagement.dto.*;
 import com.example.apartmentmanagement.entities.Apartment;
 import com.example.apartmentmanagement.entities.ContractImages;
@@ -588,6 +587,11 @@ public class UserServiceImpl implements UserService {
 
         user.getApartments().remove(apartment);
         apartment.getUsers().remove(user);
+
+        if (verificationForm != null) {
+            verificationFormRepository.delete(verificationForm);
+            user.setVerificationForm(null);
+        }
 
         userRepository.save(user);
         apartmentRepository.save(apartment);

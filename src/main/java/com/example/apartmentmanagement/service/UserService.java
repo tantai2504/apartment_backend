@@ -53,4 +53,5 @@ public interface UserService {
 
     Map<String, Object> show_user_and_role();
 
+    void terminateContract(Long userId, Long apartmentId, String reason);
 }

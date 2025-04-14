@@ -519,10 +519,9 @@ public class UserServiceImpl implements UserService {
         apartment.setHouseholder(null);
         user.setRole("User");
 
-        if (verificationForm != null) {
-            verificationFormRepository.delete(verificationForm);
-            user.setVerificationForm(null);
-        }
+        verificationForm.setVerified(false);
+        verificationForm.setExpired(true);
+        verificationFormRepository.save(verificationForm);
 
         user.getApartments().remove(apartment);
         apartment.getUsers().remove(user);
@@ -570,7 +569,7 @@ public class UserServiceImpl implements UserService {
 
     @Transactional
     @Override
-    public void deleteUserById(Long apartmentId, Long userId) {
+    public void removeRentorById(Long apartmentId, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         Apartment apartment = apartmentRepository.findById(apartmentId)
@@ -588,10 +587,9 @@ public class UserServiceImpl implements UserService {
         user.getApartments().remove(apartment);
         apartment.getUsers().remove(user);
 
-        if (verificationForm != null) {
-            verificationFormRepository.delete(verificationForm);
-            user.setVerificationForm(null);
-        }
+        verificationForm.setVerified(false);
+        verificationForm.setExpired(true);
+        verificationFormRepository.save(verificationForm);
 
         userRepository.save(user);
         apartmentRepository.save(apartment);

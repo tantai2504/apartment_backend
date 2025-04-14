@@ -31,7 +31,7 @@ public interface UserService {
 
     List<UserRequestDTO> getUserByFullName(String fullName);
 
-    void deleteUserById(Long apartmentId, Long userId);
+    void removeRentorById(Long apartmentId, Long userId);
 
     void setCurrentStatusForApartment(Long apartmentId);
 

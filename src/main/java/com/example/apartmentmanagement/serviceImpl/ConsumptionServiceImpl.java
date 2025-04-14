@@ -165,7 +165,7 @@ public class ConsumptionServiceImpl implements ConsumptionService {
                                     lastMonth.withDayOfMonth(1),
                                     lastMonth.withDayOfMonth(lastMonth.lengthOfMonth())
                             );
-                    LocalDate currentMonth = LocalDate.now().withDayOfMonth(1); // Đầu tháng hiện tại
+                    LocalDate currentMonth = LocalDate.now().withDayOfMonth(1);
 
                     if (!consumptionDate.isAfter(currentMonth.minusDays(1)) || !consumptionDate.isBefore(currentMonth.plusMonths(1).minusDays(1))) {
                         errorMessages.add("Dòng " + (row.getRowNum() + 1) + ": Ngày không phải của tháng hiện tại");

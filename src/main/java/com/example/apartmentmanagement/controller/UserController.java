@@ -218,7 +218,7 @@ public class UserController {
     public ResponseEntity<Object> deleteUser(@RequestBody Map<String, Long> user_apartment) {
         Long userId = user_apartment.get("userId");
         Long apartmentId = user_apartment.get("apartmentId");
-        userService.deleteUserById(apartmentId, userId);
+        userService.removeRentorById(apartmentId, userId);
         userService.setCurrentStatusForApartment(apartmentId);
         return ResponseEntity.noContent().build();
     }

@@ -33,7 +33,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                                 "/order/**", "/create-payment-link", "/success", "/cancel", "/api/bank-account/**",
                                 "/payment/**","/user/**", "/user/search", "user/update_verification", "/notification/**", "/api/reports/**",
                                 "/public/**","/api/replies/report/**", "/api/replies/report/**", "/api/replies/**",
-                                "/ws/**", "/chat/**", "/app/**", "/post/**", "/notification/**")
+                                "/ws/**", "/chat/**", "/app/**", "/post/**", "/notification/**","/api/forms/**", "/api/forms/upload/**")
                         .permitAll()
                         .anyRequest().authenticated()
                 )

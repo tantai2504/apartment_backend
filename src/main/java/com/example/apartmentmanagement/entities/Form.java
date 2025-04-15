@@ -23,6 +23,8 @@ public class Form {
     private String fileName; // Tên file gốc
     private Date createdAt; // Ngày tạo đơn
     private Date executedAt;  // Ngày thực hiện đơn
+    @Nationalized
+    private String reason;
 
     /**
      * Trạng thái đơn:

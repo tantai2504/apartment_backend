@@ -46,17 +46,24 @@ public class FormServiceImpl implements FormService {
                     .orElseThrow(() -> new RuntimeException("User not found"));
             Apartment apartment = apartmentRepository.findById(dto.getApartmentId())
                     .orElseThrow(() -> new RuntimeException("Apartment not found"));
-
-            Map uploadResult = cloudinary.uploader().upload(dto.getFile().getBytes(), ObjectUtils.emptyMap());
+            MultipartFile file = dto.getFile();
+            if (file == null || file.isEmpty()) {
+                throw new RuntimeException("File must not be empty");
+            }
+            Map uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap("resource_type", "auto")
+            );
 
             Form form = new Form();
             form.setFormType(dto.getFormType());
-            form.setStatus(dto.getStatus());
+            form.setStatus("pending");
             form.setFileUrl(uploadResult.get("secure_url").toString());
             form.setFileName(dto.getFile().getOriginalFilename());
             form.setCreatedAt(new Date());
             form.setUser(user);
             form.setApartment(apartment);
+            form.setReason(dto.getReason());
 
             if ("approved".equalsIgnoreCase(dto.getStatus())) {
                 form.setExecutedAt(new Date());
@@ -75,7 +82,10 @@ public class FormServiceImpl implements FormService {
                     .orElseThrow(() -> new RuntimeException("Form not found"));
             Apartment apartment = apartmentRepository.findById(dto.getApartmentId())
                     .orElseThrow(() -> new RuntimeException("Apartment not found"));
-
+            MultipartFile file = dto.getFile();
+            if (file == null || file.isEmpty()) {
+                throw new RuntimeException("File must not be empty");
+            }
             Map uploadResult = cloudinary.uploader().upload(dto.getFile().getBytes(), ObjectUtils.emptyMap());
 
             form.setFormType(dto.getFormType());
@@ -84,6 +94,7 @@ public class FormServiceImpl implements FormService {
             form.setFileName(dto.getFile().getOriginalFilename());
             form.setCreatedAt(new Date());
             form.setApartment(apartment);
+            form.setReason(dto.getReason());
 
             if ("approved".equalsIgnoreCase(dto.getStatus())) {
                 form.setExecutedAt(new Date());

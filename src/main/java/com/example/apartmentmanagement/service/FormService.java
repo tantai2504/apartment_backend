@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface FormService {
+    List<Form> getAllForms();
     Form uploadForm(Long userId, FormRequestDTO dto);
     Form editForm(Long formId, FormRequestDTO dto);
 
@@ -16,4 +17,5 @@ public interface FormService {
     List<Form> filterForms(String formType);
     void sendFeedback(Long formId, String feedback);
     String getFileUrl(Long formId);
+    Form approveForm(Long formId, String status);
 }

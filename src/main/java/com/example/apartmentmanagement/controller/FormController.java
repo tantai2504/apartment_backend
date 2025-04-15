@@ -1,6 +1,7 @@
 package com.example.apartmentmanagement.controller;
 
 import com.example.apartmentmanagement.dto.FormRequestDTO;
+import com.example.apartmentmanagement.dto.FormResponseDTO;
 import com.example.apartmentmanagement.entities.Form;
 import com.example.apartmentmanagement.service.FormService;
 import org.springframework.http.HttpStatus;
@@ -23,18 +24,32 @@ public class FormController {
         this.formService = formService;
     }
 
-    @PostMapping(value = "/upload/{userId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/upload",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Object> uploadForm(
-            @PathVariable Long userId,
-            @RequestPart("dto") FormRequestDTO dto,
-            @RequestPart("file") MultipartFile file
+            @RequestParam("userId") Long userId,
+            @RequestParam("formType") String formType,
+            @RequestParam("apartmentId") Long apartmentId,
+            @RequestParam("reason") String reason,
+            @RequestParam("file") MultipartFile file
     ) {
-        dto.setFile(file);
+        FormRequestDTO dto = new FormRequestDTO(formType, reason, apartmentId, file);
         Map<String, Object> response = new HashMap<>();
         try {
             Form form = formService.uploadForm(userId, dto);
+            FormResponseDTO formResponse = new FormResponseDTO();
+            formResponse.setFormId(form.getFormId());
+            formResponse.setFormType(form.getFormType());
+            formResponse.setFileUrl(form.getFileUrl());
+            formResponse.setFileName(form.getFileName());
+            formResponse.setCreatedAt(form.getCreatedAt());
+            formResponse.setExecutedAt(form.getExecutedAt());
+            formResponse.setStatus(form.getStatus());
+            formResponse.setReason(form.getReason());
+            formResponse.setUserId(form.getUser().getUserId());
+            formResponse.setApartmentId(form.getApartment().getApartmentId());
+
             response.put("status", HttpStatus.CREATED.value());
-            response.put("data", form);
+            response.put("data", formResponse);
             response.put("message", "Form uploaded successfully");
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (Exception e) {
@@ -132,4 +147,34 @@ public class FormController {
         response.put("fileUrl", fileUrl);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+    //  NEW: Get all forms (admin)
+    @GetMapping("/all")
+    public ResponseEntity<Object> getAllForms() {
+        List<Form> forms = formService.getAllForms();
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", HttpStatus.OK.value());
+        response.put("forms", forms);
+        return ResponseEntity.ok(response);
+    }
+
+    //  NEW: Approve or reject a form
+    @PutMapping("/approve/{formId}")
+    public ResponseEntity<Object> approveForm(
+            @PathVariable Long formId,
+            @RequestParam String status
+    ) {
+        Map<String, Object> response = new HashMap<>();
+        try {
+            Form form = formService.approveForm(formId, status);
+            response.put("status", HttpStatus.OK.value());
+            response.put("message", "Form status updated successfully");
+            response.put("form", form);
+            return ResponseEntity.ok(response);
+        } catch (RuntimeException e) {
+            response.put("status", HttpStatus.BAD_REQUEST.value());
+            response.put("message", e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+        }
+    }
+
 }

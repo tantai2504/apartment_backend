@@ -10,6 +10,7 @@ public class FormResponseDTO {
     private String formType;
     private String fileUrl;
     private String fileName;
+    private String reason;
     private Date createdAt;
     private Date executedAt;
     private String status;

@@ -29,7 +29,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                 .csrf(csrf -> csrf.disable())
                 .cors(withDefaults())
                 .authorizeHttpRequests(auth -> auth 
-                        .requestMatchers("/api/**", "/bill/**", "/apartment/**", "/deposit/**", "/consumption/**",
+                        .requestMatchers("/api/**", "/bill/**", "/apartment/**", "/deposit/**", "/consumption/**", "/facility/**",
                                 "/order/**", "/create-payment-link", "/success", "/cancel", "/api/bank-account/**",
                                 "/payment/**","/user/**", "/user/search", "user/update_verification", "/notification/**", "/api/reports/**",
                                 "/public/**","/api/replies/report/**", "/api/replies/report/**", "/api/replies/**",

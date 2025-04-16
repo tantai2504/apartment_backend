@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/forms")
@@ -24,7 +25,22 @@ public class FormController {
         this.formService = formService;
     }
 
-    @PostMapping(value = "/upload",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    private FormResponseDTO toDTO(Form form) {
+        FormResponseDTO dto = new FormResponseDTO();
+        dto.setFormId(form.getFormId());
+        dto.setFormType(form.getFormType());
+        dto.setFileUrl(form.getFileUrl());
+        dto.setFileName(form.getFileName());
+        dto.setCreatedAt(form.getCreatedAt());
+        dto.setExecutedAt(form.getExecutedAt());
+        dto.setStatus(form.getStatus());
+        dto.setReason(form.getReason());
+        dto.setUserId(form.getUser().getUserId());
+        dto.setApartmentId(form.getApartment().getApartmentId());
+        return dto;
+    }
+
+    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Object> uploadForm(
             @RequestParam("userId") Long userId,
             @RequestParam("formType") String formType,
@@ -36,18 +52,7 @@ public class FormController {
         Map<String, Object> response = new HashMap<>();
         try {
             Form form = formService.uploadForm(userId, dto);
-            FormResponseDTO formResponse = new FormResponseDTO();
-            formResponse.setFormId(form.getFormId());
-            formResponse.setFormType(form.getFormType());
-            formResponse.setFileUrl(form.getFileUrl());
-            formResponse.setFileName(form.getFileName());
-            formResponse.setCreatedAt(form.getCreatedAt());
-            formResponse.setExecutedAt(form.getExecutedAt());
-            formResponse.setStatus(form.getStatus());
-            formResponse.setReason(form.getReason());
-            formResponse.setUserId(form.getUser().getUserId());
-            formResponse.setApartmentId(form.getApartment().getApartmentId());
-
+            FormResponseDTO formResponse = toDTO(form);
             response.put("status", HttpStatus.CREATED.value());
             response.put("data", formResponse);
             response.put("message", "Form uploaded successfully");
@@ -62,15 +67,18 @@ public class FormController {
     @PutMapping(value = "/edit/{formId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Object> editForm(
             @PathVariable Long formId,
-            @RequestPart("dto") FormRequestDTO dto,
-            @RequestPart("file") MultipartFile file
+            @RequestParam("formType") String formType,
+            @RequestParam("apartmentId") Long apartmentId,
+            @RequestParam("reason") String reason,
+            @RequestParam("file") MultipartFile file
     ) {
-        dto.setFile(file);
+        FormRequestDTO dto = new FormRequestDTO(formType, reason, apartmentId, file);
         Map<String, Object> response = new HashMap<>();
         try {
             Form form = formService.editForm(formId, dto);
+            FormResponseDTO formResponse = toDTO(form);
             response.put("status", HttpStatus.OK.value());
-            response.put("data", form);
+            response.put("data", formResponse);
             response.put("message", "Form edited successfully");
             return ResponseEntity.status(HttpStatus.OK).body(response);
         } catch (Exception e) {
@@ -80,7 +88,6 @@ public class FormController {
         }
     }
 
-    //get form by user id
     @GetMapping("/user/{userId}")
     public ResponseEntity<Object> getFormsByUser(@PathVariable Long userId) {
         List<Form> forms = formService.getFormsByUser(userId);
@@ -90,12 +97,12 @@ public class FormController {
             response.put("status", HttpStatus.NOT_FOUND.value());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         } else {
+            List<FormResponseDTO> dtos = forms.stream().map(this::toDTO).collect(Collectors.toList());
             response.put("status", HttpStatus.OK.value());
-            response.put("forms", forms);
+            response.put("forms", dtos);
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
     }
-
 
     @GetMapping("/{formId}")
     public ResponseEntity<Object> getFormById(@PathVariable Long formId) {
@@ -107,7 +114,7 @@ public class FormController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
         } else {
             response.put("status", HttpStatus.OK.value());
-            response.put("form", form);
+            response.put("form", toDTO(form));
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
     }
@@ -124,40 +131,23 @@ public class FormController {
     @GetMapping("/filter")
     public ResponseEntity<Object> filterForms(@RequestParam String formType) {
         List<Form> forms = formService.filterForms(formType);
+        List<FormResponseDTO> dtos = forms.stream().map(this::toDTO).collect(Collectors.toList());
         Map<String, Object> response = new HashMap<>();
         response.put("status", HttpStatus.OK.value());
-        response.put("forms", forms);
+        response.put("forms", dtos);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/feedback/{formId}")
-    public ResponseEntity<Object> sendFeedback(@PathVariable Long formId, @RequestParam("feedback") String feedback) {
-        formService.sendFeedback(formId, feedback);
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", HttpStatus.OK.value());
-        response.put("message", "Feedback sent successfully");
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @GetMapping("/download/{formId}")
-    public ResponseEntity<Object> downloadForm(@PathVariable Long formId) {
-        String fileUrl = formService.getFileUrl(formId);
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", HttpStatus.OK.value());
-        response.put("fileUrl", fileUrl);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-    //  NEW: Get all forms (admin)
     @GetMapping("/all")
     public ResponseEntity<Object> getAllForms() {
         List<Form> forms = formService.getAllForms();
+        List<FormResponseDTO> dtos = forms.stream().map(this::toDTO).collect(Collectors.toList());
         Map<String, Object> response = new HashMap<>();
         response.put("status", HttpStatus.OK.value());
-        response.put("forms", forms);
+        response.put("forms", dtos);
         return ResponseEntity.ok(response);
     }
 
-    //  NEW: Approve or reject a form
     @PutMapping("/approve/{formId}")
     public ResponseEntity<Object> approveForm(
             @PathVariable Long formId,
@@ -168,7 +158,7 @@ public class FormController {
             Form form = formService.approveForm(formId, status);
             response.put("status", HttpStatus.OK.value());
             response.put("message", "Form status updated successfully");
-            response.put("form", form);
+            response.put("form", toDTO(form));
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             response.put("status", HttpStatus.BAD_REQUEST.value());

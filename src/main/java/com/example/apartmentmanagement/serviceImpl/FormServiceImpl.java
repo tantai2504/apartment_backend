@@ -86,7 +86,10 @@ public class FormServiceImpl implements FormService {
             if (file == null || file.isEmpty()) {
                 throw new RuntimeException("File must not be empty");
             }
-            Map uploadResult = cloudinary.uploader().upload(dto.getFile().getBytes(), ObjectUtils.emptyMap());
+            Map uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap("resource_type", "auto")
+            );
 
             form.setFormType(dto.getFormType());
             form.setStatus(dto.getStatus());

@@ -20,8 +20,50 @@ public class FacilityController {
     private FacilityService facilityService;
 
     @GetMapping("/getAll")
-    public ResponseEntity<Object> showAllApartment(){
+    public ResponseEntity<Object> showAllFacilities() {
         List<FacilityResponseDTO> facilityResponseDTOS = facilityService.getFacilities();
+        Map<String, Object> response = new HashMap<>();
+        if (facilityResponseDTOS.isEmpty()) {
+            response.put("message", "Không có bài đăng dịch vụ nào");
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        response.put("data", facilityResponseDTOS);
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/get_verified")
+    public ResponseEntity<Object> showAllVerifiedFacilities() {
+        List<FacilityResponseDTO> facilityResponseDTOS = facilityService.getVerifiedFacilities();
+        Map<String, Object> response = new HashMap<>();
+        if (facilityResponseDTOS.isEmpty()) {
+            response.put("message", "Không có bài đăng dịch vụ nào");
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        response.put("data", facilityResponseDTOS);
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/get_unverified")
+    public ResponseEntity<Object> showAllUnverifiedFacilities() {
+        List<FacilityResponseDTO> facilityResponseDTOS = facilityService.getUnverifiedFacilities();
+        Map<String, Object> response = new HashMap<>();
+        if (facilityResponseDTOS.isEmpty()) {
+            response.put("message", "Không có bài đăng dịch vụ nào");
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        response.put("data", facilityResponseDTOS);
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/get_rejected")
+    public ResponseEntity<Object> showAllRejectedFacilities() {
+        List<FacilityResponseDTO> facilityResponseDTOS = facilityService.getRejectedFacilities();
         Map<String, Object> response = new HashMap<>();
         if (facilityResponseDTOS.isEmpty()) {
             response.put("message", "Không có bài đăng dịch vụ nào");
@@ -50,8 +92,9 @@ public class FacilityController {
     @PostMapping("/create")
     public ResponseEntity<Object> createFacility(@RequestParam ("userId") Long userId,
                                                  @RequestParam ("facilityPostContent") String facilityPostContent,
+                                                 @RequestParam ("facilityHeader") String facilityHeader,
                                                  @RequestParam ("file") List<MultipartFile> file) {
-        FacilityRequestDTO facilityRequestDTO = new FacilityRequestDTO(userId, facilityPostContent);
+        FacilityRequestDTO facilityRequestDTO = new FacilityRequestDTO(userId, facilityPostContent, facilityHeader);
         Map<String, Object> response = new HashMap<>();
         try {
             FacilityResponseDTO facilityResponseDTO = facilityService.createFacility(facilityRequestDTO, file);
@@ -112,10 +155,11 @@ public class FacilityController {
     @PutMapping("/update/{facilityId}")
     public ResponseEntity<Object> updateFacilityPost(@PathVariable ("facilityId") Long facilityId,
                                                      @RequestParam ("userId") Long userId,
+                                                     @RequestParam ("facilityHeader") String facilityHeader,
                                                      @RequestParam ("facilityPostContent") String facilityPostContent,
                                                      @RequestParam ("file") List<MultipartFile> file) {
         Map<String, Object> response = new HashMap<>();
-        FacilityRequestDTO facilityRequestDTO = new FacilityRequestDTO(userId, facilityPostContent);
+        FacilityRequestDTO facilityRequestDTO = new FacilityRequestDTO(userId, facilityPostContent, facilityHeader);
         try {
             FacilityResponseDTO facilityResponseDTO = facilityService.updateFacility(facilityId, facilityRequestDTO, file);
             response.put("message", "Update bài post dịch vụ thành công, hãy chờ xét duyệt");

@@ -36,12 +36,76 @@ public class FacilityServiceImpl implements FacilityService {
     public List<FacilityResponseDTO> getFacilities() {
         return facilityRepository.findAll().stream().map(facility -> new FacilityResponseDTO(
                 facility.getUser().getUserName(),
+                facility.getUser().getPhone(),
+                facility.getUser().getEmail(),
                 facility.getFacilityId(),
                 facility.getFacilityContent(),
+                facility.getFacilityHeader(),
                 facility.getVerifiedCheck(),
                 facility.getFacilityPostingDate(),
                 facility.getFacilityImages().stream().map(FacilityImages::getImageUrl).toList()
         )).toList();
+    }
+
+    @Override
+    public List<FacilityResponseDTO> getRejectedFacilities() {
+        return facilityRepository.findAll().stream()
+                .filter(facility -> "rejected".equals(facility.getVerifiedCheck()))
+                .map(facility -> new FacilityResponseDTO(
+                        facility.getUser().getUserName(),
+                        facility.getUser().getPhone(),
+                        facility.getUser().getEmail(),
+                        facility.getFacilityId(),
+                        facility.getFacilityContent(),
+                        facility.getFacilityHeader(),
+                        facility.getVerifiedCheck(),
+                        facility.getFacilityPostingDate(),
+                        facility.getFacilityImages().stream()
+                                .map(FacilityImages::getImageUrl)
+                                .toList()
+                ))
+                .toList();
+    }
+
+
+    @Override
+    public List<FacilityResponseDTO> getVerifiedFacilities() {
+        return facilityRepository.findAll().stream()
+                .filter(facility -> "verified".equals(facility.getVerifiedCheck()))
+                .map(facility -> new FacilityResponseDTO(
+                        facility.getUser().getUserName(),
+                        facility.getUser().getPhone(),
+                        facility.getUser().getEmail(),
+                        facility.getFacilityId(),
+                        facility.getFacilityContent(),
+                        facility.getFacilityHeader(),
+                        facility.getVerifiedCheck(),
+                        facility.getFacilityPostingDate(),
+                        facility.getFacilityImages().stream()
+                                .map(FacilityImages::getImageUrl)
+                                .toList()
+                ))
+                .toList();
+    }
+
+    @Override
+    public List<FacilityResponseDTO> getUnverifiedFacilities() {
+        return facilityRepository.findAll().stream()
+                .filter(facility -> "unverified".equals(facility.getVerifiedCheck()))
+                .map(facility -> new FacilityResponseDTO(
+                        facility.getUser().getUserName(),
+                        facility.getUser().getPhone(),
+                        facility.getUser().getEmail(),
+                        facility.getFacilityId(),
+                        facility.getFacilityContent(),
+                        facility.getFacilityHeader(),
+                        facility.getVerifiedCheck(),
+                        facility.getFacilityPostingDate(),
+                        facility.getFacilityImages().stream()
+                                .map(FacilityImages::getImageUrl)
+                                .toList()
+                ))
+                .toList();
     }
 
     @Override
@@ -77,8 +141,11 @@ public class FacilityServiceImpl implements FacilityService {
 
         return new FacilityResponseDTO(
                 facility.getUser().getUserName(),
+                facility.getUser().getPhone(),
+                facility.getUser().getEmail(),
                 facility.getFacilityId(),
                 facility.getFacilityContent(),
+                facility.getFacilityHeader(),
                 facility.getVerifiedCheck(),
                 facility.getFacilityPostingDate(),
                 facility.getFacilityImages().stream().map(FacilityImages::getImageUrl).toList()
@@ -113,8 +180,11 @@ public class FacilityServiceImpl implements FacilityService {
 
         return new FacilityResponseDTO(
                 facility.getUser().getUserName(),
+                facility.getUser().getPhone(),
+                facility.getUser().getEmail(),
                 facility.getFacilityId(),
                 facility.getFacilityContent(),
+                facility.getFacilityHeader(),
                 facility.getVerifiedCheck(),
                 facility.getFacilityPostingDate(),
                 facility.getFacilityImages().stream().map(FacilityImages::getImageUrl).toList()
@@ -132,31 +202,11 @@ public class FacilityServiceImpl implements FacilityService {
             throw new RuntimeException("Không thể bỏ trống nội dung");
         }
 
+        facility.setVerifiedUserId(null);
         facility.setFacilityContent(facilityRequestDTO.getFacilityPostContent());
+        facility.setVerifiedCheckDate(null);
         facility.setVerifiedCheck("unverified");
         facility.setFacilityPostingDate(LocalDateTime.now());
-
-//        if (imageFiles != null && !imageFiles.isEmpty()) {
-//
-//            List<FacilityImages> oldImages = facility.getFacilityImages();
-//            if (oldImages != null) {
-//                oldImages.clear();
-//            }
-//
-//            List<String> facilityImageUrl = imageUploadService.uploadMultipleImages(imageFiles);
-//            List<FacilityImages> newImages = new ArrayList<>();
-//
-//            for (String imageUrl : facilityImageUrl) {
-//                FacilityImages facilityImage = new FacilityImages();
-//                facilityImage.setImageUrl(imageUrl);
-//                facilityImage.setFacility(facility);
-//                newImages.add(facilityImage);
-//            }
-//
-//            facility.getFacilityImages().addAll(newImages);
-//        }
-//
-//        facilityRepository.save(facility);
 
         if (imageFiles != null && !imageFiles.isEmpty()) {
             facility.getFacilityImages().clear();
@@ -178,8 +228,11 @@ public class FacilityServiceImpl implements FacilityService {
 
         return new FacilityResponseDTO(
                 facility.getUser().getUserName(),
+                facility.getUser().getPhone(),
+                facility.getUser().getEmail(),
                 facility.getFacilityId(),
                 facility.getFacilityContent(),
+                facility.getFacilityHeader(),
                 facility.getVerifiedCheck(),
                 facility.getFacilityPostingDate(),
                 facility.getFacilityImages().stream().map(FacilityImages::getImageUrl).toList()
@@ -208,8 +261,11 @@ public class FacilityServiceImpl implements FacilityService {
 
         return new FacilityResponseDTO(
                 facility.getUser().getUserName(),
+                facility.getUser().getPhone(),
+                facility.getUser().getEmail(),
                 facility.getFacilityId(),
                 facility.getFacilityContent(),
+                facility.getFacilityHeader(),
                 facility.getVerifiedCheck(),
                 facility.getFacilityPostingDate(),
                 facility.getVerifiedCheckDate(),
@@ -241,8 +297,11 @@ public class FacilityServiceImpl implements FacilityService {
 
         return new FacilityResponseDTO(
                 facility.getUser().getUserName(),
+                facility.getUser().getPhone(),
+                facility.getUser().getEmail(),
                 facility.getFacilityId(),
                 facility.getFacilityContent(),
+                facility.getFacilityHeader(),
                 facility.getVerifiedCheck(),
                 facility.getFacilityPostingDate(),
                 facility.getVerifiedCheckDate(),

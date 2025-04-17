@@ -9,6 +9,12 @@ import java.util.List;
 public interface FacilityService {
     List<FacilityResponseDTO> getFacilities();
 
+    List<FacilityResponseDTO> getRejectedFacilities();
+
+    List<FacilityResponseDTO> getVerifiedFacilities();
+
+    List<FacilityResponseDTO> getUnverifiedFacilities();
+
     FacilityResponseDTO createFacility(FacilityRequestDTO facilityRequestDTO, List<MultipartFile> imageFiles);
 
     void deleteFacility(Long id);

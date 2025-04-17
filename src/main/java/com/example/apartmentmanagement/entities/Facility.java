@@ -25,6 +25,10 @@ public class Facility {
     @Nationalized
     private String facilityContent;
 
+    @Lob
+    @Nationalized
+    private String facilityHeader;
+
     private LocalDateTime facilityPostingDate;
 
     // verified & unverified

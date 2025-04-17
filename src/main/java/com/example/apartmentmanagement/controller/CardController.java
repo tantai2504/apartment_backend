@@ -21,6 +21,7 @@ public class CardController {
     public ResponseEntity<Object> sendCardCreatedNotification(@PathVariable Long userId) {
         NotificationDTO notificationDTO = notificationService.createAndBroadcastNotification(String.format("Tài khoản của bạn đã được duyệt thành công! Vui lòng xuống" +
                 " lễ tân để nhận thẻ đỗ xe!"), "Thông báo cấp thẻ nhà xe", userId);
+        System.out.println("hello");
         Map<String, Object> response = new HashMap<>();
         response.put("data", notificationDTO);
         response.put("status", HttpStatus.CREATED.value());

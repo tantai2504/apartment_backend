@@ -45,6 +45,58 @@ public class FacilityServiceImpl implements FacilityService {
     }
 
     @Override
+    public List<FacilityResponseDTO> getRejectedFacilities() {
+        return facilityRepository.findAll().stream()
+                .filter(facility -> "rejected".equals(facility.getVerifiedCheck()))
+                .map(facility -> new FacilityResponseDTO(
+                        facility.getUser().getUserName(),
+                        facility.getFacilityId(),
+                        facility.getFacilityContent(),
+                        facility.getVerifiedCheck(),
+                        facility.getFacilityPostingDate(),
+                        facility.getFacilityImages().stream()
+                                .map(FacilityImages::getImageUrl)
+                                .toList()
+                ))
+                .toList();
+    }
+
+
+    @Override
+    public List<FacilityResponseDTO> getVerifiedFacilities() {
+        return facilityRepository.findAll().stream()
+                .filter(facility -> "verified".equals(facility.getVerifiedCheck()))
+                .map(facility -> new FacilityResponseDTO(
+                        facility.getUser().getUserName(),
+                        facility.getFacilityId(),
+                        facility.getFacilityContent(),
+                        facility.getVerifiedCheck(),
+                        facility.getFacilityPostingDate(),
+                        facility.getFacilityImages().stream()
+                                .map(FacilityImages::getImageUrl)
+                                .toList()
+                ))
+                .toList();
+    }
+
+    @Override
+    public List<FacilityResponseDTO> getUnverifiedFacilities() {
+        return facilityRepository.findAll().stream()
+                .filter(facility -> "unverified".equals(facility.getVerifiedCheck()))
+                .map(facility -> new FacilityResponseDTO(
+                        facility.getUser().getUserName(),
+                        facility.getFacilityId(),
+                        facility.getFacilityContent(),
+                        facility.getVerifiedCheck(),
+                        facility.getFacilityPostingDate(),
+                        facility.getFacilityImages().stream()
+                                .map(FacilityImages::getImageUrl)
+                                .toList()
+                ))
+                .toList();
+    }
+
+    @Override
     public FacilityResponseDTO createFacility(FacilityRequestDTO facilityRequestDTO, List<MultipartFile> imageFiles) {
 
         User user = userRepository.findById(facilityRequestDTO.getUserId()).get();

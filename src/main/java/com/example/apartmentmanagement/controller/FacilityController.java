@@ -20,8 +20,50 @@ public class FacilityController {
     private FacilityService facilityService;
 
     @GetMapping("/getAll")
-    public ResponseEntity<Object> showAllApartment(){
+    public ResponseEntity<Object> showAllFacilities() {
         List<FacilityResponseDTO> facilityResponseDTOS = facilityService.getFacilities();
+        Map<String, Object> response = new HashMap<>();
+        if (facilityResponseDTOS.isEmpty()) {
+            response.put("message", "Không có bài đăng dịch vụ nào");
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        response.put("data", facilityResponseDTOS);
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/get_verified")
+    public ResponseEntity<Object> showAllVerifiedFacilities() {
+        List<FacilityResponseDTO> facilityResponseDTOS = facilityService.getVerifiedFacilities();
+        Map<String, Object> response = new HashMap<>();
+        if (facilityResponseDTOS.isEmpty()) {
+            response.put("message", "Không có bài đăng dịch vụ nào");
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        response.put("data", facilityResponseDTOS);
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/get_unverified")
+    public ResponseEntity<Object> showAllUnverifiedFacilities() {
+        List<FacilityResponseDTO> facilityResponseDTOS = facilityService.getUnverifiedFacilities();
+        Map<String, Object> response = new HashMap<>();
+        if (facilityResponseDTOS.isEmpty()) {
+            response.put("message", "Không có bài đăng dịch vụ nào");
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        response.put("data", facilityResponseDTOS);
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/get_rejected")
+    public ResponseEntity<Object> showAllRejectedFacilities() {
+        List<FacilityResponseDTO> facilityResponseDTOS = facilityService.getRejectedFacilities();
         Map<String, Object> response = new HashMap<>();
         if (facilityResponseDTOS.isEmpty()) {
             response.put("message", "Không có bài đăng dịch vụ nào");

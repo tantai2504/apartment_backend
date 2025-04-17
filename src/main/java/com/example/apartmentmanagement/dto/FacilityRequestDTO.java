@@ -12,4 +12,5 @@ import lombok.Setter;
 public class FacilityRequestDTO {
     private Long userId;
     private String facilityPostContent;
+    private String facilityHeader;
 }

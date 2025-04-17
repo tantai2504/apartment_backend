@@ -14,8 +14,11 @@ import java.util.List;
 @NoArgsConstructor
 public class FacilityResponseDTO {
     private String userName;
+    private String userPhone;
+    private String userEmail;
     private Long facilityId;
     private String facilityPostContent;
+    private String facilityHeader;
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime verifiedAt;
@@ -23,19 +26,25 @@ public class FacilityResponseDTO {
     private String verifiedUserName;
     private List<String> images;
 
-    public FacilityResponseDTO(String userName, Long facilityId, String facilityPostContent, String status, LocalDateTime createdAt, List<String> images) {
+    public FacilityResponseDTO(String userName, String userPhone, String userEmail, Long facilityId, String facilityPostContent, String facilityHeader, String status, LocalDateTime createdAt, List<String> images) {
         this.userName = userName;
+        this.userPhone = userPhone;
+        this.userEmail = userEmail;
         this.facilityId = facilityId;
         this.facilityPostContent = facilityPostContent;
+        this.facilityHeader = facilityHeader;
         this.status = status;
         this.createdAt = createdAt;
         this.images = images;
     }
 
-    public FacilityResponseDTO(String userName, Long facilityId, String facilityPostContent, String status, LocalDateTime createdAt, LocalDateTime verifiedAt, List<String> images, String verifiedUserName) {
+    public FacilityResponseDTO(String userName, String userPhone, String userEmail, Long facilityId, String facilityPostContent, String facilityHeader, String status, LocalDateTime createdAt, LocalDateTime verifiedAt, List<String> images, String verifiedUserName) {
         this.userName = userName;
+        this.userPhone = userPhone;
+        this.userEmail = userEmail;
         this.facilityId = facilityId;
         this.facilityPostContent = facilityPostContent;
+        this.facilityHeader = facilityHeader;
         this.status = status;
         this.createdAt = createdAt;
         this.verifiedAt = verifiedAt;

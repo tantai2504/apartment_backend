@@ -90,6 +90,7 @@ public class FacilityServiceImpl implements FacilityService {
 
     @Override
     public List<FacilityResponseDTO> getUnverifiedFacilities() {
+        System.out.println("hello");
         return facilityRepository.findAll().stream()
                 .filter(facility -> "unverified".equals(facility.getVerifiedCheck()))
                 .map(facility -> new FacilityResponseDTO(

@@ -34,10 +34,17 @@ public class ApartmentServiceImpl implements ApartmentService{
 
     @Override
     public List<ApartmentResponseDTO> getOwnApartments(Long userId) {
-        User user = userRepository.findById(userId).get();
+        User user = userRepository.findById(userId).orElse(null);
         if (user != null) {
 
-            List<Apartment> apartments = user.getApartments();
+            List<Apartment> apartments = new ArrayList<>();
+            List<Apartment> apartmentListFromDB = apartmentRepository.findAll();
+
+            for (Apartment apartment : apartmentListFromDB) {
+                if (apartment.getHouseholder().equals(user.getUserName())) {
+                    apartments.add(apartment);
+                }
+            }
 
             return apartments.stream().map(apartment -> new ApartmentResponseDTO(
                     apartment.getApartmentId(),

@@ -202,6 +202,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (verificationForm.getVerificationFormType() == 2) {
+            // Chủ sở hữu
             if (apartment.getHouseholder() == null) {
                 user.setRole("Owner");
                 apartment.setHouseholder(user.getUserName());
@@ -212,6 +213,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (verificationForm.getVerificationFormType() == 1) {
+            // Người thuê
             user.setRole("Rentor");
             apartment.setStatus("rented");
             apartment.setTotalNumber(apartment.getTotalNumber() + 1);
@@ -220,7 +222,6 @@ public class UserServiceImpl implements UserService {
         apartmentRepository.save(apartment);
 
         user.setVerificationForm(verificationForm);
-
         userRepository.save(user);
 
         verificationForm.setVerified(true);
@@ -232,13 +233,18 @@ public class UserServiceImpl implements UserService {
         System.out.println("User ID: " + user.getUserId());
         System.out.println("Apartment ID: " + apartmentId);
 
-        userRepository.addUserToApartment(userId, apartmentId);
+        if (verificationForm.getVerificationFormType() == 1) {
+            userRepository.addUserToApartment(userId, apartmentId);
+        }
 
         emailService.sendVerificationEmail(user.getEmail(), newAccountDTO.getUsername());
 
-        notificationService.createAndBroadcastNotification(String.format("Tài khoản của bạn đã được duyệt thành công!"), "Thông báo duyệt tài khoản", userId);
+        notificationService.createAndBroadcastNotification(
+                "Tài khoản của bạn đã được duyệt thành công!",
+                "Thông báo duyệt tài khoản",
+                userId
+        );
 
-        // Chuẩn bị dữ liệu phản hồi
         List<ApartmentResponseDTO> apartmentResponseDTOList = user.getApartments().stream()
                 .map(apartment1 -> new ApartmentResponseDTO(
                         apartment1.getApartmentId(),
@@ -263,7 +269,6 @@ public class UserServiceImpl implements UserService {
                 true
         );
     }
-
 
     @Override
     public RegisterResponseDTO register(VerifyOTPRequestDTO registerRequestDTO) {

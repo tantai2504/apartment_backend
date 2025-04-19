@@ -4,7 +4,6 @@ package com.example.apartmentmanagement.entities;
  * Entity user: tai khoan co ban truy cap vao trang web
  */
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -81,10 +80,10 @@ public class User {
     private List<Post> posts;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Deposit> deposits;
+    private List<Facility> facilities;
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Card card;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Deposit> deposits;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<BankAccount> bankAccounts;

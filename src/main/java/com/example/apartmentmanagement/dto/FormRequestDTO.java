@@ -8,13 +8,13 @@ public class FormRequestDTO {
     private String formType;
     private String status;
     private String reason;
-    private Long apartmentId;
+    private String apartmentName;
     private MultipartFile file;
 
-    public FormRequestDTO(String formType, String reason, Long apartmentId, MultipartFile file) {
+    public FormRequestDTO(String formType, String reason, String apartmentName, MultipartFile file) {
         this.formType = formType;
         this.reason = reason;
-        this.apartmentId = apartmentId;
+        this.apartmentName = apartmentName;
         this.file = file;
     }
 }

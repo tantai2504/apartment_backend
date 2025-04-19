@@ -10,6 +10,8 @@ import com.example.apartmentmanagement.repository.ApartmentRepository;
 import com.example.apartmentmanagement.repository.FormRepository;
 import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.service.FormService;
+import com.example.apartmentmanagement.service.NotificationService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,9 +25,10 @@ public class FormServiceImpl implements FormService {
 
     private final FormRepository formRepository;
     private final UserRepository userRepository;
-
     private final ApartmentRepository apartmentRepository;
     private final Cloudinary cloudinary;
+    @Autowired
+    private NotificationService notificationService;
 
     public FormServiceImpl(FormRepository formRepository, UserRepository userRepository,ApartmentRepository apartmentRepository, Cloudinary cloudinary) {
         this.formRepository = formRepository;
@@ -44,8 +47,7 @@ public class FormServiceImpl implements FormService {
         try {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("User not found"));
-            Apartment apartment = apartmentRepository.findById(dto.getApartmentId())
-                    .orElseThrow(() -> new RuntimeException("Apartment not found"));
+            Apartment apartment = apartmentRepository.findApartmentByApartmentName(dto.getApartmentName());
             MultipartFile file = dto.getFile();
             if (file == null || file.isEmpty()) {
                 throw new RuntimeException("File must not be empty");
@@ -80,13 +82,15 @@ public class FormServiceImpl implements FormService {
         try {
             Form form = formRepository.findById(formId)
                     .orElseThrow(() -> new RuntimeException("Form not found"));
-            Apartment apartment = apartmentRepository.findById(dto.getApartmentId())
-                    .orElseThrow(() -> new RuntimeException("Apartment not found"));
+            Apartment apartment = apartmentRepository.findApartmentByApartmentName(dto.getApartmentName());
             MultipartFile file = dto.getFile();
             if (file == null || file.isEmpty()) {
                 throw new RuntimeException("File must not be empty");
             }
-            Map uploadResult = cloudinary.uploader().upload(dto.getFile().getBytes(), ObjectUtils.emptyMap());
+            Map uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap("resource_type", "auto")
+            );
 
             form.setFormType(dto.getFormType());
             form.setStatus(dto.getStatus());
@@ -162,7 +166,23 @@ public class FormServiceImpl implements FormService {
 
         if ("approved".equalsIgnoreCase(status)) {
             form.setExecutedAt(new Date());
+            // Tạo thông báo cho admin
+            notificationService.createAndBroadcastNotification(
+                    "Đơn từ " + form.getFileName() + " đã được duyệt",
+                    "form",
+                    form.getUser().getUserId()
+            );
         }
+
+        if ("rejected".equalsIgnoreCase(status)) {
+            // Tạo thông báo cho admin
+            notificationService.createAndBroadcastNotification(
+                    "Đơn từ " + form.getFileName() + " đã bị từ chối",
+                    "form",
+                    form.getUser().getUserId()
+            );
+        }
+
 
         return formRepository.save(form);
     }

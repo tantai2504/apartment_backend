@@ -1,10 +1,7 @@
 package com.example.apartmentmanagement.serviceImpl;
 
 import com.example.apartmentmanagement.dto.*;
-import com.example.apartmentmanagement.entities.Apartment;
-import com.example.apartmentmanagement.entities.ContractImages;
-import com.example.apartmentmanagement.entities.User;
-import com.example.apartmentmanagement.entities.VerificationForm;
+import com.example.apartmentmanagement.entities.*;
 import com.example.apartmentmanagement.repository.*;
 import com.example.apartmentmanagement.service.EmailService;
 import com.example.apartmentmanagement.service.NotificationService;
@@ -15,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -35,9 +33,6 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private EmailService emailService;
-
-    @Autowired
-    private ContractImagesRepository contractImagesRepository;
 
     @Autowired
     private NotificationService notificationService;
@@ -207,6 +202,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (verificationForm.getVerificationFormType() == 2) {
+            // Chủ sở hữu
             if (apartment.getHouseholder() == null) {
                 user.setRole("Owner");
                 apartment.setHouseholder(user.getUserName());
@@ -217,6 +213,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (verificationForm.getVerificationFormType() == 1) {
+            // Người thuê
             user.setRole("Rentor");
             apartment.setStatus("rented");
             apartment.setTotalNumber(apartment.getTotalNumber() + 1);
@@ -225,7 +222,6 @@ public class UserServiceImpl implements UserService {
         apartmentRepository.save(apartment);
 
         user.setVerificationForm(verificationForm);
-
         userRepository.save(user);
 
         verificationForm.setVerified(true);
@@ -237,11 +233,18 @@ public class UserServiceImpl implements UserService {
         System.out.println("User ID: " + user.getUserId());
         System.out.println("Apartment ID: " + apartmentId);
 
-        userRepository.addUserToApartment(userId, apartmentId);
+        if (verificationForm.getVerificationFormType() == 1) {
+            userRepository.addUserToApartment(userId, apartmentId);
+        }
 
         emailService.sendVerificationEmail(user.getEmail(), newAccountDTO.getUsername());
 
-        // Chuẩn bị dữ liệu phản hồi
+        notificationService.createAndBroadcastNotification(
+                "Tài khoản của bạn đã được duyệt thành công!",
+                "Thông báo duyệt tài khoản",
+                userId
+        );
+
         List<ApartmentResponseDTO> apartmentResponseDTOList = user.getApartments().stream()
                 .map(apartment1 -> new ApartmentResponseDTO(
                         apartment1.getApartmentId(),
@@ -267,7 +270,6 @@ public class UserServiceImpl implements UserService {
         );
     }
 
-
     @Override
     public RegisterResponseDTO register(VerifyOTPRequestDTO registerRequestDTO) {
         User user = new User();
@@ -275,6 +277,7 @@ public class UserServiceImpl implements UserService {
         user.setEmail(registerRequestDTO.getEmail());
         user.setPhone(registerRequestDTO.getPhone());
         user.setPassword(registerRequestDTO.getPassword());
+        user.setBirthday(LocalDate.of(1950, 1, 1));
         user.setRole("User");
         userRepository.save(user);
         RegisterResponseDTO responseDTO = new RegisterResponseDTO(
@@ -673,53 +676,6 @@ public class UserServiceImpl implements UserService {
                 verificationForm.isVerified()
         );
     }
-
-
-//    @Override
-//    public VerifyUserResponseDTO updateVerifyUser(Long verificationUserId, VerifyUserRequestDTO verifyUserDTO, List<MultipartFile> imageFiles) {
-//        VerificationForm verificationForm = verificationFormRepository.findById(verificationUserId)
-//                .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn xác thực với ID: " + verificationUserId));
-//
-//        User user = getUserByEmailOrUserName(verifyUserDTO.getEmail());
-//
-//        verificationForm.setContractStartDate(verifyUserDTO.getContractStartDate());
-//        verificationForm.setContractEndDate(verifyUserDTO.getContractEndDate());
-//
-//        // Xoá ảnh cũ nếu có
-//        List<ContractImages> oldImages = verificationForm.getContractImages();
-//        if (oldImages != null) {
-//            contractImagesRepository.deleteAll(oldImages);
-//        }
-//
-//        // Upload ảnh mới
-//        List<ContractImages> newContractImages = new ArrayList<>();
-//        for (MultipartFile file : imageFiles) {
-//            ContractImages contractImage = new ContractImages();
-//            contractImage.setImageUrl(imageUploadService.uploadImage(file));
-//            contractImage.setVerificationForm(verificationForm);
-//            newContractImages.add(contractImage);
-//        }
-//
-//        verificationForm.setContractImages(newContractImages);
-//        verificationForm = verificationFormRepository.save(verificationForm);
-//
-//        return new VerifyUserResponseDTO(
-//                verificationForm.getVerificationFormId(),
-//                verificationForm.getVerificationFormName(),
-//                verificationForm.getFullName(),
-//                verificationForm.getEmail(),
-//                verificationForm.getPhoneNumber(),
-//                verificationForm.getContractStartDate(),
-//                verificationForm.getContractEndDate(),
-//                newContractImages.stream().map(ContractImages::getImageUrl).toList(),
-//                user.getRole(),
-//                verificationForm.getVerificationFormId(),
-//                verificationForm.getVerificationFormType(),
-//                verificationForm.getApartmentName(),
-//                verificationForm.getUserName(),
-//                verificationForm.isVerified()
-//        );
-//    }
 
     @Override
     public VerifyUserResponseDTO updateVerifyUser(Long verificationUserId, VerifyUserRequestDTO verifyUserDTO, List<MultipartFile> imageFiles) {

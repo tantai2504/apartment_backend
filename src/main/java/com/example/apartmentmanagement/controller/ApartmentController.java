@@ -60,7 +60,7 @@ public class ApartmentController {
 
     @GetMapping("/getAll/unrented")
     public ResponseEntity<Object> showAllUnrentedApartment() {
-        List<ApartmentResponseDTO> apartments = apartmentService.totalUnrentedApartment();
+        List<ApartmentResponseDTO> apartments = apartmentService.showApartment();
         Map<String, Object> response = new HashMap<>();
         if (apartments.isEmpty()) {
             response.put("message", "Tất cả các căn hộ đều đã được cho thuê");
@@ -203,7 +203,7 @@ public class ApartmentController {
     }
 
     @GetMapping("/get_rentor")
-    public ResponseEntity<Object> getRentor(@RequestBody String apartmentName) {
+    public ResponseEntity<Object> getRentor(@RequestParam String apartmentName) {
         List<UserResponseDTO> userResponseDTOS = apartmentService.getRentorByApartment(apartmentName);
         Map<String, Object> response = new HashMap<>();
         if (userResponseDTOS != null) {

@@ -47,8 +47,7 @@ public class FormServiceImpl implements FormService {
         try {
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new RuntimeException("User not found"));
-            Apartment apartment = apartmentRepository.findById(dto.getApartmentId())
-                    .orElseThrow(() -> new RuntimeException("Apartment not found"));
+            Apartment apartment = apartmentRepository.findApartmentByApartmentName(dto.getApartmentName());
             MultipartFile file = dto.getFile();
             if (file == null || file.isEmpty()) {
                 throw new RuntimeException("File must not be empty");
@@ -83,8 +82,7 @@ public class FormServiceImpl implements FormService {
         try {
             Form form = formRepository.findById(formId)
                     .orElseThrow(() -> new RuntimeException("Form not found"));
-            Apartment apartment = apartmentRepository.findById(dto.getApartmentId())
-                    .orElseThrow(() -> new RuntimeException("Apartment not found"));
+            Apartment apartment = apartmentRepository.findApartmentByApartmentName(dto.getApartmentName());
             MultipartFile file = dto.getFile();
             if (file == null || file.isEmpty()) {
                 throw new RuntimeException("File must not be empty");

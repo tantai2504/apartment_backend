@@ -128,7 +128,6 @@ public class ApartmentServiceImpl implements ApartmentService{
     @Override
     public List<ApartmentResponseDTO> totalUnrentedApartment() {
         return apartmentRepository.findAll().stream().
-                filter(apartment -> apartment.getStatus().equals("unrented")).
                 map(apartment -> new ApartmentResponseDTO(
                 apartment.getApartmentId(),
                 apartment.getApartmentName(),

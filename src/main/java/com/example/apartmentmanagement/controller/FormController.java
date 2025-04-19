@@ -44,11 +44,11 @@ public class FormController {
     public ResponseEntity<Object> uploadForm(
             @RequestParam("userId") Long userId,
             @RequestParam("formType") String formType,
-            @RequestParam("apartmentId") Long apartmentId,
+            @RequestParam("apartmentId") String apartmentName,
             @RequestParam("reason") String reason,
             @RequestParam("file") MultipartFile file
     ) {
-        FormRequestDTO dto = new FormRequestDTO(formType, reason, apartmentId, file);
+        FormRequestDTO dto = new FormRequestDTO(formType, reason, apartmentName, file);
         Map<String, Object> response = new HashMap<>();
         try {
             Form form = formService.uploadForm(userId, dto);
@@ -68,11 +68,11 @@ public class FormController {
     public ResponseEntity<Object> editForm(
             @PathVariable Long formId,
             @RequestParam("formType") String formType,
-            @RequestParam("apartmentId") Long apartmentId,
+            @RequestParam("apartmentId") String apartmentName,
             @RequestParam("reason") String reason,
             @RequestParam("file") MultipartFile file
     ) {
-        FormRequestDTO dto = new FormRequestDTO(formType, reason, apartmentId, file);
+        FormRequestDTO dto = new FormRequestDTO(formType, reason, apartmentName, file);
         Map<String, Object> response = new HashMap<>();
         try {
             Form form = formService.editForm(formId, dto);

@@ -203,7 +203,7 @@ public class ApartmentController {
     }
 
     @GetMapping("/get_rentor")
-    public ResponseEntity<Object> getRentor(@RequestBody String apartmentName) {
+    public ResponseEntity<Object> getRentor(@RequestParam String apartmentName) {
         List<UserResponseDTO> userResponseDTOS = apartmentService.getRentorByApartment(apartmentName);
         Map<String, Object> response = new HashMap<>();
         if (userResponseDTOS != null) {

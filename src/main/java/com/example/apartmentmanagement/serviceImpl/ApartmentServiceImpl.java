@@ -41,7 +41,7 @@ public class ApartmentServiceImpl implements ApartmentService{
             List<Apartment> apartmentListFromDB = apartmentRepository.findAll();
 
             for (Apartment apartment : apartmentListFromDB) {
-                if (apartment.getHouseholder().equals(user.getUserName())) {
+                if (user.getUserName().equals(apartment.getHouseholder())) {
                     apartments.add(apartment);
                 }
             }

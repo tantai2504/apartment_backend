@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -271,6 +272,7 @@ public class UserServiceImpl implements UserService {
         user.setEmail(registerRequestDTO.getEmail());
         user.setPhone(registerRequestDTO.getPhone());
         user.setPassword(registerRequestDTO.getPassword());
+        user.setBirthday(LocalDate.of(1950, 1, 1));
         user.setRole("User");
         userRepository.save(user);
         RegisterResponseDTO responseDTO = new RegisterResponseDTO(

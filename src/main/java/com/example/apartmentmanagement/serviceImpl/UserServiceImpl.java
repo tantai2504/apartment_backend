@@ -5,6 +5,7 @@ import com.example.apartmentmanagement.entities.*;
 import com.example.apartmentmanagement.repository.*;
 import com.example.apartmentmanagement.service.EmailService;
 import com.example.apartmentmanagement.service.NotificationService;
+import com.example.apartmentmanagement.service.PostService;
 import com.example.apartmentmanagement.service.UserService;
 import com.example.apartmentmanagement.util.AESUtil;
 import jakarta.transaction.Transactional;
@@ -13,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
+import java.time.Period;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -24,6 +26,12 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private ApartmentRepository apartmentRepository;
+
+    @Autowired
+    private PostRepository postRepository;
+
+    @Autowired
+    private PostService postService;
 
     @Autowired
     private ImageUploadService imageUploadService;
@@ -245,6 +253,10 @@ public class UserServiceImpl implements UserService {
                 userId
         );
 
+        String apartmentName = apartment.getApartmentName();
+        Post post = postRepository.findByApartment_ApartmentName(apartmentName);
+        postService.deletePost(post.getPostId());
+
         List<ApartmentResponseDTO> apartmentResponseDTOList = user.getApartments().stream()
                 .map(apartment1 -> new ApartmentResponseDTO(
                         apartment1.getApartmentId(),
@@ -444,6 +456,11 @@ public class UserServiceImpl implements UserService {
         }
         if (updateUserRequestDTO.getBirthday() != null) {
             checkUser.setBirthday(updateUserRequestDTO.getBirthday());
+            LocalDate birthday = updateUserRequestDTO.getBirthday();
+            LocalDate today = LocalDate.now();
+            int age = Period.between(birthday, today).getYears();
+            String ageStr = String.valueOf(age);
+            checkUser.setAge(ageStr);
         }
         if (updateUserRequestDTO.getJob() != null) {
             checkUser.setJob(updateUserRequestDTO.getJob());

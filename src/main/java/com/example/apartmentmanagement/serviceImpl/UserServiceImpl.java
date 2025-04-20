@@ -253,9 +253,9 @@ public class UserServiceImpl implements UserService {
                 userId
         );
 
-        String apartmentName = apartment.getApartmentName();
-        Post post = postRepository.findByApartment_ApartmentName(apartmentName);
-        postService.deletePost(post.getPostId());
+//        String apartmentName = apartment.getApartmentName();
+//        Post post = postRepository.findByApartment_ApartmentName(apartmentName);
+//        postService.deletePost(post.getPostId());
 
         List<ApartmentResponseDTO> apartmentResponseDTOList = user.getApartments().stream()
                 .map(apartment1 -> new ApartmentResponseDTO(

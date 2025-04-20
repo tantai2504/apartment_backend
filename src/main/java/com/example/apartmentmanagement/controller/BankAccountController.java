@@ -20,7 +20,6 @@ public class BankAccountController {
             @RequestBody BankAccountRequestDTO requestDTO) {
         // Thêm tài khoản và sinh QR
         BankAccountQRResponseDTO response = bankAccountService.addBankAccountWithQR(requestDTO);
-
         return ResponseEntity.ok(response);
     }
 
@@ -39,8 +38,6 @@ public class BankAccountController {
     @PostMapping("/update-payment-status")
     public ResponseEntity<String> updatePaymentStatus(@RequestParam Long billId, @RequestParam String status) {
         System.out.println("✅ Trạng thái thanh toán: " + status + " - Bill ID: " + billId);
-
-
         return ResponseEntity.ok("Đã nhận trạng thái thanh toán cho billId: " + billId);
     }
 }

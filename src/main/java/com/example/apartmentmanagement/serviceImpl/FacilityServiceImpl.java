@@ -122,6 +122,7 @@ public class FacilityServiceImpl implements FacilityService {
         }
 
         facility.setFacilityContent(facilityRequestDTO.getFacilityPostContent());
+        facility.setFacilityHeader(facilityRequestDTO.getFacilityHeader());
         facility.setVerifiedCheck("unverified");
         facility.setFacilityPostingDate(LocalDateTime.now());
 
@@ -206,6 +207,7 @@ public class FacilityServiceImpl implements FacilityService {
         facility.setVerifiedUserId(null);
         facility.setFacilityContent(facilityRequestDTO.getFacilityPostContent());
         facility.setVerifiedCheckDate(null);
+        facility.setFacilityHeader(facilityRequestDTO.getFacilityHeader());
         facility.setVerifiedCheck("unverified");
         facility.setFacilityPostingDate(LocalDateTime.now());
 

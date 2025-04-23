@@ -26,13 +26,6 @@ public class ApartmentServiceImpl implements ApartmentService{
     private UserRepository userRepository;
 
     @Override
-    public String addApartment(Apartment apartment) {
-        apartment.setStatus("unrented");
-        apartmentRepository.save(apartment);
-        return "Add successfully";
-    }
-
-    @Override
     public List<ApartmentResponseDTO> getOwnApartments(Long userId) {
         User user = userRepository.findById(userId).orElse(null);
         if (user != null) {

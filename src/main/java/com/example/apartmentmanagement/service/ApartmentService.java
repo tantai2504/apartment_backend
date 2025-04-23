@@ -7,9 +7,6 @@ import com.example.apartmentmanagement.entities.Apartment;
 import java.util.List;
 
 public interface ApartmentService {
-
-    String addApartment(Apartment apartment);
-
     //list danh sach can ho cua owner
     List<ApartmentResponseDTO> getOwnApartments(Long userId);
 

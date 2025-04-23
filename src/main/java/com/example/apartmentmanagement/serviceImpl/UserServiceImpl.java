@@ -204,6 +204,10 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Chưa có user này trong hệ thống");
         }
 
+        if (!user.getRole().equals("User")) {
+            throw new RuntimeException("Người dùng hiện đang ở trong căn hộ khác, không thể thêm vào căn hộ này");
+        }
+
         Apartment apartment = apartmentRepository.findApartmentByApartmentName(newAccountDTO.getApartmentName());
         if (apartment == null) {
             throw new RuntimeException("Không tìm thấy căn hộ");

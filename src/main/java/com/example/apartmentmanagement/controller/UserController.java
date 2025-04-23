@@ -149,23 +149,6 @@ public class UserController {
         }
     }
 
-    @GetMapping("/user_profile")
-    public ResponseEntity<Object> getUserInfo(HttpSession session) {
-        User user = (User) session.getAttribute("user");
-        Long userId = user.getUserId();
-        UserRequestDTO userRequestDto = userService.getUserDTOById(userId);
-        Map<String, Object> response = new HashMap<>();
-        if (userRequestDto != null) {
-            response.put("status", HttpStatus.OK.value());
-            response.put("data", userRequestDto);
-            return ResponseEntity.ok(response);
-        } else {
-            response.put("status", HttpStatus.NOT_FOUND.value());
-            response.put("message", "Không tìm thấy thông tin cư dân này");
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);
-        }
-    }
-
     @GetMapping("/get/{userId}")
     public ResponseEntity<Object> getUserById(@PathVariable Long userId) {
         Map<String, Object> response = new HashMap<>();

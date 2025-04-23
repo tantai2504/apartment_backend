@@ -221,6 +221,9 @@ public class UserServiceImpl implements UserService {
         }
 
         if (verificationForm.getVerificationFormType() == 1) {
+            if (apartment.getHouseholder() == null) {
+                throw new RuntimeException("Căn hộ này chưa có chủ hộ, không thể thêm người thuê này vào");
+            }
             // Người thuê
             user.setRole("Rentor");
             apartment.setStatus("rented");

@@ -48,6 +48,31 @@ public class FacilityServiceImpl implements FacilityService {
     }
 
     @Override
+    public List<FacilityResponseDTO> getFacilityByUserId(Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        List<Facility> facilities = facilityRepository.findByUser(user);
+
+        return facilities.stream()
+                .map(facility -> new FacilityResponseDTO(
+                        facility.getUser().getUserName(),
+                        facility.getUser().getPhone(),
+                        facility.getUser().getEmail(),
+                        facility.getFacilityId(),
+                        facility.getFacilityContent(),
+                        facility.getFacilityHeader(),
+                        facility.getVerifiedCheck(),
+                        facility.getFacilityPostingDate(),
+                        facility.getFacilityImages().stream()
+                                .map(FacilityImages::getImageUrl)
+                                .toList()
+                ))
+                .toList();
+    }
+
+
+    @Override
     public List<FacilityResponseDTO> getRejectedFacilities() {
         return facilityRepository.findAll().stream()
                 .filter(facility -> "rejected".equals(facility.getVerifiedCheck()))
@@ -207,7 +232,7 @@ public class FacilityServiceImpl implements FacilityService {
         facility.setVerifiedUserId(null);
         facility.setFacilityContent(facilityRequestDTO.getFacilityPostContent());
         facility.setVerifiedCheckDate(null);
-        facility.setFacilityHeader(facilityRequestDTO.getFacilityHeader());
+        facility.setFacilityHeader(facilityRequestDTO.getFacilityHeader()   );
         facility.setVerifiedCheck("unverified");
         facility.setFacilityPostingDate(LocalDateTime.now());
 

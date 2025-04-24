@@ -15,9 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.example.apartmentmanagement.service.NotificationService;
 import vn.payos.PayOS;
+import vn.payos.type.CheckoutResponseData;
+
+import java.util.HashMap;
 import java.util.List;
 
 import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -175,6 +179,17 @@ public class DepositServiceImpl implements DepositService {
             dto.setPostOwnerName(getUsername.getFullName());
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public Map<String, Object> paymentResponseData(CheckoutResponseData checkoutResponseData, DepositResponseDTO dto) {
+        Map<String, Object> data = new HashMap<>();
+        data.put("depositId",dto.getDepositId());
+        data.put("postId",dto.getPostId());
+        data.put("depositUserId",dto.getDepositUserId());
+        data.put("depositPrice",dto.getDepositPrice());
+        data.put("checkoutUrl", checkoutResponseData.getCheckoutUrl());
+        return data;
     }
 }
 

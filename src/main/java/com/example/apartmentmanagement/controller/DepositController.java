@@ -73,12 +73,13 @@ public class DepositController {
             // Tạo link thanh toán
             CheckoutResponseData checkoutData = payOS.createPaymentLink(paymentData);
 
+            Map<String, Object> paymentResponseData = depositService.paymentResponseData(checkoutData, dto);
 
             // Chuẩn bị response
             Map<String, Object> response = new HashMap<>();
             response.put("error", 0);
             response.put("message", "Bắt đầu quá trình đặt cọc");
-            response.put("data", createPaymentResponseData(checkoutData,dto));
+            response.put("data", paymentResponseData);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             Map<String, Object> errorResponse = new HashMap<>();
@@ -87,16 +88,6 @@ public class DepositController {
             errorResponse.put("data", null);
             return ResponseEntity.badRequest().body(errorResponse);
         }
-    }
-
-    private Map<String, Object> createPaymentResponseData(CheckoutResponseData checkoutData, DepositResponseDTO dto) {
-        Map<String, Object> data = new HashMap<>();
-        data.put("depositId",dto.getDepositId());
-        data.put("postId",dto.getPostId());
-        data.put("depositUserId",dto.getDepositUserId());
-        data.put("depositPrice",dto.getDepositPrice());
-        data.put("checkoutUrl", checkoutData.getCheckoutUrl());
-        return data;
     }
 
     @PostMapping("/cancel")

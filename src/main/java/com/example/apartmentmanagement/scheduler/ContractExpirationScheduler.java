@@ -58,7 +58,7 @@ public class ContractExpirationScheduler {
 
     /**
      * Xử lý hợp đồng đã hết hạn
-     * Chạy hàng ngày lúc 01:00
+     * Chạy hàng ngày lúc 01:00x
      */
     @Scheduled(cron = "0 0 1 * * ?")
     @Transactional
@@ -148,8 +148,8 @@ public class ContractExpirationScheduler {
         }
 
         // Đánh dấu hợp đồng đã xử lý
-        contract.setExpired(true);      // Đánh dấu đã xử lý hết hạn
-        contract.setVerified(false);    // Đánh dấu không còn hiệu lực
+        contract.setExpired(true);
+        contract.setVerified(false);
         verificationFormRepository.save(contract);
     }
 }

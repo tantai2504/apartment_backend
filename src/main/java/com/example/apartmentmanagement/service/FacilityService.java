@@ -26,4 +26,6 @@ public interface FacilityService {
     FacilityResponseDTO rejectFacility(Long id, String reason, Long verifiedUserId);
 
     FacilityResponseDTO verifyFacility(Long facilityId, Long verifiedUserId);
+
+    List<FacilityResponseDTO> getFacilityByUserId(Long userId);
 }

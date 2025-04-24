@@ -33,6 +33,22 @@ public class FacilityController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("/getFacilityByUser/{userId}")
+    public ResponseEntity<Object> getFacilityByUserId(@PathVariable("userId") Long userId) {
+        Map<String, Object> response = new HashMap<>();
+        List<FacilityResponseDTO> facilityList = facilityService.getFacilityByUserId(userId);
+
+        if (facilityList.isEmpty()) {
+            response.put("message", "Không có bài đăng dịch vụ nào cho userId: " + userId);
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+
+        response.put("data", facilityList);
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
+    }
+
     @GetMapping("/get_verified")
     public ResponseEntity<Object> showAllVerifiedFacilities() {
         List<FacilityResponseDTO> facilityResponseDTOS = facilityService.getVerifiedFacilities();

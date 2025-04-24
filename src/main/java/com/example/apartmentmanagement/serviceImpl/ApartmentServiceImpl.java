@@ -20,9 +20,6 @@ public class ApartmentServiceImpl implements ApartmentService{
     private ApartmentRepository apartmentRepository;
 
     @Autowired
-    private ImageUploadService imageUploadService;
-
-    @Autowired
     private UserRepository userRepository;
 
     @Override

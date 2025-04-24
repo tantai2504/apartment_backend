@@ -29,28 +29,6 @@ public class DepositController {
     @Autowired
     private DepositService depositService;
 
-    @Autowired
-    private PostRepository postRepository;
-
-    @Autowired
-    private UserRepository userRepository;
-
-//    @PostMapping("/create")
-//    public ResponseEntity<Object> makeDeposit(@RequestBody DepositRequestDTO depositRequestDTO) {
-//        Map<String, Object> response = new HashMap<>();
-//        try {
-//            DepositResponseDTO dto = depositService.depositFlag(depositRequestDTO);
-//            response.put("status", HttpStatus.CREATED.value());
-//            response.put("message", "Tiến hành chuyển tiền");
-//            response.put("data", dto);
-//            return ResponseEntity.ok(response);
-//        } catch (RuntimeException e) {
-//            response.put("message", e.getMessage());
-//            response.put("status", HttpStatus.BAD_REQUEST.value());
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
-//        }
-//    }
-
     @GetMapping("/getAll")
     public ResponseEntity<Object> getAllDeposits() {
         List<DepositListResponseDTO> deposits = depositService.getAllDeposits();

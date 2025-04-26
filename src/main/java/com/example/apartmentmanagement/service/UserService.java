@@ -45,13 +45,13 @@ public interface UserService {
 
     List<VerifyUserResponseDTO> showAllVerifyUser();
 
-    List<VerifyUserResponseDTO> showAllContract(String apartmentName);
+
 
     VerifyUserResponseDTO findVerificationByUserName(String userName);
 
-    VerifyUserResponseDTO updateVerifyUser(Long verificationId, VerifyUserRequestDTO verifyUserDTO, List<MultipartFile> imageFile);
+
 
     Map<String, Object> show_user_and_role();
 
-    void terminateContract(Long userId, Long apartmentId, String reason);
+
 }

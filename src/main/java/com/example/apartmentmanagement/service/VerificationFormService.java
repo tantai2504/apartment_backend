@@ -8,6 +8,9 @@ import java.util.List;
 
 public interface VerificationFormService {
     List<VerifyUserResponseDTO> showAllContract(String apartmentName);
+    List<VerifyUserResponseDTO> getAll();
+
+    List<VerifyUserResponseDTO> getByRentorId(Long rentorId);
     VerifyUserResponseDTO updateVerifyUser(Long verificationId, VerifyUserRequestDTO verifyUserDTO, List<MultipartFile> imageFile);
     void terminateContract(Long userId, Long apartmentId, String reason);
 }

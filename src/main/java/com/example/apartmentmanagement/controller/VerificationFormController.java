@@ -39,6 +39,38 @@ public class VerificationFormController {
         }
     }
 
+    @GetMapping("/getAll")
+    public ResponseEntity<Object> getAll() {
+        Map<String, Object> response = new HashMap<>();
+        List<VerifyUserResponseDTO> contractList = verificationFormService.getAll();
+
+        if (!contractList.isEmpty()) {
+            response.put("status", HttpStatus.OK.value());
+            response.put("data", contractList);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } else {
+            response.put("status", HttpStatus.OK.value());
+            response.put("message", "Không có hợp đồng nào");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+    }
+
+    @GetMapping("/getByRentorId/{rentorId}")
+    public ResponseEntity<Object> getByRentorId(@PathVariable Long rentorId) {
+        Map<String, Object> response = new HashMap<>();
+        List<VerifyUserResponseDTO> contractList = verificationFormService.getByRentorId(rentorId);
+
+        if (!contractList.isEmpty()) {
+            response.put("status", HttpStatus.OK.value());
+            response.put("data", contractList);
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } else {
+            response.put("status", HttpStatus.OK.value());
+            response.put("message", "Không có hợp đồng nào");
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+    }
+
     @PutMapping("/update_verification")
     public ResponseEntity<Object> updateVerification(
             @RequestParam("verificationId") Long verificationId,

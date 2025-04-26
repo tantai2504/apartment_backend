@@ -17,6 +17,12 @@ public interface VerificationFormRepository extends JpaRepository<VerificationFo
             int verificationFormType
     );
 
+    List<VerificationForm> findByUser_UserIdAndVerifiedAndVerificationFormType(
+            Long userId,
+            boolean verified,
+            int verificationFormType
+    );
+
     List<VerificationForm> findByContractEndDateBetweenAndVerifiedIsTrue(LocalDateTime start, LocalDateTime end);
 
     List<VerificationForm> findByContractEndDateBeforeAndVerifiedIsTrueAndExpiredIsFalseAndVerificationFormType(

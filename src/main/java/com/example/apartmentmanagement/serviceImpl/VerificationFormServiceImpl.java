@@ -76,6 +76,70 @@ public class VerificationFormServiceImpl implements VerificationFormService {
     }
 
     @Override
+    public List<VerifyUserResponseDTO> getByRentorId(Long rentorId) {
+        List<VerificationForm> forms = verificationFormRepository.findByUser_UserIdAndVerifiedAndVerificationFormType(rentorId,true,1);
+        return forms.stream().map(verificationForm -> {
+            VerifyUserResponseDTO dto = new VerifyUserResponseDTO();
+            dto.setVerificationFormId(verificationForm.getVerificationFormId());
+            dto.setVerificationFormName(verificationForm.getVerificationFormName());
+            dto.setVerificationFormType(verificationForm.getVerificationFormType());
+            dto.setApartmentName(verificationForm.getApartmentName());
+            dto.setFullName(verificationForm.getFullName());
+            dto.setUsername(verificationForm.getUserName());
+            dto.setEmail(verificationForm.getEmail());
+            dto.setPhoneNumber(verificationForm.getPhoneNumber());
+            dto.setContractStartDate(verificationForm.getContractStartDate());
+            dto.setContractEndDate(verificationForm.getContractEndDate());
+            dto.setVerified(verificationForm.isVerified());
+
+            User user = userRepository.findByUserName(verificationForm.getUserName());
+
+            dto.setUserRole(user.getRole());
+
+            // Chuyển đổi danh sách ảnh
+            dto.setImageFiles(
+                    verificationForm.getContractImages().stream()
+                            .map(ContractImages::getImageUrl)
+                            .toList()
+            );
+
+            return dto;
+        }).toList();
+    }
+
+    @Override
+    public List<VerifyUserResponseDTO> getAll() {
+        List<VerificationForm> forms = verificationFormRepository.findAll();
+        return forms.stream().map(verificationForm -> {
+            VerifyUserResponseDTO dto = new VerifyUserResponseDTO();
+            dto.setVerificationFormId(verificationForm.getVerificationFormId());
+            dto.setVerificationFormName(verificationForm.getVerificationFormName());
+            dto.setVerificationFormType(verificationForm.getVerificationFormType());
+            dto.setApartmentName(verificationForm.getApartmentName());
+            dto.setFullName(verificationForm.getFullName());
+            dto.setUsername(verificationForm.getUserName());
+            dto.setEmail(verificationForm.getEmail());
+            dto.setPhoneNumber(verificationForm.getPhoneNumber());
+            dto.setContractStartDate(verificationForm.getContractStartDate());
+            dto.setContractEndDate(verificationForm.getContractEndDate());
+            dto.setVerified(verificationForm.isVerified());
+
+            User user = userRepository.findByUserName(verificationForm.getUserName());
+
+            dto.setUserRole(user.getRole());
+
+            // Chuyển đổi danh sách ảnh
+            dto.setImageFiles(
+                    verificationForm.getContractImages().stream()
+                            .map(ContractImages::getImageUrl)
+                            .toList()
+            );
+
+            return dto;
+        }).toList();
+    }
+
+    @Override
     public VerifyUserResponseDTO updateVerifyUser(Long verificationUserId, VerifyUserRequestDTO verifyUserDTO, List<MultipartFile> imageFiles) {
         VerificationForm verificationForm = verificationFormRepository.findById(verificationUserId)
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy đơn xác thực với ID: " + verificationUserId));

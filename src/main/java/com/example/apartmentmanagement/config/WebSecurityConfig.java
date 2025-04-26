@@ -32,7 +32,7 @@ public class WebSecurityConfig implements WebMvcConfigurer {
                         .requestMatchers("/api/**", "/bill/**", "/apartment/**", "/deposit/**", "/consumption/**", "/facility/**",
                                 "/order/**", "/create-payment-link", "/success", "/cancel", "/api/bank-account/**", "/card/**",
                                 "/payment/**","/user/**", "/user/search", "user/update_verification", "/notification/**", "/api/reports/**",
-                                "/public/**","/api/replies/report/**", "/api/replies/report/**", "/api/replies/**",
+                                "/public/**","/api/replies/report/**", "/api/replies/report/**", "/api/replies/**", "/verification/**",
                                 "/ws/**", "/chat/**", "/app/**", "/post/**", "/notification/**","/api/forms/**", "/api/forms/upload/**","/recoin/**")
                         .permitAll()
                         .anyRequest().authenticated()

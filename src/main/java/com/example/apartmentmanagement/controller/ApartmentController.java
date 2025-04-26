@@ -38,6 +38,22 @@ public class ApartmentController {
         return ResponseEntity.ok(response);
     }
 
+    // get apartment cua renter
+    @GetMapping("/get_rented_apartment")
+    public ResponseEntity<Object> showRentedApartment(@RequestParam Long userId) {
+        List<ApartmentResponseDTO> apartments = apartmentService.getApartmentByRenter(userId);
+        Map<String, Object> response = new HashMap<>();
+        if (apartments.isEmpty()) {
+            response.put("message", "Không tìm thấy căn hộ nào");
+            response.put("status", HttpStatus.OK.value());
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        }
+        response.put("data", apartments);
+        response.put("status", HttpStatus.OK.value());
+        return ResponseEntity.ok(response);
+    }
+
+
     /**
      * Tim kiem can ho
      *

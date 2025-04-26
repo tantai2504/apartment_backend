@@ -364,4 +364,25 @@ public class ApartmentServiceImpl implements ApartmentService{
                 ))
                 .toList();
     }
+
+    @Override
+    public List<ApartmentResponseDTO> getApartmentByRenter(Long userId) {
+        List<Apartment> apartments = apartmentRepository.findApartmentsByRenterId(userId);
+        return apartments.stream().map(apartment -> new ApartmentResponseDTO(
+                        apartment.getApartmentId(),
+                        apartment.getApartmentName(),
+                        apartment.getHouseholder(),
+                        apartment.getTotalNumber(),
+                        apartment.getStatus(),
+                        apartment.getNumberOfBedrooms(),
+                        apartment.getNumberOfBathrooms(),
+                        apartment.getNote(),
+                        apartment.getDirection(),
+                        apartment.getFloor(),
+                        apartment.getArea(),
+                        apartment.getUsers().stream().map(User::getUserName).toList()
+                ))
+                .collect(Collectors.toList());
+    }
+
 }

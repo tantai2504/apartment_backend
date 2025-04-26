@@ -33,4 +33,6 @@ public interface ApartmentService {
     void deleteApartment(Long apartmentId);
 
     List<UserResponseDTO> getRentorByApartment(String apartmentName);
+
+    List<ApartmentResponseDTO> getApartmentByRenter(Long userId);
 }

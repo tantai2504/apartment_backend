@@ -53,7 +53,8 @@ public class BillServiceImpl implements BillService {
                         bill.getCreateBillUserId(),
                         bill.getApartment().getStatus(),
                         bill.getPeriod(),
-                        bill.getConsumption()
+                        bill.getConsumption(),
+                        bill.getPayment()
                 ))
                 .collect(Collectors.toList());
     }
@@ -78,7 +79,8 @@ public class BillServiceImpl implements BillService {
                         bill.getCreateBillUserId(),
                         bill.getApartment().getStatus(),
                         bill.getPeriod(),
-                        bill.getConsumption()
+                        bill.getConsumption(),
+                        bill.getPayment()
                 ))
                 .collect(Collectors.toList());
     }
@@ -99,7 +101,8 @@ public class BillServiceImpl implements BillService {
                 bill.getCreateBillUserId(),
                 bill.getApartment().getStatus(),
                 bill.getPeriod(),
-                bill.getConsumption()
+                bill.getConsumption(),
+                bill.getPayment()
         );
         return billResponseDTO;
     }
@@ -164,7 +167,8 @@ public class BillServiceImpl implements BillService {
                 bill.getCreateBillUserId(),
                 bill.getApartment().getStatus(),
                 bill.getPeriod(),
-                bill.getConsumption()
+                bill.getConsumption(),
+                bill.getPayment()
         );
     }
 
@@ -188,7 +192,8 @@ public class BillServiceImpl implements BillService {
                         bill.getCreateBillUserId(),
                         bill.getApartment().getStatus(),
                         bill.getPeriod(),
-                        bill.getConsumption()
+                        bill.getConsumption(),
+                        bill.getPayment()
                 ))
                 .collect(Collectors.toList());
     }
@@ -212,7 +217,8 @@ public class BillServiceImpl implements BillService {
                         bill.getCreateBillUserId(),
                         bill.getApartment().getStatus(),
                         bill.getPeriod(),
-                        bill.getConsumption()
+                        bill.getConsumption(),
+                        bill.getPayment()
                 ))
                 .collect(Collectors.toList());
     }
@@ -241,7 +247,8 @@ public class BillServiceImpl implements BillService {
                             bill.getCreateBillUserId(),
                             bill.getApartment().getStatus(),
                             bill.getPeriod(),
-                            bill.getConsumption()
+                            bill.getConsumption(),
+                            bill.getPayment()
                     ));
                 }
             }
@@ -309,7 +316,8 @@ public class BillServiceImpl implements BillService {
                 newBill.getCreateBillUserId(),
                 newBill.getApartment().getStatus(),
                 newBill.getPeriod(),
-                newBill.getConsumption()
+                newBill.getConsumption(),
+                newBill.getPayment()
         );
     }
 
@@ -361,7 +369,8 @@ public class BillServiceImpl implements BillService {
                 newBill.getCreateBillUserId(),
                 newBill.getApartment().getStatus(),
                 newBill.getPeriod(),
-                newBill.getConsumption()
+                newBill.getConsumption(),
+                newBill.getPayment()
         );
     }
 
@@ -404,7 +413,8 @@ public class BillServiceImpl implements BillService {
                 newBill.getCreateBillUserId(),
                 newBill.getApartment().getStatus(),
                 newBill.getPeriod(),
-                newBill.getConsumption()
+                newBill.getConsumption(),
+                newBill.getPayment()
         );
     }
 

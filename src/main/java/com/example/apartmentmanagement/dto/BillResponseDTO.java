@@ -1,6 +1,7 @@
 package com.example.apartmentmanagement.dto;
 
 import com.example.apartmentmanagement.entities.Consumption;
+import com.example.apartmentmanagement.entities.Payment;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,8 +28,11 @@ public class BillResponseDTO {
     private Long createBillUserId;
     private String apartmentStatus;
     private String period;
+    private LocalDateTime paymentDate;
+    private Long userPaymentId;
+    private String userPaymentName;
 
-    public BillResponseDTO(Long billId, String billContent, float amount, LocalDateTime billDate, String status, String username, String apartmentName, String billType, float surcharge, Long createBillUserId, String apartmentStatus, String period, Consumption consumption) {
+    public BillResponseDTO(Long billId, String billContent, float amount, LocalDateTime billDate, String status, String username, String apartmentName, String billType, float surcharge, Long createBillUserId, String apartmentStatus, String period, Consumption consumption, Payment payment) {
         this.billId = billId;
         this.billContent = billContent;
         this.amount = amount;
@@ -44,6 +48,11 @@ public class BillResponseDTO {
         if(consumption != null){
             this.lastMonthWaterConsumption = consumption.getLastMonthWaterConsumption();
             this.waterConsumption = consumption.getWaterConsumption();
+        }
+        if(payment != null){
+            this.paymentDate = payment.getPaymentDate();
+            this.userPaymentName = payment.getUser().getUserName();
+            this.userPaymentId = payment.getUser().getUserId();
         }
     }
 }

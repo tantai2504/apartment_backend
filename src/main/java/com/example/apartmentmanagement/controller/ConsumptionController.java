@@ -59,8 +59,15 @@ public class ConsumptionController {
         Map<String, Object> response = new HashMap<>();
         try {
             List<ConsumptionResponseDTO> consumptions = consumptionService.viewAllConsumption(month, year);
+            if(consumptions.isEmpty()){
+                response.put("status", HttpStatus.CREATED.value());
+                response.put("data", consumptions);
+                response.put("message", "Tháng năm này chưa thống kê lượng tiêu thụ");
+                return ResponseEntity.status(HttpStatus.CREATED).body(response);
+            }
             response.put("status", HttpStatus.CREATED.value());
             response.put("data", consumptions);
+            response.put("message", "Lấy danh sách lượng tiêu thụ theo tháng năm thành công");
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
         } catch (RuntimeException e) {
             response.put("status", HttpStatus.BAD_REQUEST.value());

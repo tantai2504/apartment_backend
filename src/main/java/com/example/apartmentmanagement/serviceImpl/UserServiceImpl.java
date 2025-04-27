@@ -195,10 +195,16 @@ public class UserServiceImpl implements UserService {
                 throw new RuntimeException("Căn hộ này chưa có chủ hộ, không thể thêm người thuê này vào");
             }
             // Người thuê
-            if(!user.getRole().equalsIgnoreCase("Owner")){
+//            if(!user.getRole().equalsIgnoreCase("Owner")){
+//                user.setRole("Rentor");
+//            }
+            if(user.getRole().equalsIgnoreCase("User")) {
                 user.setRole("Rentor");
             }
             user.setRentor(true);
+            List<User> lUser = apartment.getUsers();
+            lUser.add(user);
+            apartment.setUsers(lUser);
             apartment.setStatus("rented");
             apartment.setTotalNumber(apartment.getTotalNumber() + 1);
         }

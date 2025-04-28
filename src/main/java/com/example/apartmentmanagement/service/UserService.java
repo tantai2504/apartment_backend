@@ -23,7 +23,7 @@ public interface UserService {
 
     boolean updateImage(User user, MultipartFile imageFile);
 
-    UserResponseDTO updateUser(UserRequestDTO userRequestDTO, User user);
+    UpdateUserResponseDTO updateUser(UpdateUserRequestDTO updateUserRequestDTO);
 
     User getUserByName(String name);
 

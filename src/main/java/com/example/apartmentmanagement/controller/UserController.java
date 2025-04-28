@@ -149,11 +149,10 @@ public class UserController {
     }
 
     @PutMapping("/edit_profile")
-    public ResponseEntity<Object> updateUserBaseProfile(@RequestBody UserRequestDTO userRequestDTO) {
-        User user = userRepository.findById(userRequestDTO.getUserId()).orElse(null);
+    public ResponseEntity<Object> updateUserBaseProfile(@RequestBody UpdateUserRequestDTO updateUserRequestDTO) {
         Map<String, Object> response = new HashMap<>();
         try {
-            UserResponseDTO result = userService.updateUser(userRequestDTO, user);
+            UpdateUserResponseDTO result = userService.updateUser(updateUserRequestDTO);
             response.put("status", HttpStatus.OK.value());
             response.put("data", result);
             response.put("message", "Cập nhật thông tin thành công");

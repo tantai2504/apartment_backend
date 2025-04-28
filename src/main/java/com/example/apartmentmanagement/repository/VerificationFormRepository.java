@@ -17,6 +17,7 @@ public interface VerificationFormRepository extends JpaRepository<VerificationFo
             int verificationFormType
     );
 
+
     List<VerificationForm> findByUser_UserIdAndVerifiedAndVerificationFormType(
             Long userId,
             boolean verified,

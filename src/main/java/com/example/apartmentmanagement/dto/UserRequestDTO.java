@@ -14,41 +14,26 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserRequestDTO {
-
     private Long userId;
-
     private String userName;
-
     @Nationalized
     private String fullName;
-
     private String password;
-
     private String email;
-
     @Nationalized
     private String description;
-
     private String phone;
-
     private String userImgUrl;
-
     private String age;
-
     private LocalDate birthday;
-
     /**
      * @param idNumber: can cuoc cong dan
      */
     private String idNumber;
-
     @Nationalized
     private String job;
-
     private List<ApartmentResponseInUserDTO> apartment;
-
     private String role;
-
     public UserRequestDTO(Long userId, String userName, String fullName, String password, String email, String description, String phone, String userImgUrl, String age, LocalDate birthday, String idNumber, String job, String role) {
         this.userId = userId;
         this.userName = userName;

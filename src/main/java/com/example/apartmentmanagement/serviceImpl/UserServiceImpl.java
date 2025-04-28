@@ -517,38 +517,22 @@ public class UserServiceImpl implements UserService {
      * ServiceImpl: Cap nhat thong tin nguoi dung
      *
      * @param updateUserRequestDTO
-     * @param checkUser
      * @return
      */
     @Override
-    public UserResponseDTO updateUser(UserRequestDTO updateUserRequestDTO, User checkUser) {
-
-        VerificationForm verificationForm = verificationFormRepository.findById(checkUser.getUserId()).orElse(null);
-
+    public UpdateUserResponseDTO updateUser(UpdateUserRequestDTO updateUserRequestDTO) {
+        User checkUser = userRepository.findById(updateUserRequestDTO.getUserId()).get();
         if (updateUserRequestDTO.getFullName() != null) {
             checkUser.setFullName(updateUserRequestDTO.getFullName());
-            if (verificationForm != null) {
-                verificationForm.setFullName(updateUserRequestDTO.getFullName());
-            }
         }
-        if (updateUserRequestDTO.getEmail() != null) {
-            checkUser.setEmail(updateUserRequestDTO.getEmail());
-            if (verificationForm != null) {
-                verificationForm.setEmail(updateUserRequestDTO.getEmail());
-            }
-        }
+
         if (updateUserRequestDTO.getPhone() != null) {
             checkUser.setPhone(updateUserRequestDTO.getPhone());
-            if (verificationForm != null) {
-                verificationForm.setPhoneNumber(updateUserRequestDTO.getPhone());
-            }
         }
         if (updateUserRequestDTO.getDescription() != null) {
             checkUser.setDescription(updateUserRequestDTO.getDescription());
         }
-        if (updateUserRequestDTO.getAge() != null) {
-            checkUser.setAge(updateUserRequestDTO.getAge());
-        }
+
         if (updateUserRequestDTO.getBirthday() != null) {
             checkUser.setBirthday(updateUserRequestDTO.getBirthday());
             LocalDate birthday = updateUserRequestDTO.getBirthday();
@@ -557,51 +541,35 @@ public class UserServiceImpl implements UserService {
             String ageStr = String.valueOf(age);
             checkUser.setAge(ageStr);
         }
+
         if (updateUserRequestDTO.getJob() != null) {
             checkUser.setJob(updateUserRequestDTO.getJob());
         }
-        if (updateUserRequestDTO.getIdNumber() != null) {
-            checkUser.setIdNumber(updateUserRequestDTO.getIdNumber());
-        }
+
         if (updateUserRequestDTO.getUserImgUrl() != null) {
             checkUser.setUserImgUrl(updateUserRequestDTO.getUserImgUrl());
         }
 
         User updatedUser = userRepository.save(checkUser);
-        verificationFormRepository.save(verificationForm);
 
         try {
-            List<ApartmentResponseInUserDTO> apartmentDTOList = Optional.ofNullable(checkUser.getApartments())
-                    .map(apartments -> apartments.stream()
-                            .map(apartment -> new ApartmentResponseInUserDTO(
-                                    apartment.getApartmentId(),
-                                    apartment.getApartmentName(),
-                                    apartment.getHouseholder(),
-                                    apartment.getTotalNumber(),
-                                    apartment.getStatus(),
-                                    apartment.getNumberOfBedrooms(),
-                                    apartment.getNumberOfBathrooms(),
-                                    apartment.getNote()
-                            ))
-                            .toList())
-                    .orElse(List.of());
-
-            return new UserResponseDTO(
+            return new UpdateUserResponseDTO(
                     updatedUser.getUserId(),
                     updatedUser.getUserName(),
+                    updatedUser.getPassword(),
                     updatedUser.getFullName(),
                     updatedUser.getEmail(),
-                    updatedUser.getDescription(),
                     updatedUser.getPhone(),
+                    updatedUser.getRole(),
+                    updatedUser.getDescription(),
                     updatedUser.getUserImgUrl(),
                     updatedUser.getAge(),
                     updatedUser.getBirthday(),
                     updatedUser.getIdNumber(),
                     updatedUser.getJob(),
-                    apartmentDTOList,
-                    updatedUser.getRole()
+                    updatedUser.isRentor(),
+                    updatedUser.getAccountBalance()
             );
-
         } catch (Exception e) {
             throw new RuntimeException("Lỗi khi cập nhật người dùng: " + e.getMessage());
         }

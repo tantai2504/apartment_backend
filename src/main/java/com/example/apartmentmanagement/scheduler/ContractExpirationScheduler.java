@@ -1,9 +1,11 @@
 package com.example.apartmentmanagement.scheduler;
 
 import com.example.apartmentmanagement.entities.Apartment;
+import com.example.apartmentmanagement.entities.Deposit;
 import com.example.apartmentmanagement.entities.User;
 import com.example.apartmentmanagement.entities.VerificationForm;
 import com.example.apartmentmanagement.repository.ApartmentRepository;
+import com.example.apartmentmanagement.repository.DepositRepository;
 import com.example.apartmentmanagement.repository.UserRepository;
 import com.example.apartmentmanagement.repository.VerificationFormRepository;
 import com.example.apartmentmanagement.service.NotificationService;
@@ -17,6 +19,9 @@ import java.util.List;
 
 @Component
 public class ContractExpirationScheduler {
+
+    @Autowired
+    private DepositRepository depositRepository;
 
     @Autowired
     private VerificationFormRepository verificationFormRepository;
@@ -110,6 +115,9 @@ public class ContractExpirationScheduler {
         if (user.getApartments().contains(apartment)) {
             user.getApartments().remove(apartment);
             apartment.getUsers().remove(user);
+            user.setRentor(false);
+            Deposit deposit = depositRepository.findDepositByUser_UserId(user.getUserId());
+            user.setAccountBalance(user.getAccountBalance()+deposit.getPrice());
 
             // Cập nhật số lượng người trong căn hộ
             if (apartment.getTotalNumber() > 0) {

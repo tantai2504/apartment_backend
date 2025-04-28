@@ -551,8 +551,9 @@ public class UserServiceImpl implements UserService {
         }
 
         User updatedUser = userRepository.save(checkUser);
-
         try {
+
+
             return new UpdateUserResponseDTO(
                     updatedUser.getUserId(),
                     updatedUser.getUserName(),

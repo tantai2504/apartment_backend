@@ -43,7 +43,6 @@ public class VerificationFormController {
     public ResponseEntity<Object> getAll() {
         Map<String, Object> response = new HashMap<>();
         List<VerifyUserResponseDTO> contractList = verificationFormService.getAll();
-
         if (!contractList.isEmpty()) {
             response.put("status", HttpStatus.OK.value());
             response.put("data", contractList);

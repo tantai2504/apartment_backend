@@ -152,7 +152,6 @@ public class UserServiceImpl implements UserService {
                             ))
                             .toList())
                     .orElse(List.of());
-
             dto.setApartment(apartmentDTOList);
             return dto;
         }).toList();
@@ -161,6 +160,22 @@ public class UserServiceImpl implements UserService {
     @Override
     public AddNewResidentResponseDTO addUser(VerifyUserResponseDTO newAccountDTO) {
         VerificationForm verificationForm = verificationFormRepository.findVerificationFormByUserNameContainingIgnoreCase(newAccountDTO.getUsername());
+
+        Apartment apartment = apartmentRepository.findApartmentByApartmentName(newAccountDTO.getApartmentName());
+        System.out.println(apartment);
+
+        if (apartment == null) {
+            throw new RuntimeException("Không tìm thấy căn hộ");
+        }
+
+        String apartmentName = apartment.getApartmentName();
+        Post post = postRepository.findByApartment_ApartmentName(apartmentName);
+        if (post == null) {
+            throw new RuntimeException("Không có bài viết nào được đăng tải cho căn hộ này");
+        } else {
+            postService.deletePost(post.getPostId());
+        }
+
         if (verificationForm == null) {
             throw new RuntimeException("Không tìm thấy form xác minh");
         }
@@ -174,10 +189,6 @@ public class UserServiceImpl implements UserService {
             throw new RuntimeException("Người dùng hiện đang ở trong căn hộ khác, không thể thêm vào căn hộ này");
         }
 
-        Apartment apartment = apartmentRepository.findApartmentByApartmentName(newAccountDTO.getApartmentName());
-        if (apartment == null) {
-            throw new RuntimeException("Không tìm thấy căn hộ");
-        }
 
         if (verificationForm.getVerificationFormType() == 2) {
             // Chủ sở hữu
@@ -209,14 +220,6 @@ public class UserServiceImpl implements UserService {
             apartment.setTotalNumber(apartment.getTotalNumber() + 1);
         }
 
-        apartmentRepository.save(apartment);
-
-        user.setVerificationForm(verificationForm);
-        userRepository.save(user);
-
-        verificationForm.setVerified(true);
-        verificationFormRepository.save(verificationForm);
-
         Long userId = user.getUserId();
         Long apartmentId = apartment.getApartmentId();
 
@@ -235,9 +238,13 @@ public class UserServiceImpl implements UserService {
                 userId
         );
 
-        String apartmentName = apartment.getApartmentName();
-        Post post = postRepository.findByApartment_ApartmentName(apartmentName);
-        postService.deletePost(post.getPostId());
+        apartmentRepository.save(apartment);
+
+        user.setVerificationForm(verificationForm);
+        userRepository.save(user);
+
+        verificationForm.setVerified(true);
+        verificationFormRepository.save(verificationForm);
 
         List<ApartmentResponseDTO> apartmentResponseDTOList = user.getApartments().stream()
                 .map(apartment1 -> new ApartmentResponseDTO(
@@ -263,6 +270,112 @@ public class UserServiceImpl implements UserService {
                 true
         );
     }
+
+//    @Override
+//    public AddNewResidentResponseDTO addUser(VerifyUserResponseDTO newAccountDTO) {
+//        VerificationForm verificationForm = verificationFormRepository.findVerificationFormByUserNameContainingIgnoreCase(newAccountDTO.getUsername());
+//        if (verificationForm == null) {
+//            throw new RuntimeException("Không tìm thấy form xác minh");
+//        }
+//
+//        User user = userRepository.findByUserName(newAccountDTO.getUsername());
+//        if (user == null) {
+//            throw new RuntimeException("Chưa có user này trong hệ thống");
+//        }
+//
+//        if (!user.getRole().equals("User")) {
+//            throw new RuntimeException("Người dùng hiện đang ở trong căn hộ khác, không thể thêm vào căn hộ này");
+//        }
+//
+//        Apartment apartment = apartmentRepository.findApartmentByApartmentName(newAccountDTO.getApartmentName());
+//        if (apartment == null) {
+//            throw new RuntimeException("Không tìm thấy căn hộ");
+//        }
+//
+//        if (verificationForm.getVerificationFormType() == 2) {
+//            // Chủ sở hữu
+//            if (apartment.getHouseholder() == null) {
+//                user.setRole("Owner");
+//                apartment.setHouseholder(user.getUserName());
+//                apartment.setStatus("sold");
+//            } else {
+//                throw new RuntimeException("Căn hộ này đã có chủ sở hữu");
+//            }
+//        }
+//
+//        if (verificationForm.getVerificationFormType() == 1) {
+//            if (apartment.getHouseholder() == null) {
+//                throw new RuntimeException("Căn hộ này chưa có chủ hộ, không thể thêm người thuê này vào");
+//            }
+//            // Người thuê
+////            if(!user.getRole().equalsIgnoreCase("Owner")){
+////                user.setRole("Rentor");
+////            }
+//            if(user.getRole().equalsIgnoreCase("User")) {
+//                user.setRole("Rentor");
+//            }
+//            user.setRentor(true);
+//            List<User> lUser = apartment.getUsers();
+//            lUser.add(user);
+//            apartment.setUsers(lUser);
+//            apartment.setStatus("rented");
+//            apartment.setTotalNumber(apartment.getTotalNumber() + 1);
+//        }
+//
+//        apartmentRepository.save(apartment);
+//
+//        user.setVerificationForm(verificationForm);
+//        userRepository.save(user);
+//
+//        verificationForm.setVerified(true);
+//        verificationFormRepository.save(verificationForm);
+//
+//        Long userId = user.getUserId();
+//        Long apartmentId = apartment.getApartmentId();
+//
+//        System.out.println("User ID: " + user.getUserId());
+//        System.out.println("Apartment ID: " + apartmentId);
+//
+//        if (verificationForm.getVerificationFormType() == 1) {
+//            userRepository.addUserToApartment(userId, apartmentId);
+//        }
+//
+//        emailService.sendVerificationEmail(user.getEmail(), newAccountDTO.getUsername());
+//
+//        notificationService.createAndBroadcastNotification(
+//                "Tài khoản của bạn đã được duyệt thành công!",
+//                "Thông báo duyệt tài khoản",
+//                userId
+//        );
+//
+//        String apartmentName = apartment.getApartmentName();
+//        Post post = postRepository.findByApartment_ApartmentName(apartmentName);
+//        postService.deletePost(post.getPostId());
+//
+//        List<ApartmentResponseDTO> apartmentResponseDTOList = user.getApartments().stream()
+//                .map(apartment1 -> new ApartmentResponseDTO(
+//                        apartment1.getApartmentId(),
+//                        apartment1.getApartmentName(),
+//                        apartment1.getHouseholder(),
+//                        apartment1.getTotalNumber(),
+//                        apartment1.getStatus(),
+//                        apartment1.getNumberOfBedrooms(),
+//                        apartment1.getNumberOfBathrooms(),
+//                        apartment1.getNote(),
+//                        apartment1.getDirection(),
+//                        apartment1.getFloor(),
+//                        apartment1.getArea()
+//                ))
+//                .toList();
+//
+//        return new AddNewResidentResponseDTO(
+//                user.getUserName(),
+//                apartmentResponseDTOList,
+//                user.getFullName(),
+//                user.getRole(),
+//                true
+//        );
+//    }
 
     @Override
     public RegisterResponseDTO register(VerifyOTPRequestDTO registerRequestDTO) {

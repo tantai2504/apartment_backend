@@ -16,4 +16,5 @@ public class FormResponseDTO {
     private String status;
     private Long userId;
     private Long apartmentId;
+    private String apartmentName;
 }

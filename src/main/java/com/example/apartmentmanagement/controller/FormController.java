@@ -37,6 +37,7 @@ public class FormController {
         dto.setReason(form.getReason());
         dto.setUserId(form.getUser().getUserId());
         dto.setApartmentId(form.getApartment().getApartmentId());
+        dto.setApartmentName(form.getApartment().getApartmentName());
         return dto;
     }
 

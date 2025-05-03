@@ -40,33 +40,31 @@ jobs:
           docker push $IMAGE_NAME:${{ github.sha }}
           docker push $IMAGE_NAME:latest
 
-  deploy:
-    name: Deploy to Google Cloud VM
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Setup SSH agent
-        uses: webfactory/ssh-agent@v0.5.4
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+ deploy:
+  name: Deploy to Google Cloud VM
+  runs-on: ubuntu-latest
+  steps:
+    - name: Setup SSH agent
+      uses: webfactory/ssh-agent@v0.5.4
+      with:
+        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-      - name: Add VM to known_hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+    - name: Add VM to known_hosts
+      run: |
+        mkdir -p ~/.ssh
+        ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
-      - name: Deploy container on VM
-        run: |
-          IMAGE=${{ needs.build.outputs.image }}
-          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} bash << 'EOF'
-            # Dừng container cũ nếu đang chạy
-            docker rm -f absm-be-deploy || true
-            # Kéo image mới
-            docker pull $IMAGE
-            # Chạy container mới với restart policy
-            docker run -d \
-              --name absm-be-deploy \
-              -p 8080:8080 \
-              --restart always \
-              $IMAGE
-          EOF
+    - name: Deploy container on VM
+      run: |
+        # Xây dựng tên image: user/repo:SHA
+        IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/absm-be-deploy:${{ github.sha }}
+        echo "Deploying $IMAGE"
+        ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+          docker rm -f absm-be-deploy || true
+          docker pull $IMAGE
+          docker run -d \
+            --name absm-be-deploy \
+            -p 8080:8080 \
+            --restart always \
+            $IMAGE
+        EOF

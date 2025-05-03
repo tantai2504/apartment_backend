@@ -5,7 +5,7 @@ on:
   push:
     branches: [ main ]
 
-# Định nghĩa biến toàn cục
+# Biến toàn cục
 env:
   IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/absm-be-deploy
 
@@ -14,7 +14,8 @@ jobs:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
     outputs:
-      image: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+      # Xuất image (bao gồm SHA tag) để job sau dùng
+      image: ${{ steps.build.outputs.full_image }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -26,45 +27,53 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build & push Docker image
-        # kích hoạt Docker BuildKit để dùng cache mount
+        id: build
+        # kích hoạt BuildKit để dùng cache mount trong Dockerfile
         env:
           DOCKER_BUILDKIT: 1
         run: |
-          # Xây dựng multi-stage image theo Dockerfile
+          # Tạo biến IMAGE với commit SHA
+          FULL_IMAGE=${IMAGE_NAME}:${GITHUB_SHA}
+          # Build & tag
           docker build \
             --file Dockerfile \
-            --tag $IMAGE_NAME:${{ github.sha }} \
-            --tag $IMAGE_NAME:latest \
+            --tag $FULL_IMAGE \
+            --tag ${IMAGE_NAME}:latest \
             .
-          # Đẩy lên Docker Hub
-          docker push $IMAGE_NAME:${{ github.sha }}
-          docker push $IMAGE_NAME:latest
+          # Push cả hai tag
+          docker push $FULL_IMAGE
+          docker push ${IMAGE_NAME}:latest
+          # Xuất output để job deploy dùng
+          echo "full_image=$FULL_IMAGE" >> $GITHUB_OUTPUT
 
- deploy:
-  name: Deploy to Google Cloud VM
-  runs-on: ubuntu-latest
-  steps:
-    - name: Setup SSH agent
-      uses: webfactory/ssh-agent@v0.5.4
-      with:
-        ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+  deploy:
+    name: Deploy to Google Cloud VM
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
 
-    - name: Add VM to known_hosts
-      run: |
-        mkdir -p ~/.ssh
-        ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+      - name: Add VM to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
 
-    - name: Deploy container on VM
-      run: |
-        # Xây dựng tên image: user/repo:SHA
-        IMAGE=${{ secrets.DOCKERHUB_USERNAME }}/absm-be-deploy:${{ github.sha }}
-        echo "Deploying $IMAGE"
-        ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
-          docker rm -f absm-be-deploy || true
-          docker pull $IMAGE
-          docker run -d \
-            --name absm-be-deploy \
-            -p 8080:8080 \
-            --restart always \
-            $IMAGE
-        EOF
+      - name: Deploy container on VM
+        run: |
+          IMAGE=${{ needs.build.outputs.image }}
+          echo "Deploying $IMAGE to ${{ secrets.SERVER_IP }}"
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} << 'EOF'
+            # Dừng container cũ nếu có
+            docker rm -f absm-be-deploy || true
+            # Kéo image mới
+            docker pull $IMAGE
+            # Chạy container mới, map 8080, tự restart khi crash
+            docker run -d \
+              --name absm-be-deploy \
+              -p 8080:8080 \
+              --restart always \
+              $IMAGE
+          EOF

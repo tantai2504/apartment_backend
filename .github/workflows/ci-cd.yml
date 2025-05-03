@@ -2,8 +2,10 @@ name: CI/CD Spring Boot Docker
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
+# IMAGE_NAME chung cho cả build và deploy
 env:
   IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/absm-be-deploy
 
@@ -11,9 +13,6 @@ jobs:
   build:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
-    outputs:
-      # Xuất image (bao gồm SHA tag) để job deploy dùng
-      image: ${{ steps.build.outputs.full_image }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -25,20 +24,15 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build & push Docker image
-        id: build
         env:
           DOCKER_BUILDKIT: 1
         run: |
+          # Đặt tag với SHA hiện tại
           FULL_IMAGE="${IMAGE_NAME}:${GITHUB_SHA}"
-          # Xuất output để job khác dùng
-          echo "full_image=$FULL_IMAGE" >> $GITHUB_OUTPUT
-          # Build & tag
-          docker build \
-            --file Dockerfile \
+          docker build --file Dockerfile \
             --tag "$FULL_IMAGE" \
             --tag "${IMAGE_NAME}:latest" \
             .
-          # Push cả hai tag
           docker push "$FULL_IMAGE"
           docker push "${IMAGE_NAME}:latest"
 
@@ -47,7 +41,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      IMAGE: ${{ needs.build.outputs.image }}
+      # Tái tạo tag y hệt bước build
+      IMAGE: ${{ env.IMAGE_NAME }}:${{ github.sha }}
       SERVER_IP: ${{ secrets.SERVER_IP }}
       SERVER_USER: ${{ secrets.SERVER_USER }}
     steps:
@@ -61,18 +56,14 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H $SERVER_IP >> ~/.ssh/known_hosts
 
+      - name: Debug IMAGE
+        run: echo "IMAGE = $IMAGE"
+
       - name: Deploy container on VM
         run: |
           echo "Deploying $IMAGE to $SERVER_IP"
           ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP <<EOF
-            # Dừng container cũ nếu có
             docker rm -f absm-be-deploy || true
-            # Kéo image mới
             docker pull $IMAGE
-            # Chạy container mới, map 8080, tự restart khi crash
-            docker run -d \
-              --name absm-be-deploy \
-              -p 8080:8080 \
-              --restart always \
-              $IMAGE
+            docker run -d --name absm-be-deploy -p 8080:8080 --restart always $IMAGE
           EOF

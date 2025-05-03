@@ -2,10 +2,8 @@ name: CI/CD Spring Boot Docker
 
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
-# IMAGE_NAME chung cho cả build và deploy
 env:
   IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/absm-be-deploy
 
@@ -14,8 +12,7 @@ jobs:
     name: Build & Push Docker Image
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
       - name: Log in to Docker Hub
         uses: docker/login-action@v2
@@ -27,8 +24,8 @@ jobs:
         env:
           DOCKER_BUILDKIT: 1
         run: |
-          # Đặt tag với SHA hiện tại
           FULL_IMAGE="${IMAGE_NAME}:${GITHUB_SHA}"
+          echo "full_image=$FULL_IMAGE" >> $GITHUB_OUTPUT
           docker build --file Dockerfile \
             --tag "$FULL_IMAGE" \
             --tag "${IMAGE_NAME}:latest" \
@@ -41,8 +38,6 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     env:
-      # Tái tạo tag y hệt bước build
-      IMAGE: ${{ env.IMAGE_NAME }}:${{ github.sha }}
       SERVER_IP: ${{ secrets.SERVER_IP }}
       SERVER_USER: ${{ secrets.SERVER_USER }}
     steps:
@@ -56,14 +51,18 @@ jobs:
           mkdir -p ~/.ssh
           ssh-keyscan -H $SERVER_IP >> ~/.ssh/known_hosts
 
-      - name: Debug IMAGE
-        run: echo "IMAGE = $IMAGE"
-
       - name: Deploy container on VM
         run: |
+          # Tính IMAGE ngay trong shell, dùng biến workflow-level và runner-level
+          IMAGE="${IMAGE_NAME}:${GITHUB_SHA}"
           echo "Deploying $IMAGE to $SERVER_IP"
+
           ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP <<EOF
             docker rm -f absm-be-deploy || true
             docker pull $IMAGE
-            docker run -d --name absm-be-deploy -p 8080:8080 --restart always $IMAGE
+            docker run -d \
+              --name absm-be-deploy \
+              -p 8080:8080 \
+              --restart always \
+              $IMAGE
           EOF

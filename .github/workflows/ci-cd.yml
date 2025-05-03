@@ -1,0 +1,72 @@
+name: CI/CD Spring Boot Docker
+
+# Chạy khi có push lên main
+on:
+  push:
+    branches: [ main ]
+
+# Định nghĩa biến toàn cục
+env:
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/absm-be-deploy
+
+jobs:
+  build:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ env.IMAGE_NAME }}:${{ github.sha }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build & push Docker image
+        # kích hoạt Docker BuildKit để dùng cache mount
+        env:
+          DOCKER_BUILDKIT: 1
+        run: |
+          # Xây dựng multi-stage image theo Dockerfile
+          docker build \
+            --file Dockerfile \
+            --tag $IMAGE_NAME:${{ github.sha }} \
+            --tag $IMAGE_NAME:latest \
+            .
+          # Đẩy lên Docker Hub
+          docker push $IMAGE_NAME:${{ github.sha }}
+          docker push $IMAGE_NAME:latest
+
+  deploy:
+    name: Deploy to Google Cloud VM
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup SSH agent
+        uses: webfactory/ssh-agent@v0.5.4
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: Add VM to known_hosts
+        run: |
+          mkdir -p ~/.ssh
+          ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
+
+      - name: Deploy container on VM
+        run: |
+          IMAGE=${{ needs.build.outputs.image }}
+          ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_IP }} bash << 'EOF'
+            # Dừng container cũ nếu đang chạy
+            docker rm -f absm-be-deploy || true
+            # Kéo image mới
+            docker pull $IMAGE
+            # Chạy container mới với restart policy
+            docker run -d \
+              --name absm-be-deploy \
+              -p 8080:8080 \
+              --restart always \
+              $IMAGE
+          EOF

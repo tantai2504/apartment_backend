@@ -32,37 +32,3 @@ jobs:
             .
           docker push "$FULL_IMAGE"
           docker push "${IMAGE_NAME}:latest"
-
-  deploy:
-    name: Deploy to Google Cloud VM
-    needs: build
-    runs-on: ubuntu-latest
-    env:
-      SERVER_IP: ${{ secrets.SERVER_IP }}
-      SERVER_USER: ${{ secrets.SERVER_USER }}
-    steps:
-      - name: Setup SSH agent
-        uses: webfactory/ssh-agent@v0.5.4
-        with:
-          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Add VM to known_hosts
-        run: |
-          mkdir -p ~/.ssh
-          ssh-keyscan -H $SERVER_IP >> ~/.ssh/known_hosts
-
-      - name: Deploy container on VM
-        run: |
-          # Tính IMAGE ngay trong shell, dùng biến workflow-level và runner-level
-          IMAGE="${IMAGE_NAME}:${GITHUB_SHA}"
-          echo "Deploying $IMAGE to $SERVER_IP"
-
-          ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP <<EOF
-            docker rm -f absm-be-deploy || true
-            docker pull $IMAGE
-            docker run -d \
-              --name absm-be-deploy \
-              -p 8080:8080 \
-              --restart always \
-              $IMAGE
-          EOF
